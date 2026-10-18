@@ -1,0 +1,32 @@
+{
+  "query": {
+    "rows": [
+      {
+        "id": "browser-preflight-1",
+        "title": "runner ensured workspace Chrome"
+      },
+      {
+        "id": "browser-preflight-2",
+        "title": "collector remained offline"
+      },
+      {
+        "id": "browser-preflight-3",
+        "title": "browser diagnostic is sanitized"
+      }
+    ]
+  },
+  "browser": {
+    "ensure": true
+  },
+  "completion": {
+    "mode": "all",
+    "expected_total": 3
+  },
+  "validation": {
+    "unique_key": "id",
+    "required_fields": [
+      "id",
+      "title"
+    ]
+  }
+}

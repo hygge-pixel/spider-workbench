@@ -1,0 +1,5 @@
+# Preserve exact source-snapshot/manifest bytes across Git checkout platforms.
+# EditorConfig uses LF for newly edited files; intentional changes refresh hashes.
+* -text whitespace=trailing-space,space-before-tab,cr-at-eol
+# Preserve upstream formatting rather than rewriting the vendored snapshot.
+vendor/js-reverse-mcp/** -whitespace

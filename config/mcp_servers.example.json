@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "js-reverse-cloak": {
+      "command": "PROJECT_NODE_ABSOLUTE_PATH",
+      "args": ["PROJECT_ABSOLUTE_PATH/scripts/start_js_reverser.mjs", "--python", "PROJECT_TOOL_PYTHON_ABSOLUTE_PATH", "--candidate", "cloak"]
+    },
+    "js-reverse": {
+      "command": "PROJECT_NODE_ABSOLUTE_PATH",
+      "args": ["PROJECT_ABSOLUTE_PATH/scripts/start_js_reverser.mjs", "--python", "PROJECT_TOOL_PYTHON_ABSOLUTE_PATH", "--candidate", "chrome"]
+    }
+  }
+}

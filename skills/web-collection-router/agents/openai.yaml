@@ -1,0 +1,4 @@
+interface:
+  display_name: "网页采集路线判断"
+  short_description: "浏览器侦察接口，优先本地Node.js/Python协议采集，仅对缺失部分使用浏览器"
+  default_prompt: "Use $web-collection-router to inspect Network and verify local Node.js/Python protocol replay first; retain browser collection only for portions proven uncovered by protocol requests."

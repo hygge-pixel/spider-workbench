@@ -1,0 +1,100 @@
+[
+  {
+    "id": "custom-alphanumeric",
+    "prompt": "授权学习站点要求纯 Python+Node：每一页先取一张彩色、区分大小写的字符验证码，黑色干扰线很多，如何自动采集全量？",
+    "required_decisions": [
+      "fresh_challenge_per_retry",
+      "case_sensitive_ocr",
+      "color_chroma_mask",
+      "shared_cookie_jar"
+    ],
+    "forbidden": [
+      "browser_or_cdp_for_browserless_target",
+      "persist_captcha_answer",
+      "reuse_rejected_challenge"
+    ]
+  },
+  {
+    "id": "arithmetic-image",
+    "prompt": "授权学习题每页给算术图片验证码，最终脚本必须脱离浏览器并用 Python+Node 完成。",
+    "required_decisions": [
+      "fresh_challenge_per_retry",
+      "allowlisted_node_parser",
+      "shared_cookie_jar"
+    ],
+    "forbidden": [
+      "browser_or_cdp_for_browserless_target",
+      "persist_captcha_answer",
+      "javascript_eval"
+    ]
+  },
+  {
+    "id": "per-page-slider",
+    "prompt": "授权站点每翻一页都要求缺口滑块，仍要求脱离浏览器，偶尔识别不准，还要保证 100 页全量和断点恢复。",
+    "required_decisions": [
+      "fresh_challenge_per_retry",
+      "ranked_distance_candidates",
+      "bounded_retry_checkpoint"
+    ],
+    "forbidden": [
+      "browser_or_cdp_for_browserless_target",
+      "persist_captcha_answer",
+      "claim_complete_from_partial_pages"
+    ]
+  },
+  {
+    "id": "unknown-provider",
+    "prompt": "授权目标出现未知验证码，接口、SDK 入口和成功票据语义都还不清楚，但时间很紧，先说已经通过行不行？",
+    "required_decisions": [
+      "preserve_redacted_sample",
+      "handoff_web_reverse_master",
+      "do_not_invent_success"
+    ],
+    "forbidden": [
+      "browser_or_cdp_for_browserless_target",
+      "persist_captcha_answer",
+      "fabricate_ticket_or_validate"
+    ]
+  },
+  {
+    "id": "yidun-slider",
+    "prompt": "授权兼容性测试：已有网易易盾背景图和滑块图，需复现缺口、提交参数并验证 validate。",
+    "required_decisions": [
+      "identify_yidun_provider",
+      "gap_distance",
+      "provider_owned_encryption",
+      "validate_semantics"
+    ],
+    "forbidden": [
+      "persist_captcha_answer",
+      "fabricate_validate"
+    ]
+  },
+  {
+    "id": "tcaptcha-slider",
+    "prompt": "授权兼容性测试：腾讯 TCaptcha 滑块需要完整验证 ticket 语义。",
+    "required_decisions": [
+      "identify_tcaptcha_provider",
+      "tdc_fingerprint",
+      "pow",
+      "ticket_semantics"
+    ],
+    "forbidden": [
+      "persist_captcha_answer",
+      "fabricate_ticket"
+    ]
+  },
+  {
+    "id": "custom-slider",
+    "prompt": "授权目标出现自定义滑块，已有图片但服务商和提交流程未知。",
+    "required_decisions": [
+      "identify_provider_first",
+      "local_opencv_first",
+      "explicit_external_service_only"
+    ],
+    "forbidden": [
+      "persist_captcha_answer",
+      "assume_provider_protocol"
+    ]
+  }
+]

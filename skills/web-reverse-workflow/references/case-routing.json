@@ -1,0 +1,104 @@
+[
+  {
+    "id": "geetest-ast",
+    "prompt": "极验4代码被控制流平坦化，需要还原 dispatcher。",
+    "primary": "ast-deobfuscation",
+    "supporting": []
+  },
+  {
+    "id": "geetest-captcha",
+    "prompt": "极验4滑块已经拿到背景图，需要计算轨迹并获得 validate。",
+    "primary": "captcha-solver",
+    "supporting": ["env-patcher"]
+  },
+  {
+    "id": "yidun-env",
+    "prompt": "网易易盾 IR SDK 放到 Node 后报 navigator 未定义。",
+    "primary": "env-patcher",
+    "supporting": ["captcha-solver"]
+  },
+  {
+    "id": "dingxiang-captcha",
+    "prompt": "顶象 Verify5 拼图需要还原坐标和提交参数。",
+    "primary": "captcha-solver",
+    "supporting": ["ast-deobfuscation", "env-patcher"]
+  },
+  {
+    "id": "ruishu-failure",
+    "prompt": "瑞数6 Cookie 已经生成，但请求仍然返回 400。",
+    "primary": "web-reverse-field-guide",
+    "supporting": ["web-reverse-master", "env-patcher"]
+  },
+  {
+    "id": "akamai-reese84",
+    "prompt": "Akamai reese84 脚本需要做结构还原。",
+    "primary": "ast-deobfuscation",
+    "supporting": ["web-reverse-master"]
+  },
+  {
+    "id": "akamai-waf",
+    "prompt": "分析 Akamai Bot Manager Sensor 和 Cookie 的完整状态链。",
+    "primary": "web-reverse-master",
+    "supporting": ["env-patcher", "ast-deobfuscation"]
+  },
+  {
+    "id": "a-bogus-generate",
+    "prompt": "根据已知输入直接生成抖音 a_bogus。",
+    "primary": "param-encryptor",
+    "supporting": []
+  },
+  {
+    "id": "a-bogus-discover",
+    "prompt": "不知道 a_bogus 在哪个脚本和函数里生成。",
+    "primary": "web-reverse-master",
+    "supporting": ["ast-deobfuscation", "param-encryptor"]
+  },
+  {
+    "id": "h5st-reproduce",
+    "prompt": "用已有样本复现京东 H5ST 多段签名。",
+    "primary": "param-encryptor",
+    "supporting": ["web-reverse-test-driven-development"]
+  },
+  {
+    "id": "xiaohongshu-wrapper",
+    "prompt": "小红书 x-s wrapper 被混淆，需要先恢复结构。",
+    "primary": "ast-deobfuscation",
+    "supporting": ["param-encryptor"]
+  },
+  {
+    "id": "android-apk-api",
+    "prompt": "分析授权 APK 的 Manifest、DEX、Retrofit/Ktor 接口并追踪 UI 到请求调用链。",
+    "primary": "android-reverse-engineering",
+    "supporting": ["web-reverse-workflow"]
+  },
+  {
+    "id": "android-native-so",
+    "prompt": "授权 APK 中的 libguard.so 需要恢复 JNI 调用和原生签名函数。",
+    "primary": "native-reverse-master",
+    "supporting": ["android-reverse-engineering", "web-reverse-test-driven-development"]
+  },
+  {
+    "id": "unity-il2cpp",
+    "prompt": "Unity 包含 libil2cpp 和 global-metadata.dat，需要恢复指定方法映射。",
+    "primary": "native-reverse-master",
+    "supporting": ["android-reverse-engineering"]
+  },
+  {
+    "id": "pe-gdb-symbols",
+    "prompt": "授权 PE 程序被剥离符号，需要静态恢复并用 GDB 做有界条件观测。",
+    "primary": "native-reverse-master",
+    "supporting": []
+  },
+  {
+    "id": "browser-js-initiator",
+    "prompt": "浏览器请求参数来源未知，需要从 initiator、Hook、WASM 或 WebSocket 链定位。",
+    "primary": "web-reverse-master",
+    "supporting": ["ast-deobfuscation", "env-patcher"]
+  },
+  {
+    "id": "known-signature-samples",
+    "prompt": "已有明确签名算法与正向输入输出样本，需要实现并证明 parity。",
+    "primary": "param-encryptor",
+    "supporting": ["web-reverse-test-driven-development"]
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "public_version": "0.1.1",
+  "prepared_on": "2026-10-18",
+  "base_edition": "framework-toolchain-v2",
+  "base_archive_sha256": "288eb774d3ac139e06093c8869b407350f715fb5e558f051a1007ae906297091",
+  "original_core_files": {
+    "spider.py": "59a0ef5850890f16672b90bc29077c3da45a76dcdcae4a60b804452cc32eccef",
+    "spider_core/__init__.py": "260137c7a3087c0089c45fed4850ef9fcf1cd084037c34e2dc787fcd92f429d8",
+    "spider_core/browser.py": "a3cbb38472b44d7a74c2825d49b43db81f09074b4f3e46fedb020f925a3eede2",
+    "spider_core/evidence_safety.py": "2d994cf1cbc359d34ea66d38f8b649343c932b1d790180dd128cf0e516d80b54",
+    "spider_core/experiments.py": "2605c7e8308a70897a2b9b8d52bcfec8131ec6da9f55d413f1d624676d126637",
+    "spider_core/health.py": "7040fdc165c04fc25f7c774465bf157daf469bc7c2eece4354e675bc852bfc7a",
+    "spider_core/optional_backends.py": "8d77f0f327dc4273938344b3f34c8531f9ab3533b3ec07e4c1a27f2fd2bcba74",
+    "spider_core/promotion.py": "18de5ad7890ed96a36098c61ee7e3d02ac3a7d28b9e4d28ea9af77fc880aac8c",
+    "spider_core/registry.py": "3804b3b2a2ab98b8584718b562f1c0cb06d0db5c6c4baddc0b7935140d0d7fcb",
+    "spider_core/routing.py": "5e717b890aeeec14a6c5f8a363b79d14ad287074b1dee2edec66558a59f76e64",
+    "spider_core/run_comparison.py": "bba22c7ec519a63d90ff39014a2216e225d514a6ca50070ccdd32fe4bd4e7b38",
+    "spider_core/runner.py": "b65579854e09823b70b8cfa09a373505e159508397675530949f9dc4f630da45"
+  },
+  "public_adaptations": [
+    "public documentation/license/CI/release tooling",
+    "Playwright CLI skill Apache-2.0 text preserved",
+    "npm mirror resolved URLs changed to official registry; versions/integrity unchanged",
+    "public project metadata; runtime collection core unchanged",
+    "0.1.1: beginner README, user guide, Agent install prompt and explicit bootstrap installer wrapper"
+  ],
+  "original_git_history_included": false,
+  "legacy_collectors_or_data_included": false,
+  "base_public_archive_sha256": "8766d42339002881ba2166a45c82eabf3b8f042daf1c242398eaad41c89f01a2"
+}

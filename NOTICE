@@ -1,0 +1,12 @@
+Spider Workbench
+Copyright 2026 Spider Workbench contributors
+
+Original framework code and documentation are licensed under Apache-2.0.
+Third-party components retain their original licenses and notices.
+See THIRD_PARTY_NOTICES.md and the component-local LICENSE files.
+
+JSReverser MCP is a vendored, modified source snapshot of
+https://github.com/zhizhuodemao/js-reverse-mcp (package version 2.0.3).
+Its projectPaths.ts is modified to isolate artifacts and caches under runs/_mcp.
+The snapshot is not asserted to equal a published upstream tag.
+No upstream affiliation or endorsement is implied.

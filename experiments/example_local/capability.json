@@ -1,0 +1,13 @@
+{
+  "platform_id": "example_local",
+  "platform_name": "Local Example",
+  "id": "rows",
+  "name": "Local rows contract example",
+  "route": "local",
+  "requires_auth": false,
+  "unique_key": "id",
+  "required_fields": [
+    "id",
+    "title"
+  ]
+}

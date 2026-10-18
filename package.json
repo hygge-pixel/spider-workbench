@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "@babel/generator": "^7.29.1",
+    "@babel/parser": "^7.29.2",
+    "@babel/traverse": "^7.29.0",
+    "@babel/types": "^7.29.0"
+  },
+  "name": "spider-workbench",
+  "private": true,
+  "version": "0.1.1",
+  "license": "Apache-2.0"
+}

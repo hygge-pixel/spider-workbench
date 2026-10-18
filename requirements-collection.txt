@@ -1,0 +1,7 @@
+# Same direct versions observed in the current source workspace (2026-10-17).
+# Dedicated .venv-toolchain recommended; these are not a complete transitive lock.
+playwright==1.57.0
+requests==2.32.5
+httpx==0.28.1
+curl_cffi==0.13.0
+beautifulsoup4==4.15.0

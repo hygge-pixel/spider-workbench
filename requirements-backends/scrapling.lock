@@ -1,0 +1,2 @@
+# Isolated because Scrapling fetchers require their own Playwright stack.
+scrapling[fetchers]==0.4.12

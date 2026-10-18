@@ -1,0 +1,29 @@
+{
+  "query": {
+    "rows": [
+      {
+        "id": "1",
+        "title": "first"
+      },
+      {
+        "id": "2",
+        "title": "second"
+      },
+      {
+        "id": "3",
+        "title": "third"
+      }
+    ]
+  },
+  "completion": {
+    "mode": "all",
+    "expected_total": 3
+  },
+  "validation": {
+    "unique_key": "id",
+    "required_fields": [
+      "id",
+      "title"
+    ]
+  }
+}

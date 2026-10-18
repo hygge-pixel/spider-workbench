@@ -1,0 +1,4 @@
+interface:
+  display_name: "微信小程序采集"
+  short_description: "安全采集、诊断并验证授权微信小程序商品、门店、规格与接口数据"
+  default_prompt: "Use $wechat-miniapp-collector to plan and execute this authorized WeChat Mini Program collection task."

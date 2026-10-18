@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "default_candidate": "chrome",
+  "candidates": {
+    "chrome": {
+      "executable": "CHROME_EXECUTABLE_ABSOLUTE_PATH",
+      "cdp_url": "http://127.0.0.1:9222",
+      "user_data_dir": "PROJECT_ABSOLUTE_PATH/tmp/chrome-mcp",
+      "startup_timeout_seconds": 15,
+      "launch_args": [],
+      "environment": {}
+    },
+    "cloak": {
+      "executable": "CLOAK_EXECUTABLE_ABSOLUTE_PATH_OR_UNCONFIGURED_PLACEHOLDER",
+      "cdp_url": "http://localhost:9232",
+      "user_data_dir": "PROJECT_ABSOLUTE_PATH/tmp/cloak-mcp",
+      "startup_timeout_seconds": 15,
+      "launch_args": ["--disable-blink-features=AutomationControlled", "--fingerprint=20260629"],
+      "environment": {"CLOAK_NO_DEBUGGER": "1"}
+    }
+  }
+}

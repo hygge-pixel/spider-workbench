@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Web reverse probe dump",
+  "type": "object",
+  "required": ["version", "source", "probes"],
+  "properties": {
+    "version": {"type": "integer"},
+    "source": {"type": "string"},
+    "probes": {"type": "array"}
+  }
+}
