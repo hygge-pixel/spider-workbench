@@ -2,7 +2,7 @@
 
 ## 0.1.1 — 2026-10-18
 
-首次独立开源源码整理与易用性改进版。尚未自动创建远程仓库、tag 或 GitHub Release。
+首次独立开源源码整理与易用性改进版。本条记录分发内容，实际发布与云端验证状态以仓库 Releases 和 Actions 为准。
 
 - 新增 bootstrap.py：默认一条命令离线体验，显式 --install 安装隔离工具并生成MCP定义。
 - 根据首次真实 GitHub Actions 结果修正测试的 Windows/POSIX 路径假设和 Windows 短路径别名比较，增加两种可选后端布局与非 Windows 不启动 PowerShell 的覆盖；采集核心行为不变。

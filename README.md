@@ -4,7 +4,7 @@
 
 用它组织新任务、分析接口、运行采集、检查数据并保存进度。你描述目标，Agent 按项目里的规则与 Skills 实施；任务运行和结果校验由同一个框架管理。
 
-[English](README.en.md) · **[首次安装与日常使用](docs/USER_GUIDE.md)** · [复制给 Agent 的部署提示词](docs/INSTALL_WITH_AGENT.md) · [详细技术文档](docs/ARCHITECTURE.md)
+[下载源码](https://github.com/hygge-pixel/spider-workbench/releases/tag/v0.1.1) · [English](README.en.md) · **[首次安装与日常使用](docs/USER_GUIDE.md)** · [复制给 Agent 的部署提示词](docs/INSTALL_WITH_AGENT.md) · [详细技术文档](docs/ARCHITECTURE.md)
 
 ## 我适合用它吗？
 
