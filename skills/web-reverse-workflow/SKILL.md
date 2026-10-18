@@ -38,7 +38,7 @@ description: Use when an authorized Web/JS reverse task needs stage routing beca
 
 ### 专业 Skill（深度专项）
 
-- `captcha-solver` — 验证码纯协议求解
+- 已确认验证码：按项目规则保存进度并暂停；本分发不包含求解 Skill。
 - `param-encryptor` — 加密参数纯算生成
 - `env-patcher` — 浏览器补环境生成
 - `ast-deobfuscation` — JS AST 反混淆
@@ -92,7 +92,6 @@ description: Use when an authorized Web/JS reverse task needs stage routing beca
 
 | 用户说 | 直接路由到 |
 |--------|-----------|
-| “帮我解/生成验证码” | `captcha-solver` |
 | “帮我还原/生成签名/加密参数” | `param-encryptor` |
 | “帮我补环境” | `env-patcher` |
 | “帮我反混淆这段JS” | `ast-deobfuscation` |
@@ -189,7 +188,7 @@ web-reverse-workflow
 | Phase 1 流量分析 | `web-reverse-brainstorming` → `web-reverse-writing-plans` | 定路线后拆步骤 |
 | Phase 2 定位加密 | `web-reverse-executing-plans` + `param-encryptor` / `ast-deobfuscation` | 执行定位 + 按需调用专业 Skill |
 | Phase 3 方案制定 | `web-reverse-writing-plans` | 产出 Plan |
-| Phase 4 代码还原 | `web-reverse-test-driven-development` + `captcha-solver` / `param-encryptor` / `env-patcher` | 复现 + 按需调用专业 Skill |
+| Phase 4 代码还原 | `web-reverse-test-driven-development` + `param-encryptor` / `env-patcher` | 复现 + 按需调用专业 Skill |
 
 ## 使用方式
 
@@ -211,7 +210,6 @@ web-reverse-workflow
 | `web-reverse-executing-plans` | 按计划执行 | 计划已写，准备执行 |
 | `web-reverse-test-driven-development` | 样本驱动复现 | 编码复现阶段 |
 | `web-reverse-systematic-debugging` | 证据链排错 | 结果不一致 |
-| `captcha-solver` | 验证码求解 | 验证码识别+轨迹+提交 |
 | `param-encryptor` | 加密参数生成 | 签名/加密参数还原 |
 | `env-patcher` | 补环境 | Node.js 环境模拟 |
 | `ast-deobfuscation` | JS 反混淆 | `_0x` / OB 变种 |
@@ -223,8 +221,6 @@ web-reverse-workflow
 
 | Evidence | Primary Skill | Handoff rule |
 |---|---|---|
-| APK, XAPK, JAR, AAR, Android manifest, managed DEX/API call flow | `android-reverse-engineering` | `.so` or IL2CPP questions hand off to native; reconstructed HTTP questions return here |
-| ELF, PE, Mach-O, native library/process, Frida, GDB, IDA, Unicorn, IL2CPP | `native-reverse-master` | recovered request transforms hand off to sample parity |
 | Browser initiator, JavaScript, WebSocket, WASM bridge, Protobuf/gRPC, Cookie/WAF state | `web-reverse-master` | route to a specialist as soon as the problem class is known |
 | Known signature/encryption with positive samples | `param-encryptor` | use `web-reverse-test-driven-development` for parity evidence |
 

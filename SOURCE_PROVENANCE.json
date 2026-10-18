@@ -23,7 +23,8 @@
     "Playwright CLI skill Apache-2.0 text preserved",
     "npm mirror resolved URLs changed to official registry; versions/integrity unchanged",
     "public project metadata; runtime collection core unchanged",
-    "0.1.1: beginner README, user guide, Agent install prompt and explicit bootstrap installer wrapper"
+    "0.1.1: beginner README, user guide, Agent install prompt and explicit bootstrap installer wrapper",
+    "Current main: remove five optional specialist Skills and their bundled materials; synchronize health and routing; add Python runtime mismatch preflight"
   ],
   "original_git_history_included": false,
   "legacy_collectors_or_data_included": false,

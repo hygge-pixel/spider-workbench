@@ -75,7 +75,6 @@ def test_sign_sample_1():
 | 匹配加密配方 | `param-encryptor` | 根据算法特征匹配配方（MD5/AES/RSA/H5ST/a_bogus 等） |
 | 生成补环境脚本 | `env-patcher` | SDK 需要 Node.js 运行时生成 browser.js |
 | 还原混淆代码 | `ast-deobfuscation` | 加密函数被混淆需先还原 |
-| 验证码计算逻辑 | `captcha-solver` | 验证码相关加密/签名逻辑 |
 
 **典型循环：**
 ```
@@ -129,7 +128,6 @@ tests/
 | `web-reverse-workflow` | 工作流入口 | 需要判断当前阶段 |
 | `web-reverse-executing-plans` | 按计划执行 | 控制执行顺序 |
 | `web-reverse-systematic-debugging` | 证据链排错 | 样本比对不一致 |
-| `captcha-solver` | 验证码求解 | 复现验证码签名逻辑 |
 | `param-encryptor` | 加密参数生成 | 匹配加密配方 + 实现签名 |
 | `env-patcher` | 补环境 | 生成 Node.js 运行环境 |
 | `ast-deobfuscation` | JS 反混淆 | 加密函数被混淆需先还原 |

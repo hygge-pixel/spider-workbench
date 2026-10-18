@@ -77,7 +77,6 @@ description: Use when an approved Web/JS reverse implementation plan already exi
 
 | 执行操作 | 调用 | 时机 |
 |---------|------|------|
-| 验证码识别+轨迹+提交 | `captcha-solver` | 任务涉及验证码 |
 | 签名/加密参数生成 | `param-encryptor` | 任务涉及加密函数复现 |
 | 浏览器环境模拟 | `env-patcher` | 任务涉及 SDK 补环境 |
 | JS 代码反混淆 | `ast-deobfuscation` | 任务涉及混淆代码还原 |
@@ -223,7 +222,7 @@ description: Use when an approved Web/JS reverse implementation plan already exi
 |-------|----------------|-------------------|
 | Phase 2 定位加密 | ✅ 核心参与：按计划执行 Hook + 源码搜索 | 需反混淆时调用 `ast-deobfuscation` |
 | Phase 3 方案制定 | ✅ 辅助：执行 Plan 中的验证步骤 | — |
-| Phase 4 代码还原 | ✅ 核心参与：执行 signer.py / main.py 编码 | 签名/加密调用 `param-encryptor`；补环境调用 `env-patcher`；验证码调用 `captcha-solver` |
+| Phase 4 代码还原 | ✅ 核心参与：执行 signer.py / main.py 编码 | 签名/加密调用 `param-encryptor`；补环境调用 `env-patcher` |
 
 ## 出口
 
@@ -239,7 +238,6 @@ description: Use when an approved Web/JS reverse implementation plan already exi
 | `web-reverse-writing-plans` | 拆步骤 | 计划需要调整 |
 | `web-reverse-test-driven-development` | 样本驱动复现 | 进入编码复现阶段 |
 | `web-reverse-systematic-debugging` | 证据链排错 | 结果不一致 |
-| `captcha-solver` | 验证码求解 | 执行中涉及验证码 |
 | `param-encryptor` | 加密参数生成 | 执行中涉及签名/加密 |
 | `env-patcher` | 补环境 | 执行中涉及环境模拟 |
 | `ast-deobfuscation` | JS 反混淆 | 执行中涉及混淆代码 |

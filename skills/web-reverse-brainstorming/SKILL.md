@@ -74,7 +74,6 @@ description: Use when an authorized Web/JS reverse task has not chosen a route a
 | SDK 加密逻辑在 WASM 中 | **流量优先** + CDP 桥 | WASM 难逆向，走环境模拟 | 纯算还原（成本极高） |
 | 自定义 Base64/XOR 等简单编码 | **流量优先** | 对照密文/明文 → 识别编码模式 | 补环境（过度工程） |
 | 浏览器环境检测严格（指纹/Canvas） | **补环境优先** + env-patcher | 必须模拟环境才能跑通 SDK | 纯算（环境依赖无法绕过） |
-| 验证码（滑块/点选/算术） | **captcha-solver** 直接调用 | 专业 Skill 覆盖全流程 | 自己从头分析 |
 | 标准 MD5/AES/RSA 签名 | **param-encryptor** 直接调用 | 专业 Skill 覆盖 20+ 配方 | 自己从头实现 |
 | VM 字节码/JSVMP | **流量优先** + CDP 桥 | VM 逆向成本极高，走运行时提取 | 纯算还原（除非目标极度明确） |
 | 多层加密（签名→AES→RSA） | **源码优先** + Hook 辅助 | 需要理清加密链路，逐层定位 | 单一路线容易遗漏中间层 |
@@ -153,7 +152,6 @@ description: Use when an authorized Web/JS reverse task has not chosen a route a
 
 | 目标 | 路由到 | 跳过后续阶段 |
 |------|--------|-------------|
-| 已知验证码类型，需识别+提交 | `captcha-solver` | ✅ 直接进入 |
 | 已知加密算法，需生成签名/密文 | `param-encryptor` | ✅ 直接进入 |
 | 已知缺哪些浏览器 API，需补环境 | `env-patcher` | ✅ 直接进入 |
 | JS 代码有混淆，需先还原 | `ast-deobfuscation` | ✅ 直接进入 |
@@ -224,7 +222,6 @@ description: Use when an authorized Web/JS reverse task has not chosen a route a
 | `web-reverse-master` | 全流程编排 | 需要完整逆向分析流程 |
 | `web-reverse-workflow` | 工作流入口 | 需要判断当前阶段 |
 | `web-reverse-writing-plans` | 拆步骤 | 路线确定后拆分实施步骤 |
-| `captcha-solver` | 验证码求解 | 路线涉及验证码识别 |
 | `param-encryptor` | 加密参数生成 | 路线涉及签名/加密参数 |
 | `env-patcher` | 补环境 | 路线涉及浏览器环境模拟 |
 | `ast-deobfuscation` | JS 反混淆 | 路线涉及 JS 代码混淆 |

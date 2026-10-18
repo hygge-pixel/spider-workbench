@@ -22,7 +22,7 @@ SpiderFramework/
 │   ├── promotion.py                显式注册与 proof 刷新
 │   ├── run_comparison.py           对已验证运行做离线差异比较
 │   └── optional_backends.py        隔离后端调用与资源诊断
-├── skills/                          18 个通用 Skill 及 scripts/references
+├── skills/                          13 个通用 Skill 及 scripts/references
 ├── scripts/
 │   ├── agent_platform_compat.py     本机 Skill 入口和可选浏览器配置
 │   ├── verify_distribution.py       原始分发文件完整性检查
@@ -65,7 +65,7 @@ SpiderFramework/
 `route` 给建议，collector 才实现实际分页、协议、会话刷新和候选切换。框架不是通用网站自动采集器，不会凭一个 URL 自动产生所有网站适配逻辑。
 `register` 是用户要求沉淀能力后的显式步骤，不属于默认交付流水。
 
-## 3. 18 个 Skill 的职责
+## 3. 13 个 Skill 的职责
 
 | Skill | 何时读 | 负责什么 |
 |---|---|---|
@@ -81,12 +81,7 @@ SpiderFramework/
 | `param-encryptor` | 已定位签名/加密链 | 编码、算法与参数绑定复现 |
 | `env-patcher` | 浏览器 JS 在 Node 缺环境 | 按观测补环境并对拍；不伪造真实业务通过 |
 | `ast-deobfuscation` | JS 表达式/控制流混淆 | Babel AST 分析、变换及语义验证 |
-| `captcha-solver` | 用户明确允许本次验证码研究后 | provider 与协议资料；普通运行遇验证码先暂停 |
 | `playwright-cli` | 需要浏览器 UI/Network 操作 | CLI 用法、会话、跟踪与自动化；工具需另装 |
-| `wechat-miniapp-collector` | 同范围小程序采集 | 接口、会话、分页与小程序证据 |
-| `android-reverse-engineering` | APK/JAR/AAR 等分析 | 包、Manifest/DEX、Java/Kotlin/API 调用链 |
-| `native-reverse-master` | PE/ELF/Mach-O、Frida、IDA 等 | 本地样本、符号/结构/动态证据与原生链路 |
-| `rea-analysis` | Electron/.NET 静态分析 | 按实际 REA 版本/schema 调用；本包无 REA 宿主 |
 
 Skill 是任务方法和辅助脚本，不是工具安装包。每个 `SKILL.md` 的 `name`/`description` 用于宿主发现；正文给出触发条件、证据约束与关联资源。
 `references/` 是需要时读取的方法/算法/上游来源资料；`scripts/` 是具体辅助程序；`agents/openai.yaml` 若存在，仅是特定宿主元数据，不要求其它 Agent 支持。

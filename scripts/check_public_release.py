@@ -140,7 +140,7 @@ def scan(root, *, require_structure=True):
             if registry.get('platforms') != []:
                 issue('platforms/registry.json', 'nonempty_initial_registry')
             skills = [n for n in files if n.startswith('skills/') and n.count('/') == 2 and n.endswith('/SKILL.md')]
-            if len(skills) != 18:
+            if len(skills) != 13:
                 issue('skills', 'initial_skill_set_changed')
         return {'passed': not issues, 'checked_files': len(expected | tracked),
                 'issues': issues, 'scope': 'public source manifest, tracked files, known secret formats and release structure'}

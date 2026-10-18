@@ -71,3 +71,7 @@ Spider Workbench 是给 coding Agent 使用的数据采集与 Web / JavaScript �
 本项目不附带所有网站的现成功能。对外承诺安装后点击采集时，还需要完成具体网站适配、客户操作界面、依赖打包和业务验收。
 
 出错时将错误类别、版本和当前状态交给 Agent，保留现场。技术参考见[排错](TROUBLESHOOTING.md)、[浏览器/MCP](BROWSER_MCP.md)与[框架说明](框架与Skills说明.md)。
+
+## 已装的 Python 或 Node 版本不对怎么办？
+
+Agent 先盘点再选择合格版本；缺少兼容版本时并行安装，保留原环境和系统默认设置，使用明确的程序路径。安装器遇错版本会先停止，避免将依赖装进客户其它项目环境。浏览器下载与接通分层实测，详情见[版本与部署验收](RUNTIME_COMPATIBILITY.md)。

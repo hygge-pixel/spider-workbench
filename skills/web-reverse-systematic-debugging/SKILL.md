@@ -74,7 +74,6 @@ description: Use when an authorized Web/JS reverse result is inconsistent, drift
 | 算法参数错误（Key/IV/Mode/Padding） | `param-encryptor` | 本地加密输出与浏览器不同 |
 | 浏览器 API 缺失或行为不一致 | `env-patcher` | `Illegal invocation` / `undefined` / 指纹不匹配 |
 | 混淆还原不完整 | `ast-deobfuscation` | 反混淆后函数调用链断裂 |
-| 验证码参数构造错误 | `captcha-solver` | 验证码校验失败 |
 | 路线根本错误 | `web-reverse-brainstorming` | 整体方向需要重新评估 |
 
 ## 典型问题
@@ -116,7 +115,6 @@ description: Use when an authorized Web/JS reverse result is inconsistent, drift
 | `web-reverse-workflow` | 工作流入口 | 需要判断当前阶段 |
 | `web-reverse-test-driven-development` | 样本驱动复现 | 样本需要重整 |
 | `web-reverse-brainstorming` | 路线设计 | 根因是路线错误 |
-| `captcha-solver` | 验证码求解 | 排查验证码参数问题 |
 | `param-encryptor` | 加密参数生成 | 排查签名算法参数 |
 | `env-patcher` | 补环境 | 排查环境差异 |
 | `ast-deobfuscation` | JS 反混淆 | 排查混淆还原问题 |

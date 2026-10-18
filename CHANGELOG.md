@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- 按用户要求移除验证码、小程序、Android、原生逆向、REA 五项专项 Skill 及配套材料，当前保留 13 项，清理发现/健康检查/路由引用。验证码暂停规则保留。
+- 部署前检测 Python 3.11、Node/npm 和既有工具虚拟环境版本；不符合要求时保留原环境并明确停止，Agent 按并行安装规则选择兼容运行时。
+
 - README 中英文入口统一为“打开工作区并发送提示词”，移除用户手动安装命令，补充框架优势、任务流程与交付说明。
 - Agent 部署工单默认从 Google 官方获取最新 Stable Chrome for Testing，使用 chrome/9222、独立 Profile 和 js-reverse MCP；Cloak 不再安装或启用。
 - 同步项目规则、用户指南、浏览器技术文档和 Skill 引用；保留旧候选 schema、核心代码及历史记录，按当前工单验收。

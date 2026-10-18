@@ -12,6 +12,32 @@ SOURCE = Path(__file__).resolve().parents[1]
 
 
 class BootstrapTests(unittest.TestCase):
+    def test_wrong_python_stops_before_integrity_setup_or_installation(self):
+        for version in ((3, 8, 10), (3, 10, 15), (3, 12, 8)):
+            with self.subTest(version=version), \
+                 mock.patch.object(bootstrap.sys, 'version_info', version), \
+                 mock.patch.object(bootstrap, 'check_integrity') as integrity, \
+                 mock.patch.object(bootstrap, 'run_command') as command:
+                with self.assertRaisesRegex(ValueError, '3.11'):
+                    bootstrap.onboard(Path('.'), install=True)
+                integrity.assert_not_called()
+                command.assert_not_called()
+
+    def test_old_node_or_missing_npm_is_rejected_without_installing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            node = Path(directory) / 'node.exe'
+            node.write_bytes(b'fixture')
+            npm = node.parent / 'node_modules/npm/bin/npm-cli.js'
+            npm.parent.mkdir(parents=True)
+            npm.write_text('', encoding='utf-8')
+            with mock.patch.object(bootstrap.subprocess, 'run', return_value=mock.Mock(stdout='v18.20.0')):
+                with self.assertRaisesRegex(ValueError, 'Node'):
+                    bootstrap.resolve_node(str(node))
+            npm.unlink()
+            with mock.patch.object(bootstrap.subprocess, 'run', return_value=mock.Mock(stdout='v24.14.1')):
+                with self.assertRaisesRegex(ValueError, 'npm'):
+                    bootstrap.resolve_node(str(node))
+
     def test_default_demo_uses_runner_without_network_or_installer(self):
         with tempfile.TemporaryDirectory(prefix='customer demo ') as directory:
             root = Path(directory)

@@ -7,7 +7,7 @@ description: Use when an authorized task has a known request-signature or encryp
 
 ## Boundary
 
-Use this Skill only after the input fields and algorithm family are known from authorized evidence. Unknown generation entries require **web-reverse-master**. Captcha-owned submission encryption remains in **captcha-solver**.
+Use this Skill only after the input fields and algorithm family are known from authorized evidence. Unknown generation entries require **web-reverse-master**. Confirmed CAPTCHA pauses the run under project rules; this distribution does not include a challenge-solving Skill.
 
 ## Workflow
 
@@ -34,4 +34,4 @@ Use this Skill only after the input fields and algorithm family are known from a
 - Unknown request initiator or algorithm entry: **web-reverse-master**.
 - `_0x`, JSVMP, dispatcher or wrapper recovery: **ast-deobfuscation**.
 - Browser-only SDK execution: **env-patcher**.
-- Captcha validate/ticket flow: **captcha-solver**.
+- Confirmed CAPTCHA: save redacted progress and pause; no challenge-solving Skill is bundled.

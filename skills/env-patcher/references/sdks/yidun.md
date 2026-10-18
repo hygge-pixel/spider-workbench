@@ -1,6 +1,6 @@
 # Yidun IR SDK Runtime
 
-网易易盾 IR SDK 在 Node VM 中所需的浏览器能力。验证码 check 协议归 captcha-solver。
+这里只讨论已观察到的 SDK 环境差异。验证码挑战和提交求解不在当前分发范围；确认验证码仍按项目规则暂停。
 
 ## Contents
 

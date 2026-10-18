@@ -2,7 +2,7 @@
 
 > 历史迁移/实施记录：文中 Cloak 优先、Chrome 兼容模式及两项 MCP 同时接入的旧默认已由当前用户决策替代。当前部署统一按 [INSTALL_WITH_AGENT](INSTALL_WITH_AGENT.md) 和 [Chrome for Testing 工单](CHROME_FOR_TESTING.md)，只启用 chrome/9222 与 js-reverse；本记录不作为当前默认部署指令。
 
-请部署或升级随附 Spider Framework v2，保持源工作区流程：JSReverser MCP/Playwright 侦察，Python/Node 协议优先，spider.py run 唯一采集入口，18 个通用 Skill，新实验不自动注册，确认验证码按本次指示暂停。
+请部署或升级随附 Spider Framework v2，保持源工作区流程：JSReverser MCP/Playwright 侦察，Python/Node 协议优先，spider.py run 唯一采集入口，13 个通用 Skill，新实验不自动注册，确认验证码按本次指示暂停。
 
 先读 README.md、AGENTS.md、docs/部署与调整说明.md、docs/工具链部署与验收.md。
 已部署 v1 时必须先读 docs/已部署旧版的调整工单.md，不能直接解压覆盖现有项目。
@@ -14,7 +14,7 @@
 
 1. 盘点现有任务/注册表/本机配置/运行与 Profile，保留原文件；保存升级计划、冲突处理和备份位置。
 2. 确认实际 Python 3.11 与完整 Node 24+/npm。路径来自本机，不沿用源电脑用户名/盘符。
-3. 18 个 Skill 的 canonical 源与发现入口正常；目标宿主实际读取规则和一个相关 Skill。
+3. 13 个 Skill 的 canonical 源与发现入口正常；目标宿主实际读取规则和一个相关 Skill。
 4. 隔离工具环境依赖安装通过、pip check 通过，核心回归与本地 3 条示例通过；旧任务和注册表不清空。
 5. 随包 JSReverser 真实构建，MCP 初始化、tools/list、list_pages 只读调用均通过。
 6. 优先 Cloak/9232 独立 Profile；缺 Cloak 时明确 Chrome/9222 兼容模式及剩余差异，不声称完全复现。

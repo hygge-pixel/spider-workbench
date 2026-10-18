@@ -72,7 +72,6 @@ description: Use when an authorized Web/JS reverse route is approved and must be
 
 | 任务类型 | 调用 Skill | 示例 |
 |---------|-----------|------|
-| 验证码识别+轨迹生成+提交 | `captcha-solver` | 滑块/点选/算术验证码 |
 | 签名/加密参数生成 | `param-encryptor` | MD5/AES/RSA/H5ST/a_bogus |
 | 浏览器环境模拟 | `env-patcher` | 让 SDK 在 Node.js 运行 |
 | JS 代码反混淆 | `ast-deobfuscation` | `_0x` 字符串表/控制流平坦化 |
@@ -136,7 +135,7 @@ description: Use when an authorized Web/JS reverse route is approved and must be
 |-------|----------------|-------------------|
 | Phase 1 流量分析 | ✅ 辅助：规划流量捕获步骤 | — |
 | Phase 2 定位加密 | ✅ 核心参与：规划 Hook + 源码搜索步骤 | 规划中标注 `param-encryptor` / `ast-deobfuscation` |
-| Phase 3 方案制定 | ✅ 核心参与：产出 Plan 文档 | Plan 中引用 `env-patcher` 模板 / `captcha-solver` 方案 |
+| Phase 3 方案制定 | ✅ 核心参与：产出 Plan 文档 | Plan 中引用 `env-patcher` 模板 方案 |
 
 ## 默认落盘
 
@@ -157,7 +156,6 @@ description: Use when an authorized Web/JS reverse route is approved and must be
 | `web-reverse-workflow` | 工作流入口 | 需要判断当前阶段 |
 | `web-reverse-brainstorming` | 路线设计 | 路线未定 |
 | `web-reverse-executing-plans` | 按计划执行 | 计划已确认，准备执行 |
-| `captcha-solver` | 验证码求解 | 计划中涉及验证码 |
 | `param-encryptor` | 加密参数生成 | 计划中涉及签名/加密 |
 | `env-patcher` | 补环境 | 计划中涉及环境模拟 |
 | `ast-deobfuscation` | JS 反混淆 | 计划中涉及混淆代码 |

@@ -64,17 +64,18 @@ class CollectionHealthTests(unittest.TestCase):
             self.assertEqual(health["browser"], {"status": "unavailable", "error": "browser_config_invalid"})
             self.assertIsNone(health["default_browser_candidate"])
 
-    def test_default_health_reports_wechat_miniapp_skill(self) -> None:
-        self.assertIn("wechat-miniapp-collector", COLLECTION_SKILLS)
+    def test_default_health_excludes_removed_miniapp_skill(self) -> None:
+        self.assertNotIn("wechat-miniapp-collector", COLLECTION_SKILLS)
 
     def test_default_health_reports_playwright_cli_skill(self) -> None:
         self.assertIn("playwright-cli", COLLECTION_SKILLS)
 
-    def test_default_health_reports_android_reverse_skill(self) -> None:
-        self.assertIn("android-reverse-engineering", COLLECTION_SKILLS)
+    def test_default_health_excludes_removed_android_reverse_skill(self) -> None:
+        self.assertNotIn("android-reverse-engineering", COLLECTION_SKILLS)
 
-    def test_default_health_reports_native_reverse_skill(self) -> None:
-        self.assertIn("native-reverse-master", COLLECTION_SKILLS)
+    def test_default_health_excludes_removed_native_and_captcha_skills(self) -> None:
+        self.assertNotIn("native-reverse-master", COLLECTION_SKILLS)
+        self.assertNotIn("captcha-solver", COLLECTION_SKILLS)
 
     def test_reports_packages_skills_and_ready_browser_without_starting(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

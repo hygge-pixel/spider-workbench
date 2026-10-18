@@ -36,11 +36,7 @@ COLLECTION_SKILLS = (
     "param-encryptor",
     "env-patcher",
     "ast-deobfuscation",
-    "captcha-solver",
     "playwright-cli",
-    "wechat-miniapp-collector",
-    "android-reverse-engineering",
-    "native-reverse-master",
 )
 
 FindSpec = Callable[[str], object | None]

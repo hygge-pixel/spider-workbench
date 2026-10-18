@@ -28,7 +28,7 @@ py -3.11 spider.py browser ensure --candidate chrome --json
 | 非 HTTP、PCAP、TLS/传输层证据 | tshark / WireMCP 的离线分析 | 问题已归因到页面 JS 或请求参数 |
 | WASM/本地模块或原生 helper | 静态脚本；授权版 IDA 可用时用 IDA MCP | 宿主缺失或问题回到 Web 调用边界 |
 | 小程序包结构与 API 线索 | 显式包路径上的 WEDECODE | 包缺失、权限不明或目标只是网页接口 |
-| 验证码 provider、轨迹或提交协议 | `captcha-solver`；浏览器、Reqable、JSReverser、环境补丁、参数复现均可成为局部候选 | 首个候选没有产生可复验样本，或失败发生在另一层 |
+| 已确认验证码 | 保存脱敏进度并暂停整个运行 | 等待本次明确指示；本分发不提供求解 Skill |
 
 不要为“工具都装了”而依次调用所有候选。一次任务可以只用其中一个，也可以在保存证据后切换多个。切换时重新建立或单独取得所需会话状态；两个浏览器上下文不得共享 Cookie、Storage、页面、请求 ID、Hook 或断点，也不得把它们的证据混为同一会话。
 

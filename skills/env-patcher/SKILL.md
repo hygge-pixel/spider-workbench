@@ -28,7 +28,7 @@ Use only for authorized testing and self-owned SDK compatibility work. Patch the
 
 ## Required handoffs
 
-- Provider challenge, trajectory and validate/ticket: **captcha-solver**.
+- Confirmed CAPTCHA: save redacted progress and pause; no challenge-solving Skill is bundled.
 - Known request-signature reproduction: **param-encryptor**.
 - Obfuscated structure: **ast-deobfuscation**.
 - Unknown full chain or WAF state flow: **web-reverse-master**.

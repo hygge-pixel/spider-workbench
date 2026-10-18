@@ -9,7 +9,7 @@
 
 先阅读 README.md、AGENTS.md、docs/USER_GUIDE.md、docs/AGENT_HANDOFF.md、docs/BROWSER_MCP.md 和相关脚本帮助。旧文件中“Cloak 优先”“Chrome 只是兼容模式”“必须接通两项 MCP”的规定由本次用户决策替代，其余采集与验收规则继续有效。
 
-1. 检查项目根目录、本机 OS/架构、Python 3.11、完整 Node 24+/npm。复用合格的已装依赖。缺少运行时时，由你从 Python/Node 官方来源安装或选择合适的用户级安装方式；不覆盖用户已有运行时，不复制其它电脑环境。确需系统权限、GUI 或重连终端时才说明具体待办。新源码先运行 py -3.11 bootstrap.py，核验离线三条示例、Skill 入口和 outputs/onboarding.json；完整工具尚未安装时执行 py -3.11 bootstrap.py --install。py 是 Windows 示例，其它平台使用已核实的 Python 3.11 实际入口。已部署框架先检查现状，不重复覆盖或全量重装。该 bootstrap 入口本身不下载浏览器，下面的浏览器下载由你继续执行。
+1. 检查项目根目录、本机 OS/架构、Python 3.11、完整 Node 24+/npm。实际执行版本检查，不以命令存在或 PATH 首项作结论。优先 Node 24 LTS 与 Python 3.11；有合格版本就用真实绝对路径。仅有其它版本时，保留客户原版本，从 Python/Node 官方来源并行安装兼容版本；Node 可按官方完整 ZIP 解压到 tmp/runtimes/node/<version>/，Python 选择带 venv/pip 的可用安装方式。不永久覆盖全局 PATH、不卸载旧环境；多个 Node 时给 bootstrap 显式传 --node，让本次构建/MCP 使用同一 Node/npm。已有工具虚拟环境也要核验 Python 版本，冲突时先备份保留再处理。具体按 docs/RUNTIME_COMPATIBILITY.md。确需系统权限、GUI 或重连终端时才说明待办。新源码先运行 py -3.11 bootstrap.py，核验离线三条示例、Skill 入口和 outputs/onboarding.json；完整工具未装时执行 py -3.11 bootstrap.py --install。这里的 py 是 Windows 示例，实际使用选定 Python 3.11 的真实入口；其它平台同理。已部署框架先检查现状，不重复覆盖或全量重装。bootstrap 本身不下载浏览器，下面的浏览器下载由你继续执行。
 
 2. 自动从官方 Chrome for Testing 获取部署当天最新 Stable 的完整 chrome 浏览器：
    官方入口：https://googlechromelabs.github.io/chrome-for-testing/
@@ -54,3 +54,5 @@
 ```text
 以后请在这个项目中处理我的采集需求。先根据本次证据选路；没有对应能力就创建新experiment；先小样本，验证后再扩大；通过spider.py run执行；保留来源、字段、进度和完整性说明；结果放outputs并告诉我实际路径。除非我明确要求，不自动注册能力。
 ```
+
+运行时版本选择与浏览器验收边界见 [RUNTIME_COMPATIBILITY.md](RUNTIME_COMPATIBILITY.md)。验收报告另记 python_version、python_executable、node_version、node_executable、npm_version 与 existing_runtimes_preserved。

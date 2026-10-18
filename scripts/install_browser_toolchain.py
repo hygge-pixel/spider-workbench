@@ -13,9 +13,21 @@ ROOT = Path(__file__).resolve().parents[1]
 def plans(component, node):
     tasks = []
     if component in ('python', 'all'):
+        if sys.version_info[:2] != (3, 11):
+            raise ValueError('Python 3.11 is required; select a side-by-side 3.11 executable without replacing existing runtimes')
         venv = ROOT / '.venv-toolchain'
         python = venv / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
-        if not python.is_file():
+        if python.is_file():
+            try:
+                version = subprocess.run(
+                    [str(python), '-c', 'import sys; print("%d.%d" % sys.version_info[:2])'],
+                    capture_output=True, text=True, check=True, timeout=15,
+                ).stdout.strip()
+            except (OSError, subprocess.SubprocessError):
+                raise ValueError('existing .venv-toolchain Python cannot be checked; preserve and review it before installation') from None
+            if version != '3.11':
+                raise ValueError('existing .venv-toolchain does not use Python 3.11; preserve it and rebuild a reviewed environment')
+        else:
             if venv.exists() and any(venv.iterdir()):
                 raise ValueError('existing incomplete .venv-toolchain requires manual review')
             tasks.append((ROOT, [sys.executable, '-m', 'venv', str(venv)]))
@@ -28,7 +40,7 @@ def plans(component, node):
         npm = node.parent / 'node_modules/npm/bin/npm-cli.js'
         if not npm.is_file():
             raise ValueError('npm-cli.js missing next to the supplied Node; use a complete Node installation')
-        version = subprocess.run([str(node), '--version'], text=True, capture_output=True, check=True).stdout.strip()
+        version = subprocess.run([str(node), '--version'], text=True, capture_output=True, check=True, timeout=15).stdout.strip()
         if int(version.lstrip('v').split('.')[0]) < 24:
             raise ValueError('Node 24+ required by the tested MCP build')
         if component in ('mcp', 'all'):

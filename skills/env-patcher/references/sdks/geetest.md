@@ -1,6 +1,6 @@
 # Geetest SDK Runtime
 
-极验 SDK 环境只处理浏览器 API 与指纹一致性；轨迹、w 和 validate 归 captcha-solver。
+这里只讨论已观察到的 SDK 环境差异。验证码挑战和提交求解不在当前分发范围；确认验证码仍按项目规则暂停。
 
 ## Contents
 
@@ -17,5 +17,5 @@
 
 ## 交接
 
-- `w`、轨迹、坐标归一化、`validate` 和验证码请求链：`captcha-solver/references/providers/geetest.md`。
+这里只讨论已观察到的 SDK 环境差异。验证码挑战和提交求解不在当前分发范围；确认验证码仍按项目规则暂停。
 - guarded-switch、数组解码器等极验4结构：`ast-deobfuscation/references/patterns/geetest4.md`。

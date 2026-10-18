@@ -36,7 +36,7 @@ Preserve unknown bytes as opaque and distinguish:
 
 Never rename or independently randomize opaque bytes from one plausible sample. Do not mix segments from separate successful profiles without a controlled independence test. Fixed-input parity is local proof; fresh downstream acceptance is final proof.
 
-For WASM/JSVM/native bridges, record active asset/runtime hashes, public wrapper boundary, stage order, input/output descriptors, side inputs, segment map, deterministic vectors, negative controls, freshness/session/route scope, and delivery class. Route a native library implementation to `native-reverse-master`; keep browser/WASM bridge and protocol evidence here.
+For WASM/JSVM/native bridges, record active asset/runtime hashes, public wrapper boundary, stage order, input/output descriptors, side inputs, segment map, deterministic vectors, negative controls, freshness/session/route scope, and delivery class. Native artifact analysis is outside this distribution; keep browser/WASM bridge and protocol evidence here.
 
 ## Failure strata
 

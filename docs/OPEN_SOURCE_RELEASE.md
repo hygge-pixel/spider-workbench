@@ -80,7 +80,7 @@ git push origin v0.1.1
 
 在 GitHub Releases 创建 v0.1.1，附生成的源码 ZIP 与 SHA256SUMS.txt。Release 文案建议：
 
-> Initial public source release of Spider Workbench: standard-library runner, evidence-based routing, 18 agent Skills, JSReverser MCP source integration and Playwright CDP diagnostics. Includes an offline three-record example, empty registry, contributor docs and CI definitions. Browser binaries, credentials, business datasets and historical collectors are excluded. Browser process ownership checks are currently verified on Windows; actual host loading and target collection require separate acceptance.
+> Initial public source release of Spider Workbench: standard-library runner, evidence-based routing, 13 agent Skills, JSReverser MCP source integration and Playwright CDP diagnostics. Includes an offline three-record example, empty registry, contributor docs and CI definitions. Browser binaries, credentials, business datasets and historical collectors are excluded. Browser process ownership checks are currently verified on Windows; actual host loading and target collection require separate acceptance.
 
 若尚未执行云端 CI/浏览器验收，照实写未执行，不把本地旧报告当新版本证据。
 

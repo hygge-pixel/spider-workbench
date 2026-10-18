@@ -22,7 +22,7 @@ Only call tools that are actually present. Names shown in references are optiona
 ## Route selection
 
 - Structural obfuscation or JSVMP: **ast-deobfuscation**.
-- Captcha provider protocol: **captcha-solver**.
+- Confirmed CAPTCHA: save redacted progress and pause; no challenge-solving Skill is bundled.
 - Browser/Node runtime divergence: **env-patcher**.
 - Known request signature: **param-encryptor**.
 - Failure-history lookup: **web-reverse-field-guide**.
@@ -40,8 +40,6 @@ Normalize captured evidence before comparing or sharing it. A tool success prove
 
 ## Cross-family handoffs
 
-- APK/XAPK/JAR/AAR, manifest, resources, and managed Android call-flow analysis: **android-reverse-engineering**.
-- ELF/PE/Mach-O, native libraries/processes, Frida, GDB, IDA, Unicorn, DEX dumping, and IL2CPP: **native-reverse-master**.
 - Keep browser request chains, JavaScript, WebSocket, WASM bridges, Protobuf/gRPC framing, Cookie/WAF, and transport evidence here.
 
 ## WAF references

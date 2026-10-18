@@ -2,7 +2,7 @@
 
 **An Agent-assisted workspace for data collection and Web / JavaScript reverse engineering, with a repeatable path from request to verified delivery.**
 
-Describe the target, scope and output you need. Your coding Agent uses project rules, 18 reusable Skills, browser tooling and a standard-library runner to implement the task, check samples and preserve evidence.
+Describe the target, scope and output you need. Your coding Agent uses project rules, 13 reusable Skills, browser tooling and a standard-library runner to implement the task, check samples and preserve evidence.
 
 [Download current source](https://github.com/hygge-pixel/spider-workbench/archive/refs/heads/main.zip) · [中文](README.md) · [Architecture](docs/ARCHITECTURE.md)
 
@@ -35,7 +35,7 @@ Final deliverables belong in outputs/; run data, validation and evidence in runs
 
 ## Included
 
-18 generic Skills, a Python standard-library core, task validation, capability/proof management, JSReverser MCP source integration, Playwright CDP diagnostics, isolated tool installers, a synthetic three-record example, distribution checks and CI.
+13 generic Skills, a Python standard-library core, task validation, capability/proof management, JSReverser MCP source integration, Playwright CDP diagnostics, isolated tool installers, a synthetic three-record example, distribution checks and CI.
 
 The repository starts without website collectors or business data. Browser binaries, credentials, profiles and personal Agent settings are excluded. The Agent installs Chrome for Testing during deployment. Your Agent account and task-specific implementations remain separate requirements; a customer desktop product needs its own packaging and acceptance.
 

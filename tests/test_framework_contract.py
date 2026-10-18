@@ -23,16 +23,30 @@ class FrameworkContractTests(unittest.TestCase):
                             if p.startswith('experiments/') and p.endswith('/collector.py'))
         self.assertEqual(collectors, ['experiments/example_local/collector.py'])
 
-    def test_eighteen_canonical_skills_and_complete_deployment_docs(self):
+    def test_thirteen_canonical_skills_and_complete_deployment_docs(self):
         original = {Path(name).parts[1] for name in shipped_files()
                     if name.startswith('skills/') and name.count('/') == 2 and name.endswith('/SKILL.md')}
-        self.assertEqual(len(original), 18)
+        self.assertEqual(len(original), 13)
         for name in original:
             self.assertTrue((ROOT / 'skills' / name / 'SKILL.md').is_file(), name)
         for name in ('部署与调整说明', '交给目标Agent', '框架与Skills说明', '导出调整记录', '部署实施计划'):
             path = ROOT / f'docs/{name}.md'
             self.assertTrue(path.is_file(), name)
             self.assertGreater(len(path.read_text(encoding='utf-8')), 300)
+
+    def test_default_skill_health_and_case_routes_resolve_to_packaged_skills(self):
+        from spider_core.health import COLLECTION_SKILLS
+        actual = {path.parent.name for path in (ROOT / 'skills').glob('*/SKILL.md')}
+        self.assertEqual(actual, set(COLLECTION_SKILLS))
+        self.assertFalse(actual.intersection({
+            'captcha-solver', 'wechat-miniapp-collector', 'android-reverse-engineering',
+            'native-reverse-master', 'rea-analysis',
+        }))
+        cases = json.loads((ROOT / 'skills/web-reverse-workflow/references/case-routing.json').read_text(encoding='utf-8'))
+        self.assertTrue(cases)
+        for case in cases:
+            self.assertIn(case['primary'], actual, case['id'])
+            self.assertTrue(set(case['supporting']).issubset(actual), case['id'])
 
     def test_no_bundled_credentials_or_active_browser_mcp_config(self):
         manifest = ROOT / 'MANIFEST.sha256.json'

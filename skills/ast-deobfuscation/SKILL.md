@@ -89,7 +89,6 @@ node scripts/run-pipeline.js <input.js> <output-dir> [hint]
 | 反混淆后发现 | 转交 Skill | 示例 |
 |-------------|-----------|------|
 | 加密/签名函数（MD5/AES/RSA/自定义） | `param-encryptor` | `CryptoJS.AES.encrypt(data, key)` |
-| 验证码计算逻辑 | `captcha-solver` | 滑块距离计算 + 轨迹生成 |
 | 浏览器环境检测代码 | `env-patcher` | `navigator.webdriver` 检测 |
 | VM 字节码（非 AST 可处理） | `web-reverse-master` | JSVMP / 字节码解释器 |
 
@@ -155,6 +154,5 @@ web-reverse-master Phase 2 发现目标 JS 被混淆
 |-------|------|---------|
 | `web-reverse-master` | 全流程编排 | 需要完整逆向分析流程 |
 | `web-reverse-workflow` | 工作流入口 | 需要判断当前阶段 |
-| `captcha-solver` | 验证码求解 | 反混淆后发现验证码计算逻辑 |
 | `param-encryptor` | 加密参数生成 | 反混淆后发现加密/签名函数 |
 | `env-patcher` | 补环境 | 反混淆后发现环境检测代码 |

@@ -21,7 +21,7 @@ Cloak/MCP 侦察、纯算法、Node.js 补环境、Python/Node HTTP、资料检�
 2. 提取最小请求，在本地 Python（requests/httpx/标准库 HTTP）或 Node.js（fetch/http/https/undici）重放。对拍至少两个不同页面或游标的唯一键、原文、明细字段和总数；变更参数后结果必须相应变化，排除缓存、搜索摘要和错误页伪成功。记录脱敏 `protocol_parity.json`，每个数据面分别判断。
 3. 确认签名、加密、动态 Token、Cookie 与请求体的生成和绑定关系。已知算法用 `param-encryptor`；未知链路用 `web-reverse-workflow` / `web-reverse-master`；混淆用 `ast-deobfuscation`；浏览器 JS 在 Node.js 缺运行环境用 `env-patcher`。还原后必须重新本地重放对拍，不因签名函数能返回字符串就宣称协议可用。
 4. 本地重放对拍成功后，优先 Node.js/Python 纯协议分页、明细与附件请求，支持限速、有限重试、断点与会话刷新。`spider.py run` 仍是唯一执行入口：Python collector 可调用本地 Node.js 模块；Runner 本身没有新增 Node.js 直接入口。现有协议运行不为每一页重新启动浏览器。
-5. 协议受阻时先保存断点、状态码和脱敏失败原因，区分参数错误、会话失效、限速、结构漂移与验证码。可查官方文档、开源实现或同一授权数据范围的 App/小程序接口，核验当前版本与真实样本；App 分析按 `android-reverse-engineering` / `wechat-miniapp-collector` 选路。开源代码或历史成功不能替代本次接口验收。
+5. 协议受阻时先保存断点、状态码和脱敏失败原因，区分参数错误、会话失效、限速、结构漂移与验证码。可查官方文档、开源实现或同一授权数据范围的 App/小程序接口，核验当前版本与真实样本；当前分发不含 App/小程序分析专项 Skill；只有任务已实现对应同范围接口时才能使用，不推定已具备外部能力。开源代码或历史成功不能替代本次接口验收。
 6. 只有本次协议请求有明确失败证据或部分目标字段确实不能协议化，才把该部分交给浏览器。在 `collector_result.json` 写 `browser_fallback_reason`、`browser_only_parts` 和脱敏协议尝试摘要；已可用的列表、明细、附件继续协议请求。禁止仅因“有登录”“有 JS”“有验证码历史”就默认批量 UI 翻页。
 
 `routing_evidence.protocol_ready=true` 表示本地重放已经验证，必要参数与会话可本地供应；它优先于网站本身的签名、JS 和登录属性，并关闭隐式会话浏览器预检。`browser.ensure=true` 仍可显式要求侦察/刷新会话。`protocol_unavailable=true` 表示已保存本次协议失败或覆盖不足证据，允许推荐浏览器兜底；二者互斥，不能当作默认模板常量。稳定 API 未标记协议不可用、且没有未解决签名/Token/WAF 时，优先 HTTP；登录初始化可在浏览器进行。
@@ -48,7 +48,7 @@ py -3.11 spider.py browser status --json
 py -3.11 spider.py browser ensure --json
 ```
 
-Task 声明 `captcha_present=true` 时，普通 `spider.py run` 在浏览器或 collector 启动前返回 `captcha_user_instruction_required`。只有用户针对当前运行明确要求处理后，才追加一次性 `--allow-captcha`；不得把该许可固化进 Task，也不得自动调用 `captcha-solver`。
+Task 声明 `captcha_present=true` 时，普通 `spider.py run` 在浏览器或 collector 启动前返回 `captcha_user_instruction_required`。只有用户针对当前运行明确要求处理后，才追加一次性 `--allow-captcha`；不得把该许可固化进 Task，也不得自动执行验证码处理；本分发不包含验证码求解 Skill。
 
 需要登录态、交互或 Network 观察的任务，在 `task.json` 顶层显式声明 `{"browser":{"ensure":true}}`。`spider.py run` 会在创建运行目录前复用或启动配置的默认浏览器（当前 Chrome for Testing／9222；Cloak 不安装或启用），普通 HTTP/HTML 任务不会启动它。对用户明确要求的采集任务，选中 browser-context candidate 后可以自动复用已有默认浏览器 Cookies 和登录态；会话可留在浏览器、进程内存或本次 `runs/` 树内名为 `cookies.json` 的本地缓存，缓存禁止提交 Git、禁止复制到 `runs/` 之外，不能写进 Task、日志或可迁移证据。账号密码/API Key/代理凭据只使用忽略的 `config/local_credentials/*.env` 或进程环境变量。
 

@@ -68,6 +68,8 @@ def install_tools(root,node):
 
 
 def onboard(root, *, install=False,node=None):
+    if sys.version_info[:2] != (3, 11):
+        raise ValueError('本项目部署入口需要 Python 3.11；请保留已有 Python，选择或并行安装 3.11，并使用其真实路径重新执行。')
     root=Path(root).resolve()
     check_integrity(root)
     selected=resolve_node(node) if install else None
