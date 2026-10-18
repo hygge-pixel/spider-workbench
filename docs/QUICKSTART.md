@@ -1,6 +1,6 @@
 # 安装与快速开始
 
-新用户优先阅读 [用户指南](USER_GUIDE.md)：`py -3.11 bootstrap.py` 离线体验，`py -3.11 bootstrap.py --install` 安装工具。下面保留分步手动命令，供排错与已有环境复用。
+用户只需按 README 打开工作区并发送提示词；后续由 Agent 按 [部署工单](INSTALL_WITH_AGENT.md)执行。本文件是供 Agent/维护者排错和复用环境的技术参考，不是另一套用户必做步骤。默认 Chrome for Testing/chrome/9222 与 js-reverse MCP。
 
 ## 1. 选择体验层级
 

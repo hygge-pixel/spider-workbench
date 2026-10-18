@@ -1,6 +1,6 @@
 # 交给新电脑 Agent 的部署工单
 
-新用户可直接复制 [安装提示词](INSTALL_WITH_AGENT.md)。推荐先用 bootstrap.py 离线验收；需要安装时用 --install；已完成的阶段复用本次证据，不重复全部安装。
+用户只需按 README 打开工作区并发送提示词。Agent 执行[完整部署工单](INSTALL_WITH_AGENT.md)，已完成阶段检查后复用，不要求用户逐条执行安装命令。
 
 目标：在本机部署 Spider Workbench，保留原项目工作方式，分别验收核心、工具、浏览器和宿主加载。请先读取 README、AGENTS 与本工单；安装和本机配置在用户授权范围内连续推进，不通过固定工具路线虚报业务成功。
 
@@ -10,8 +10,8 @@
 2. 从新源码目录校验 verify_distribution，查看初始空注册表，运行离线三条，读取 validation。
 3. setup 建立本机 Skill 发现链接；已有目录冲突保留并报告，不清空。
 4. 安装器先计划，再 component all --apply；保留旧环境，隔离到 .venv-toolchain。
-5. 配置真实浏览器程序、端口、独立 Profile。优先已具备的 Cloak；只有 Chrome 时报告兼容模式，不能声称完全复现 Cloak。
-6. 生成两项 MCP 定义；按实际 Agent 宿主格式合并管理项，不覆盖其它配置或用户全局设置。
+5. 从 Google 官方查询并安装最新 Stable Chrome for Testing，配置 chrome/9222、独立 tmp/chrome-mcp Profile 并设为默认；不安装或启用 Cloak，见 CHROME_FOR_TESTING。
+6. 生成本机 MCP 定义，只按实际 Agent 宿主格式合并 js-reverse，忽略未使用的 js-reverse-cloak；不覆盖其它配置或用户全局设置，不调用会导入两项的 --write-project-mcp。
 7. 分别做 mcp-smoke stdio、只读调用、cdp-smoke；重连宿主，实际发现并调用工具。
 8. 运行完整框架回归和公开发布扫描；如有本机新任务，运行其测试，不删除任务来满足空框架假设。
 
@@ -40,4 +40,4 @@
 }
 ```
 
-模板的 false 是待验证初值，只有本次真实成功才改 true。另记版本、实际路径、冲突、备份、升级保留哈希与回归输出。没有任务就不跑真实网站批量采集，不复制旧登录态、不提交业务数据、不发送通知、不发布 GitHub。
+模板的 false 是待验证初值，只有本次真实成功才改 true；未执行项注明原因。另记 Chrome for Testing Stable 实际版本、官方来源、default_browser_candidate=chrome、mcp_service=js-reverse、cloak_status=not_required。另记版本、实际路径、冲突、备份、升级保留哈希与回归输出。没有任务就不跑真实网站批量采集，不复制旧登录态、不提交业务数据、不发送通知、不发布 GitHub。

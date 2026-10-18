@@ -6,23 +6,23 @@
 
 `installed 不等于 live_verified`。配置存在、入口可启动、宿主可用和目标验证成功是四种不同状态；当前会话未暴露的 MCP 不能伪造成工具调用。无 MCP 也是正常候选，可使用 9222 Chrome、DevTools/HAR、`spider.py route`、本地 Hook 与验证脚本。
 
-工作区双浏览器只提供默认候选，不把链路写死。 Cloak 的 CDP 连接地址从 `config/workspace_browser.json` 读取，当前为 `http://localhost:9232`，兼容 IPv4/IPv6；Chrome 保留独立 9222。用下面的证据对象选择或启动当前候选：
+浏览器地址从 `config/workspace_browser.json` 读取。默认 Chrome for Testing/9222/js-reverse；Cloak 不安装或启用。使用下面命令启动已配置 Chrome；旧 auto 规则在出现压力证据时可能选择 Cloak，因此本部署不用该规则升级浏览器：
 
 ```powershell
-py -3.11 spider.py browser ensure --candidate auto --evidence-json '{"fingerprint_pressure":false,"anti_debugger_pressure":false,"javascript_vm_pressure":false,"wasm_runtime_pressure":false}' --json
+py -3.11 spider.py browser ensure --candidate chrome --json
 ```
 
-- 普通登录态、页面交互、Network、源码、请求发起者和断点缺口：空证据优先配置的默认 `cloak` / `js-reverse-cloak` / 9232；明确需要原 Chrome 会话或行为对照时显式选择 `chrome` / `js-reverse` / 9222。
-- 已观察到指纹压力、反调试、JavaScript VM/JSVMP 或 WASM 运行时缺口：对应 `fingerprint_pressure`、`anti_debugger_pressure`、`javascript_vm_pressure` 或 `wasm_runtime_pressure` 为 `true`，选择 `cloak` / `js-reverse-cloak` / 9232。
+- 普通登录态、页面交互、Network、源码、请求发起者和断点缺口：使用 `chrome` / `js-reverse` / 9222，保持本项目独立 Profile。
+- 已观察到指纹压力、反调试、JavaScript VM/JSVMP 或 WASM 缺口：据实保存相应证据，使用相关 Skill/本地分析或报告限制；不自动下载、启用或切换到 Cloak。
 
-这四项必须是当次证据，不是网站永久标签。候选失败后仍可尝试 AdsPower、Reqable、No-MCP、Scrapling 或 Camoufox 等独立候选，但要遵守各自的授权与升级条件。
+压力字段仍可记录为 `fingerprint_pressure`、`anti_debugger_pressure`、`javascript_vm_pressure`、`wasm_runtime_pressure`。这四项必须是当次证据，不是网站永久标签，也不代表允许启用未部署的浏览器。候选失败后仍可尝试 AdsPower、Reqable、No-MCP、Scrapling 或 Camoufox 等独立候选，但要遵守各自的授权与升级条件。
 
 ## 按证据选择候选
 
 | 当前证据或缺口 | 可优先尝试的候选 | 何时换路 |
 |---|---|---|
-| 需要现有登录态、请求发起者、源码或断点 | 默认 9232 Cloak / `js-reverse-cloak` / 本地 CDP；显式 Chrome 使用 9222 | 会话不匹配、CDP 不足或出现四类高级压力 |
-| 已观察到指纹、反调试、JS VM/JSVMP 或 WASM 运行时压力 | 9232 Cloak / `js-reverse-cloak` | 该运行时未产生所需证据，或其指纹不一致影响目标 |
+| 需要现有登录态、请求发起者、源码或断点 | Chrome for Testing / `js-reverse` / 9222 CDP | 会话不匹配、CDP 不足或出现四类高级压力 |
+| 已观察到指纹、反调试、JS VM/JSVMP 或 WASM 运行时压力 | 当前 Chrome 配合相关 Skill、离线 JS/WASM 分析 | 运行时未产生所需证据时保存进度、报告缺口或转已授权同范围候选 |
 | 需要独立指纹配置或隔离浏览器上下文 | AdsPower | 宿主/API Key 不可用，或需要更深断点时改接该上下文的 CDP |
 | 需要查看 HTTP(S) 请求、响应、重放样本 | Reqable / HAR / 浏览器 Network | 非 HTTP、TLS 前已失败或代理改变目标行为 |
 | 非 HTTP、PCAP、TLS/传输层证据 | tshark / WireMCP 的离线分析 | 问题已归因到页面 JS 或请求参数 |

@@ -3,13 +3,12 @@
   "version": "0.1.1",
   "prepared_on": "2026-10-18",
   "upgrade_from": "framework-only-2026-10-16",
-  "default_browser_preference": "cloak",
+  "default_browser_preference": "chrome",
   "browser_endpoints": {
     "cloak": "http://localhost:9232",
     "chrome": "http://127.0.0.1:9222"
   },
   "mcp_services": [
-    "js-reverse-cloak",
     "js-reverse"
   ],
   "mcp_source_snapshot_version": "2.0.3",
@@ -20,5 +19,9 @@
   "legacy_history_included": false,
   "target_machine_acceptance_required": true,
   "base_edition": "framework-toolchain-v2",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "default_browser_distribution": "chrome-for-testing",
+  "browser_install_channel": "Stable",
+  "browser_downloads_metadata": "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json",
+  "browser_deployment_work_order": "docs/INSTALL_WITH_AGENT.md"
 }

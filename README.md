@@ -1,90 +1,81 @@
 # Spider Workbench
 
-**给你的 Agent 一套可运行的数据采集与 Web/JavaScript 逆向工作台。**
+**把数据采集与 Web / JavaScript 逆向，变成 Agent 可以持续推进、验证和交付的项目流程。**
 
-用它组织新任务、分析接口、运行采集、检查数据并保存进度。你描述目标，Agent 按项目里的规则与 Skills 实施；任务运行和结果校验由同一个框架管理。
+你描述网站、数据范围和交付要求，Agent 在同一个工作区里完成环境部署、接口分析、采集实现、样本校验和结果整理。框架将项目规则、18 个通用 Skills、浏览器工具链、统一运行入口与运行证据组织在一起，让每个任务都有清楚的起点、过程和结果。
 
-[下载源码](https://github.com/hygge-pixel/spider-workbench/releases/tag/v0.1.1) · [English](README.en.md) · **[首次安装与日常使用](docs/USER_GUIDE.md)** · [复制给 Agent 的部署提示词](docs/INSTALL_WITH_AGENT.md) · [详细技术文档](docs/ARCHITECTURE.md)
+[下载当前源码](https://github.com/hygge-pixel/spider-workbench/archive/refs/heads/main.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
 
-## 我适合用它吗？
+## 为什么使用 Spider Workbench？
 
-- **使用 coding Agent 的人**：把源码文件夹作为 Agent 工作区打开，复制部署提示词，让它完成环境检查和工具接入。
-- **采集/逆向开发者**：用统一的任务目录、runner、浏览器工具链和数据校验，减少每次从零搭建。
-- **只需要某个网站现成采集软件的客户**：应使用对应任务的成品程序。这个仓库初始没有网站采集器；网站逻辑由开发者或 Agent 按实际需求实现。
+采集和逆向工作经常需要反复搭环境、找接口、处理分页、恢复进度，再确认数据是否完整。Spider Workbench 把这些工作的共用部分留在框架里，让 Agent 把精力放到当前任务的实现和验证上。
 
-**建议首次在 Windows 上部署完整浏览器工具链。** 核心离线体验只需 Python3.11；完整工具还需 Node24+/npm、独立浏览器和你自己的 Agent。Python/Node/浏览器本体与 Agent 账号不随源码提供。
-
-## 第一步：下载并打开项目
-
-在仓库页面选择 **Code → Download ZIP**，完整解压，打开能看到 bootstrap.py 和 spider.py 的文件夹。也可以通过 Git 克隆。
-
-如果你已经使用 Agent，最省事的方法是把这个文件夹作为工作区打开，然后发送：
-
-> 请先阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的首次部署。先验证离线示例，再安装工具链，最后分别验收浏览器和 MCP 实际加载。保留我的已有配置，完成后给我实际通过和待处理项。
-
-**完整提示词见[这里](docs/INSTALL_WITH_AGENT.md)**。Agent 需要具备本机文件、终端和相应工具配置权限；普通网页聊天窗口仅接收提示词不会自动部署电脑环境。
-
-## 第二步：一条命令体验
-
-已经有 Python3.11 时，在项目文件夹中打开终端，运行：
-
-```powershell
-py -3.11 bootstrap.py
-```
-
-macOS/Linux 或已确认 python 指向3.11的环境可以用：
-
-```bash
-python3.11 bootstrap.py
-```
-
-它会检查源码、建立本机 Skill 发现入口、运行离线示例，并显示结果文件位置。**默认不联网安装依赖、不启动浏览器。** 看到“3 条合成记录，数据校验通过”就说明基础框架已运行。报告在 outputs/onboarding.json。
-
-没有 Python/Node？先看[安装准备](docs/USER_GUIDE.md#1-安装前准备)。不要直接复制电脑上已有的虚拟环境或登录态。
-
-## 第三步：需要真实任务时安装工具
-
-先准备完整 Node24+/npm，关闭并重新打开终端，然后在同一项目目录运行：
-
-```powershell
-py -3.11 bootstrap.py --install
-```
-
-这会自动发现 PATH 中的 Node，隔离安装 Python/HTTP/Playwright、JSReverser MCP、Playwright CLI 和 Babel，构建 MCP、生成本机 MCP 启动定义，并再次验收离线示例。不会全局安装这些依赖。
-
-安装成功后还要让 Agent 按[部署提示词](docs/INSTALL_WITH_AGENT.md)选择本机浏览器、接入宿主并实际调用一次工具。**依赖安装成功不等于浏览器/MCP已经接通。** 本入口不会猜测你的 Agent 宿主格式、覆盖全局配置或搬运登录态。
-
-## 第四步：以后怎么用？
-
-安装完成后，在 Agent 中打开这个项目，直接描述具体任务，例如：
-
-> 从我提供的网站采集最近7天的公开文章，保留标题、原文、发布时间和来源链接。先采集5条让我确认，再扩大；结果输出Excel。先检查已有能力，没有就创建独立实验，保留进度并说明覆盖范围。
-
-Agent 应按项目规则先选路、验证样本、再通过 spider.py run 执行。新任务不要求你预先注册采集器，也不要求每次重新安装工具。网站需要登录时，在项目独立浏览器中手动登录，不把密码或 Cookie 粘贴进任务文件。
-
-结果在哪里、断点怎么继续、换电脑怎么装、给客户怎么交付，均见[用户指南](docs/USER_GUIDE.md)。默认安装只有合成示例，真实网站的字段/分页/完整性需逐任务验收。
-
-## 随仓库包含什么？
-
-| 组件 | 用途 |
+| 框架优势 | 对实际工作的帮助 |
 |---|---|
-| 18 个通用 Skills | 指导 Agent 做采集路由、接口/JS分析、算法对拍、AST、补环境与证据排查 |
-| Python 标准库核心 | 执行任务、保存运行、校验字段/唯一键/完成条件，按需显式注册 |
-| JSReverser MCP + Playwright CDP | 连接独立浏览器，观察请求、调试JS并核对本地实现 |
-| 安装/发布/回归工具 | 隔离依赖、保留本机配置、核对公开文件和分发完整性 |
+| **用自然语言开始，交给 Agent 部署** | 打开项目、发送提示词，由 Agent 检查环境、安装隔离依赖、下载浏览器并接入 MCP，用户无需逐条执行安装命令。 |
+| **18 个通用 Skills，按问题调用** | 覆盖采集选路、请求分析、JS 逆向、参数复现、AST、补环境和证据排查，让 Agent 有可查阅的方法与工具。 |
+| **浏览器分析与协议采集衔接** | 需要时借助浏览器观察请求、调试 JS，再验证本地 Python / Node 请求；已验证的协议任务可直接执行，减少重复页面操作。 |
+| **统一运行和数据校验** | Task 明确字段、唯一键、数量与结束条件；runner 执行采集并校验结果，让“脚本跑完”和“数据合格”分别可判断。 |
+| **保留进度，支持复查** | 任务可保存检查点、原始材料和脱敏证据；支持恢复的采集器可据此续跑，交付前也能检查来源与覆盖范围。 |
+| **任务独立，复用有边界** | 新任务直接在 experiments 中实施；用户明确要求沉淀时才注册，已注册能力的 proof 与可运行状态分开管理。 |
+| **核心轻量，工具环境隔离** | Python 核心只用标准库；浏览器 Profile、Python 工具环境和 npm 依赖留在项目边界内，换电脑时重新生成本机配置。 |
+| **方便维护和协作** | 项目自带规则、分层验收、完整回归、文件清单和 CI，方便交接给另一台电脑的 Agent，也方便审核后续修改。 |
 
-历史站点采集器、客户数据、账号、Cookie、Profile、个人 Agent 设置与原 Git 历史没有进入开源包。Cloak/9232是原工作流偏好，Chrome/9222是独立候选；Cloak本体不随包提供。Windows浏览器身份核验已实现，macOS/Linux浏览器层仍需适配与验收。
+## 安装：打开文件夹，发送提示词
 
-## 常见问题
+将下载并解压后的项目文件夹作为 **coding Agent 的工作区**打开，然后发送：
 
-- **没有任何注册能力？** 初始为空正常；先运行离线示例，再让 Agent 实现具体任务。
-- **不认识 py / python？** Python未安装或版本入口不同，按用户指南检查。
-- **Node找不到/版本过低？** 安装完整Node24+，重开终端；多个版本可用 --node 指定。
-- **安装好了Agent仍没有MCP？** 按宿主格式接入并重连，再实际调用；文件存在不等于已加载。
-- **有不懂的错误？** 把命令、错误类别和当前状态交给Agent，别贴凭据或删除已有任务。详见[排错](docs/TROUBLESHOOTING.md)。
+> 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的部署；已经部署的部分先检查并复用。请自动检查并补齐环境和隔离工具依赖，从 Google 官方 Chrome for Testing 下载部署当天最新 Stable 浏览器，配置项目独立 Profile、Chrome/9222 和 js-reverse MCP，不安装或启用 Cloak。完成离线示例、浏览器连接、MCP 实际调用和完整回归，保留已有任务与配置，最后告诉我实际通过和待处理的项目。已授权部署所需的常规可逆安装、构建与本项目配置调整，请连续推进。
 
-## 进一步阅读
+Agent 会按[完整部署工单](docs/INSTALL_WITH_AGENT.md)执行后续步骤。需要能操作本机文件、终端并配置工具的 Agent；普通网页聊天窗口不会仅凭这段话自动部署电脑。完整浏览器流程推荐先在 Windows 上使用；其它系统的支持范围由 Agent 实际检查和报告。
 
-[用户指南](docs/USER_GUIDE.md) · [Agent安装工单](docs/INSTALL_WITH_AGENT.md) · [手动配置](docs/QUICKSTART.md) · [浏览器/MCP](docs/BROWSER_MCP.md) · [开发采集器](docs/COLLECTOR_GUIDE.md) · [架构](docs/ARCHITECTURE.md) · [证据与数据](docs/EVIDENCE.md) · [完整测试](docs/TESTING.md) · [依赖审计状态](docs/DEPENDENCIES.md) · [GitHub发布](docs/OPEN_SOURCE_RELEASE.md)
+## 框架怎样处理一次任务？
+
+```mermaid
+flowchart LR
+    A[说明目标和数据范围] --> B[Agent 按规则与 Skills 选路]
+    B --> C[接口观察与本地请求验证]
+    C --> D[独立任务实现与小样本]
+    D --> E[统一执行与数据校验]
+    E --> F[交付文件与覆盖说明]
+```
+
+浏览器观察、JS 调试、纯算法复现和环境补齐都按当次证据使用。任务已有可用协议和样本时，可跳过重复分析。采集仍通过统一 runner 执行；遇到普通失败先保存进度，再评估已实现且同范围的候选。确认出现验证码时按项目规则保存进度并暂停。
+
+## 部署后怎么用？
+
+继续在同一项目里向 Agent 描述需求，例如：
+
+> 从我提供的网站采集最近 7 天的公开文章，字段包括标题、原文、发布时间、作者和来源链接。先给我 5 条样本，确认后采集指定范围，输出 Excel 和 JSON，说明遗漏和失败，并保留进度。没有对应能力就创建独立任务，不自动注册。
+
+说清入口、范围、时间、字段和输出形式，Agent 就能按项目流程推进。任务最终需要的 Excel、JSON 或其它报告，由具体任务实现并验证；框架保留数据与证据的位置，方便找到结果、排查问题和交接。
+
+| 目录 | 你能在这里找到什么 |
+|---|---|
+| outputs/ | 本次任务的最终文件、报告与部署验收结果 |
+| runs/ | 原始数据、标准化记录、校验结果、检查点和脱敏运行证据 |
+| experiments/ | 独立任务实现及其非敏感配置 |
+| skills/ | Agent 使用的通用方法、脚本与参考资料 |
+| spider_core/ | 执行、路由、校验、浏览器资源和能力管理的共用核心 |
+
+日常任务复用已验收环境，不反复安装或自动升级浏览器。网站需要登录时，在项目独立浏览器中完成；换电脑重新部署工具和本机配置，历史登录态不随源码迁移。更多使用与交付说明见[用户指南](docs/USER_GUIDE.md)。
+
+## 随仓库提供的能力
+
+- **项目规则与多平台入口**：AGENTS.md、CLAUDE.md、GEMINI.md，以及本机 Skill 发现链接。
+- **采集与逆向方法**：18 个通用 Skills，涵盖 Web 采集、JS 逆向及相关分析流程。
+- **统一任务核心**：Python 标准库 runner、路由、字段和唯一键校验、运行比较、显式注册及证明状态管理。
+- **浏览器工具链**：随包 JSReverser MCP 源码、Playwright CDP 诊断及隔离工具安装；Agent 部署时从[官方渠道](https://googlechromelabs.github.io/chrome-for-testing/)获取 Chrome for Testing。
+- **维护与交付工具**：离线三条合成示例、完整回归、分发清单、公开发布检查和 GitHub Actions。
+
+## 适用范围
+
+适合使用 coding Agent 开展数据采集、接口分析和 Web / JavaScript 逆向的个人与团队，也适合作为新项目的起点。框架初始不附带具体网站采集器；网站适配、分页、字段语义与完整性需要逐任务验证。工具安装通过，也需要继续验证目标网站的真实业务结果。
+
+源码不携带历史客户数据、账号、Cookie、浏览器 Profile 或个人 Agent 设置。Python、Node、浏览器本体在目标机部署，Agent 账户由用户准备。可选外部应用按需要接入；通用框架不承诺任意网站都能直接采集，也不等同于已经打包好的客户桌面软件。
+
+## 进一步了解
+
+[用户指南](docs/USER_GUIDE.md) · [Agent 部署工单](docs/INSTALL_WITH_AGENT.md) · [浏览器与 MCP](docs/BROWSER_MCP.md) · [开发采集器](docs/COLLECTOR_GUIDE.md) · [架构](docs/ARCHITECTURE.md) · [证据与数据](docs/EVIDENCE.md) · [测试与 CI](docs/TESTING.md) · [排错](docs/TROUBLESHOOTING.md) · [依赖状态](docs/DEPENDENCIES.md)
 
 原创部分使用 [Apache-2.0](LICENSE)；第三方保留原许可证，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。[贡献指南](CONTRIBUTING.md) · [安全报告](SECURITY.md) · [版本记录](CHANGELOG.md)

@@ -1,5 +1,7 @@
 # 交给目标 Agent 的部署工单 v2
 
+> 历史迁移/实施记录：文中 Cloak 优先、Chrome 兼容模式及两项 MCP 同时接入的旧默认已由当前用户决策替代。当前部署统一按 [INSTALL_WITH_AGENT](INSTALL_WITH_AGENT.md) 和 [Chrome for Testing 工单](CHROME_FOR_TESTING.md)，只启用 chrome/9222 与 js-reverse；本记录不作为当前默认部署指令。
+
 请部署或升级随附 Spider Framework v2，保持源工作区流程：JSReverser MCP/Playwright 侦察，Python/Node 协议优先，spider.py run 唯一采集入口，18 个通用 Skill，新实验不自动注册，确认验证码按本次指示暂停。
 
 先读 README.md、AGENTS.md、docs/部署与调整说明.md、docs/工具链部署与验收.md。

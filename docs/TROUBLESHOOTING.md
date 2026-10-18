@@ -12,7 +12,7 @@
 | pip check 报冲突 | 在隔离环境按声明复核包版本；不改全局环境或把冲突伪装为就绪 |
 | browser status 非 ready | 核对真实程序、端口、Profile、OS 身份核验；status 不启动，ensure 才管理资源 |
 | 端口被其它项目占用 | 不接管、不终止，明确候选隔离与当前冲突，再选本项目配置 |
-| 只有 Chrome | 显式配置 Chrome 候选和兼容模式；不要把 Chrome 程序填进 Cloak 槽位冒充 |
+| Chrome for Testing 默认部署 | 配置 chrome/9222 与 js-reverse；Cloak 不要求安装或验收，不将 Chrome 填入 cloak 槽位 |
 | MCP stdio 通过但只读调用失败 | 浏览器可能未启动/接错/会话失效；检查身份、地址和本次状态 |
 | CLI 探针成功而 Agent 没工具 | 宿主未重连、格式或权限不同；看宿主实际目录，不能只看配置文件 |
 | CDP load 超时 | 合成检查已使用 data URL/DOMContentLoaded；真实站点要看生命周期和网络，不无限增加等待 |

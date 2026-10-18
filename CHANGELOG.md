@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- README 中英文入口统一为“打开工作区并发送提示词”，移除用户手动安装命令，补充框架优势、任务流程与交付说明。
+- Agent 部署工单默认从 Google 官方获取最新 Stable Chrome for Testing，使用 chrome/9222、独立 Profile 和 js-reverse MCP；Cloak 不再安装或启用。
+- 同步项目规则、用户指南、浏览器技术文档和 Skill 引用；保留旧候选 schema、核心代码及历史记录，按当前工单验收。
+
 ## 0.1.1 — 2026-10-18
 
 首次独立开源源码整理与易用性改进版。本条记录分发内容，实际发布与云端验证状态以仓库 Releases 和 Actions 为准。
