@@ -68,19 +68,19 @@ git push -u origin main
 - 评估 Dependency graph 与更新 PR；锁文件升级经过构建和回归后合并，不为消告警盲目 npm audit fix --force。
 - 不创建虚假 Sponsor、Logo、Stars、已支持平台或已在线验证徽章。
 
-## 7. 首个 v0.1.1 Release
+## 7. 发布当前 v0.1.2 Release
 
 先确认 main 对应提交的 CI 通过和 CHANGELOG 一致，再本地运行完整回归、公开检查、刷新经审核的 manifest 并构建 ZIP。保存 checksums，独立解压验收。
 
 ```powershell
 python scripts/release.py --output outputs/releases
-git tag -a v0.1.1 -m "Spider Workbench 0.1.1"
-git push origin v0.1.1
+git tag -a v0.1.2 -m "Spider Workbench 0.1.2"
+git push origin v0.1.2
 ```
 
-在 GitHub Releases 创建 v0.1.1，附生成的源码 ZIP 与 SHA256SUMS.txt。Release 文案建议：
+在 GitHub Releases 创建 v0.1.2，附生成的源码 ZIP 与 SHA256SUMS.txt。Release 文案建议：
 
-> Initial public source release of Spider Workbench: standard-library runner, evidence-based routing, 13 agent Skills, JSReverser MCP source integration and Playwright CDP diagnostics. Includes an offline three-record example, empty registry, contributor docs and CI definitions. Browser binaries, credentials, business datasets and historical collectors are excluded. Browser process ownership checks are currently verified on Windows; actual host loading and target collection require separate acceptance.
+> Spider Workbench 0.1.2 maintenance release: standard-library runner, evidence-based routing, 13 agent Skills, JSReverser MCP source integration and Playwright CDP diagnostics. Includes an offline three-record example, empty registry, contributor docs and CI definitions. Browser binaries, credentials, business datasets and historical collectors are excluded. Browser process ownership checks are currently verified on Windows; actual host loading and target collection require separate acceptance.
 
 若尚未执行云端 CI/浏览器验收，照实写未执行，不把本地旧报告当新版本证据。
 

@@ -109,7 +109,7 @@ description: Use when an authorized Web/JS reverse task has not chosen a route a
 ### Hook 优先
 
 ```text
-入口：js-reverse-mcp.inject_before_load / break_on_xhr
+入口：js-reverse-mcp.inject_preload_script / break_on_xhr
 关键动作：
   1. Hook fetch/XHR.send → 拦截所有出站请求
   2. Hook CryptoJS/SubtleCrypto → 拦截所有加密调用
@@ -169,7 +169,7 @@ description: Use when an authorized Web/JS reverse task has not chosen a route a
 
 ## Phase Mapping
 
-本 Skill 对应 CLAUDE.md Phase 0-1（情报收集 + 路线选定）：
+本 Skill 对应 参考方法中的 Phase 0-1（情报收集 + 路线选定）：
 
 | Phase | 本 Skill 的角色 | 与专业 Skill 的协作 |
 |-------|----------------|-------------------|

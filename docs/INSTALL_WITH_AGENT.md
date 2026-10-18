@@ -27,7 +27,7 @@
 
 5. 检查本项目实际读取的规则、安装说明和 canonical skills/ 中的相关浏览器偏好。仅把相关默认选择调整为 Chrome for Testing/chrome/9222；保留按当次证据选路、协议优先、验证码暂停、凭据保护和数据完整性规则。本仓库已有相应默认规则；无需重复修改。仅旧部署存在冲突时，先验收分发清单，再做授权调整并保存差异；不改写官方 MANIFEST 来掩盖修改。Skills 的本机入口继续指向 canonical skills/，不额外复制一套。
 
-6. 通过 scripts/browser_toolchain.py configure 生成本机 MCP 定义。只将生成结果中的 js-reverse 服务合并到当前 Agent 实际支持的配置里，它连接 chrome/9222；不启用 js-reverse-cloak。旧生成器如果仍输出两项，忽略未使用项即可，不机械导入两项，也不要使用会把两项同时写入宿主的 --write-project-mcp。
+6. 通过 scripts/browser_toolchain.py configure 生成本机 MCP 定义。只将生成结果中的 js-reverse 服务合并到当前 Agent 实际支持的配置里，它连接 chrome/9222；不启用 js-reverse-cloak。当前生成器默认只有 js-reverse；旧安装若输出两项，只合并 js-reverse。--write-project-mcp 仅用于已确认支持 mcpServers 的项目配置，其他宿主按其格式适配。
    备份并审核本项目旧 js-reverse-cloak 宿主配置；确认是本项目管理项后，在本项目配置作用域停用或移除。用户全局或其它项目的同名服务不擅动。保留其它 MCP 和用户设置；JSON/TOML 按真实宿主格式转换，command/args 使用本机真实绝对路径。
 
 7. 分层验收 chrome：浏览器进程/程序/Profile/端口归属、CDP /json/version 和页面目标、MCP stdio 初始化、tools/list、list_pages 只读调用、Playwright CDP 合成页面，然后重连 Agent 验证宿主实际发现并调用 js-reverse 工具。只清理自己创建的合成标签，不操作个人浏览内容。不要将脚本探针通过等同于宿主已加载。ChromeDriver 不属于这条 MCP/CDP 链路的必需安装项。

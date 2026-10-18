@@ -57,7 +57,7 @@ Chrome 项的 launch_args=[]、environment={}，不沿用 --fingerprint 或 CLOA
 & $toolPython scripts/browser_toolchain.py configure --python $toolPython --node $nodeExecutable
 ```
 
-读取 runs/_mcp/generated/mcp_config.json，只将 mcpServers.js-reverse 合并到宿主实际支持的配置。入口仍使用生成的 scripts/start_js_reverser.mjs 与本机实际路径。旧生成器会同时输出 js-reverse-cloak，忽略该未使用项；不要使用会写入两项的 --write-project-mcp。
+读取 runs/_mcp/generated/mcp_config.json，只将 mcpServers.js-reverse 合并到宿主实际支持的配置。入口仍使用生成的 scripts/start_js_reverser.mjs 与本机实际路径。当前生成器默认只有 js-reverse；旧生成器的 js-reverse-cloak 不导入。项目写入开关只用于支持 mcpServers 格式的宿主。
 
 已有项目作用域的 js-reverse-cloak 配置先备份，确认由本项目管理后停用/移除；不删除用户全局或其它项目的配置。保留其它 MCP。宿主使用 TOML 或专用 CLI 时按真实格式配置，随后重连/新开会话完成实际工具调用。
 

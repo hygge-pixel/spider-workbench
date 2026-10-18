@@ -121,5 +121,5 @@
     "src/utils/types.ts": "13f605fbd9270a0b28166b1db6ab60ccc48b041c5ff0754208535b037233ddcd",
     "tsconfig.json": "8de302be9f264545bd9f25fb8e522dabc1c62a67a45de2844b3bbbc22859926d"
   },
-  "distribution_patch": "src/utils/projectPaths.ts accepts SPIDER_MCP_RUN_DIR to isolate runtime material under this workspace runs/"
+  "distribution_patch": "src/utils/projectPaths.ts isolates runtime materials; framework 0.1.2 updates dependency locks and adapts Puppeteer 25 connected/count APIs and a separate aggregated-issue event. Original hashes remain the unmodified input baseline."
 }

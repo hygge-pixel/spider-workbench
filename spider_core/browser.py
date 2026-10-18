@@ -228,12 +228,12 @@ def load_workspace_browser_config(
 
 
 def select_browser_candidate(
-    evidence: BrowserEvidence, *, default_candidate: str = "cloak"
+    evidence: BrowserEvidence, *, default_candidate: str = "chrome"
 ) -> str:
-    """Use the configured preference; reverse pressure favors Cloak."""
+    """Respect the configured browser; evidence alone cannot enable another runtime."""
     if default_candidate not in _CANDIDATE_PORTS:
         raise WorkspaceBrowserError("browser_config_invalid")
-    return "cloak" if any(asdict(evidence).values()) else default_candidate
+    return default_candidate
 
 
 def _json_from_url(url: str, *, timeout: float) -> Any:

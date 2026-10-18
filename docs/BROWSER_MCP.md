@@ -21,7 +21,7 @@ Agent 安装隔离工具并构建随包 JSReverser，读取官方 Stable 元数�
 
 ## MCP 宿主接入
 
-生成器仍可能输出 js-reverse 和 js-reverse-cloak 两个兼容定义。只将 js-reverse 合并到实际宿主，连接 chrome/9222；不要使用会把两项同时写入宿主的 --write-project-mcp。不启用 js-reverse-cloak；旧项目作用域定义经核对备份后停用，保留其它项目和用户全局服务。
+生成器默认只输出 js-reverse，连接 chrome/9222。按实际宿主格式合并；--write-project-mcp 仅用于已确认支持 mcpServers 格式的项目配置，并保留其它服务。不启用 js-reverse-cloak；旧项目作用域定义经核对备份后停用，保留其它项目和用户全局服务。
 
 MCP 启动器 scripts/start_js_reverser.mjs 先核验浏览器归属，再在宿主管理的同一个 Node 进程导入 build/src/index.js。command/args 使用目标机绝对路径，JSON/TOML 按实际宿主格式映射。运行材料在 runs/_mcp/js-reverse，不写入 vendor 源码。密钥不写入配置 JSON。
 

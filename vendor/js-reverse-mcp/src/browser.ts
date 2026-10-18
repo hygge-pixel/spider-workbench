@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-18: Puppeteer 25 exposes resize publicly; remove obsolete type suppression.
 /**
  * @license
  * Copyright 2025 Google LLC
@@ -167,7 +168,6 @@ export async function launch(options: McpLaunchOptions): Promise<Browser> {
     }
     if (options.viewport) {
       const [page] = await browser.pages();
-      // @ts-expect-error internal API for now.
       await page?.resize({
         contentWidth: options.viewport.width,
         contentHeight: options.viewport.height,
@@ -431,7 +431,6 @@ export class BrowserManager {
       if (this.config.viewport) {
         const [page] = await this.browser.pages();
         if (page) {
-          // @ts-expect-error internal API for now.
           await page.resize({
             contentWidth: this.config.viewport.width,
             contentHeight: this.config.viewport.height,

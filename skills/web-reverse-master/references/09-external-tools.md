@@ -8,14 +8,14 @@
 
 ### webcrack (⭐推荐)
 - **仓库**: https://github.com/j4k0xb/webcrack
-- **安装**: `npm install -g webcrack`
+- **安装**: `npm install --prefix tmp/tooling/webcrack webcrack`
 - **能力**: obfuscator.io 反混淆、webpack/browserify 解包、代码美化、死代码移除
 - **用法**: `npx webcrack input.js -o output.js`
 - **特点**: 自动检测混淆模式，无需配置，TypeScript编写，安全（考虑作用域和引用）
 
 ### js-beautify
 - **仓库**: https://github.com/beautifier/js-beautify
-- **安装**: `npm install -g js-beautify`
+- **安装**: `npm install --prefix tmp/tooling/js-beautify js-beautify`
 - **能力**: JS代码格式化、解压缩
 - **用法**: `npx js-beautify input.js -o output.js`
 - **特点**: 最基础的代码美化工具，处理简单压缩的代码
@@ -44,7 +44,7 @@
 
 ### whistle
 - **仓库**: https://github.com/avwo/whistle
-- **安装**: `npm install -g whistle`
+- **安装**: `npm install --prefix tmp/tooling/whistle whistle`
 - **能力**: 跨平台Web调试代理工具
 - **特点**: Node.js实现，支持规则配置，可拦截修改请求/响应
 

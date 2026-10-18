@@ -50,6 +50,6 @@ def encode(input_str, char_map):
                    char_map[64] if c=='=' else char_map[ABogus.__str["s0"].index(c)] for c in b)
 ```
 - **依赖**：`gmssl`（可选 SM3，失败回退内置 `SM3Hash`）；RC4/自定义 base64 纯 Python。
-- **验证**：✅ 真实请求 HTTP 200，0.84ms/个。
+- **验证状态**：此处仅保留方法参考；没有随包的当次业务证据或性能基准。必须重新做多输入对拍和新请求业务数据验收，HTTP 200 不能单独证明成功。
 
 ---

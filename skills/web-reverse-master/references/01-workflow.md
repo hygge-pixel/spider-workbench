@@ -309,7 +309,7 @@ MCP: adspower-browser → evaluate-script → 传入上面的Hook代码
 
 **路线B注入方式**：
 ```
-MCP: js-reverse-mcp → inject_before_load → 页面加载前注入（关键！）
+MCP: js-reverse-mcp → inject_preload_script → 页面加载前注入（关键！）
 MCP: js-reverse-mcp → evaluate_script → 加载后补充注入
 ```
 

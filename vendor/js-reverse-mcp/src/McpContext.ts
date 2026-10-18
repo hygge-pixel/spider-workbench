@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-18: Subscribe to the separate aggregated DevTools issue event.
 /**
  * @license
  * Copyright 2025 Google LLC
@@ -131,7 +132,7 @@ export class McpContext implements Context {
               collect(error);
             }
           },
-          issue: event => {
+          'spider:aggregated-issue': event => {
             collect(event);
           },
         } as ListenerMap;

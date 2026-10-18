@@ -161,4 +161,4 @@ python spider.py register experiments/<任务名> --proof-run runs/<本次通过
 
 在上述轻量核心之外新增 vendor/js-reverse-mcp、toolchain/playwright-cli、requirements-collection/dev、隔离安装器、Node MCP 启动器、短时 Python 身份预检、MCP/CDP 探针和旧版升级器。
 这些模块不改变 spider.py run 的采集入口。Node 启动器先经核心身份核验，再在同一宿主进程载入 JSReverser；Playwright 使用同一浏览器配置。MCP 运行材料隔离到 runs/_mcp。
-详细步骤见 [工具链部署与验收](工具链部署与验收.md)，已有项目见 [已部署旧版的调整工单](已部署旧版的调整工单.md)。
+详细步骤见 [工具链部署与验收](工具链部署与验收.md)，已有项目见 [升级与迁移](MIGRATION.md)。

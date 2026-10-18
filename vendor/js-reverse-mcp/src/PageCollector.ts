@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-18: Separate aggregated DevTools issues from Puppeteer native issue events.
 /**
  * @license
  * Copyright 2025 Google LLC
@@ -69,7 +70,7 @@ export interface RequestInitiator {
 }
 
 interface PageEvents extends PuppeteerPageEvents {
-  issue: AggregatedIssue;
+  'spider:aggregated-issue': AggregatedIssue;
 }
 
 export type ListenerMap<EventMap extends PageEvents = PageEvents> = {
@@ -348,7 +349,7 @@ class PageIssueSubscriber {
       return;
     }
     this.#seenIssues.add(event.data);
-    this.#page.emit('issue', event.data);
+    this.#page.emit('spider:aggregated-issue', event.data);
   };
 
   // On navigation, we reset issue aggregation.

@@ -94,7 +94,7 @@ description: Use when an authorized Web/JS reverse result is inconsistent, drift
 
 ## Phase Mapping
 
-本 Skill 可在 CLAUDE.md Phase 2-4 任意阶段按需插入：
+本 Skill 可在 参考方法中的 Phase 2-4 任意阶段按需插入：
 
 | Phase | 触发条件 | 与专业 Skill 的协作 |
 |-------|---------|-------------------|

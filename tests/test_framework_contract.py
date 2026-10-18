@@ -29,7 +29,7 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertEqual(len(original), 13)
         for name in original:
             self.assertTrue((ROOT / 'skills' / name / 'SKILL.md').is_file(), name)
-        for name in ('部署与调整说明', '交给目标Agent', '框架与Skills说明', '导出调整记录', '部署实施计划'):
+        for name in ('USER_GUIDE', 'INSTALL_WITH_AGENT', 'BROWSER_MCP', 'MIGRATION', '框架与Skills说明'):
             path = ROOT / f'docs/{name}.md'
             self.assertTrue(path.is_file(), name)
             self.assertGreater(len(path.read_text(encoding='utf-8')), 300)

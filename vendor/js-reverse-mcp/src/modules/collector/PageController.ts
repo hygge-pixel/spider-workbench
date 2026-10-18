@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-18: Map external clickCount option to Puppeteer 25 count.
 /**
  * 页面控制器 - 薄封装Puppeteer API
  * 
@@ -122,7 +123,7 @@ export class PageController {
     const page = await this.collector.getActivePage();
     await page.click(selector, {
       button: options?.button || 'left',
-      clickCount: options?.clickCount || 1,
+      count: options?.clickCount || 1,
       delay: options?.delay,
     });
     logger.info(`Clicked: ${selector}`);

@@ -17,12 +17,12 @@ description: Use when JavaScript contains _0x tables, decoder wrappers, dispatch
 
 ## 工作流
 
-> 以下脚本引用依赖项目内存在 `scripts/` 目录。如项目中不存在，核心工作流仍可按方法论手动执行。
+> 配套脚本已包含在本 Skill 中。以下命令从工作区根目录执行；依赖使用根目录 package-lock 安装，先检测再按命中的流水线运行。
 
 ### Step 1: 模式检测
 
 ```bash
-node scripts/detect-patterns.js <input.js> [hint]
+node skills/ast-deobfuscation/scripts/detect-patterns.js <input.js> [hint]
 ```
 
 输出：命中的混淆家族 + 检测到的症状列表。
@@ -34,7 +34,7 @@ node scripts/detect-patterns.js <input.js> [hint]
 ### Step 3: 执行流水线
 
 ```bash
-node scripts/run-pipeline.js <input.js> <output-dir> [hint]
+node skills/ast-deobfuscation/scripts/run-pipeline.js <input.js> <output-dir> [hint]
 ```
 
 执行选中的变换步骤，记录每步耗时。
@@ -43,7 +43,7 @@ node scripts/run-pipeline.js <input.js> <output-dir> [hint]
 
 - `node --check <output.js>` 语法检查
 - 对照参考产物或原始混淆症状，判断是否还需要新增专用适配脚本
-- 使用 `scripts/collect-residue-metrics.js` 统计剩余混淆特征
+- 使用 `skills/ast-deobfuscation/scripts/collect-residue-metrics.js` 统计剩余混淆特征
 
 🔴 **CHECKPOINT**：每层变换后都必须通过语法检查 + 人工审查关键函数可读性。
 
@@ -94,7 +94,7 @@ node scripts/run-pipeline.js <input.js> <output-dir> [hint]
 
 ## 入口脚本
 
-> 以下脚本为本 Skill 的配套工具，非必需。首次使用时需创建。如项目中不存在，核心工作流仍可按方法论手动执行。
+> 以下脚本已随包提供，路径相对于本 Skill；不要在工作区根 scripts/ 重建同名脚本。
 
 - `scripts/detect-patterns.js`
   根据文件路径、可选 hint 和源码症状判断最可能命中的站点或混淆家族。
@@ -131,11 +131,11 @@ node scripts/run-pipeline.js <input.js> <output-dir> [hint]
 
 ## Phase Mapping
 
-本 Skill 主要在 CLAUDE.md Phase 2（定位加密）作为前置步骤：
+本 Skill 主要在 参考方法中的 Phase 2（定位加密）作为前置步骤：
 
 | Phase | 本 Skill 的角色 | 与专业 Skill 的协作 |
 |-------|----------------|-------------------|
-| Phase 2 定位加密 | ✅ 前置步骤：混淆代码必须先还原才能 Hook/搜索 | 还原后转交 `param-encryptor` 分析加密函数 |
+| Phase 2 定位加密 | ✅ 前置步骤：根据证据按需还原；可先 Hook/搜索定位最小范围 | 还原后转交 `param-encryptor` 分析加密函数 |
 | Phase 3 方案制定 | 🟡 按需：Plan 中如涉及混淆处理方案 | — |
 | Phase 4 代码还原 | 🟡 按需：最终 signer.js 可能需要局部反混淆 | — |
 

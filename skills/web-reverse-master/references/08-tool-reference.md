@@ -97,7 +97,7 @@ adspower-browser → open-browser → get-opened-browser → 获取CDP端口
 - ✅ 断点调试（set_breakpoint_on_text）
 - ✅ 调用栈追踪（get_paused_info）
 - ✅ 源码搜索（search_in_sources）
-- ✅ 页面加载前注入（inject_before_load）
+- ✅ 页面加载前注入（inject_preload_script）
 - ✅ Hook注入（evaluate_script）
 - ✅ 网络请求列表（list_network_requests）
 - ❌ 指纹保护（浏览器可能就是普通Chrome）
@@ -113,7 +113,7 @@ MCP: js-reverse-mcp → list_scripts → 查看已加载的JS
 ### Hook注入
 ```
 MCP: js-reverse-mcp → navigate_page → 导航到目标URL
-MCP: js-reverse-mcp → inject_before_load → 注入JS（页面加载前执行）★关键
+MCP: js-reverse-mcp → inject_preload_script → 注入JS（页面加载前执行）★关键
 MCP: js-reverse-mcp → evaluate_script → 动态执行JS
 ```
 

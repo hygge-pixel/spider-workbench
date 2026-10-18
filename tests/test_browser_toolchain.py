@@ -8,6 +8,11 @@ from scripts.browser_toolchain import build_definitions, merge_definitions, prob
 
 
 class BrowserToolchainTests(unittest.TestCase):
+    def test_default_generated_mcp_only_enables_chrome(self):
+        definitions = build_definitions(Path('/project'), Path(sys.executable), node=Path(sys.executable))
+        self.assertEqual(set(definitions), {'js-reverse'})
+        self.assertEqual(definitions['js-reverse']['args'][-1], 'chrome')
+
     def test_definitions_use_launcher_and_candidate_from_current_workspace(self):
         with tempfile.TemporaryDirectory(prefix='tools space ') as directory:
             root = Path(directory)

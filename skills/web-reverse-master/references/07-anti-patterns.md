@@ -41,7 +41,7 @@
 
 **表现**：页面加载后才注入Hook → 框架闭包已创建 → Hook无效。
 
-**纠正**：用 `inject_before_load` 或 `Page.addScriptToEvaluateOnNewDocument`。
+**纠正**：用 `inject_preload_script` 或 `Page.addScriptToEvaluateOnNewDocument`。
 
 ---
 

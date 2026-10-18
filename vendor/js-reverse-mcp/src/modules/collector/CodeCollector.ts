@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-18: Use Puppeteer 25 connected property.
 /**
  * 代码收集模块 - 完整实现
  *
@@ -237,7 +238,7 @@ export class CodeCollector {
    * 初始化浏览器 - 统一由 BrowserModeManager 管理
    */
   async init(): Promise<void> {
-    if (this.browser && this.browser.isConnected()) {
+    if (this.browser && this.browser.connected) {
       return;
     }
 
@@ -287,7 +288,7 @@ export class CodeCollector {
    * 🆕 获取当前活动的Page实例
    */
   async getActivePage(): Promise<Page> {
-    if (!this.browser || !this.browser.isConnected()) {
+    if (!this.browser || !this.browser.connected) {
       await this.init();
     }
 
@@ -319,7 +320,7 @@ export class CodeCollector {
    * 🆕 创建新页面
    */
   async createPage(url?: string): Promise<Page> {
-    if (!this.browser || !this.browser.isConnected()) {
+    if (!this.browser || !this.browser.connected) {
       await this.init();
     }
 
@@ -352,9 +353,9 @@ export class CodeCollector {
     pagesCount: number;
     version?: string;
   }> {
-    if (!this.browser || !this.browser.isConnected()) {
+    if (!this.browser || !this.browser.connected) {
       const managedBrowser = this.browserManager.getBrowser();
-      if (managedBrowser && managedBrowser.isConnected()) {
+      if (managedBrowser && managedBrowser.connected) {
         this.browser = managedBrowser;
       } else {
         return {

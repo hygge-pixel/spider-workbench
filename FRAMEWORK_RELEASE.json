@@ -1,6 +1,6 @@
 {
   "edition": "public-source",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "prepared_on": "2026-10-18",
   "upgrade_from": "framework-only-2026-10-16",
   "default_browser_preference": "chrome",

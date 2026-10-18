@@ -174,7 +174,7 @@ description: Use when an approved Web/JS reverse implementation plan already exi
 # js-reverse-mcp → search_in_sources "sign"
 
 # Hook 注入：在导航前注入 Hook
-# js-reverse-mcp → inject_before_load [Hook 代码]
+# js-reverse-mcp → inject_preload_script [Hook 代码]
 
 # 断点：拦截含目标参数的请求
 # js-reverse-mcp → break_on_xhr "/api/login"
@@ -216,7 +216,7 @@ description: Use when an approved Web/JS reverse implementation plan already exi
 
 ## Phase Mapping
 
-本 Skill 对应 CLAUDE.md Phase 2-4（加密定位→方案执行→代码还原）：
+本 Skill 对应 参考方法中的 Phase 2-4（加密定位→方案执行→代码还原）：
 
 | Phase | 本 Skill 的角色 | 与专业 Skill 的协作 |
 |-------|----------------|-------------------|

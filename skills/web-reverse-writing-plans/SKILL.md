@@ -129,7 +129,7 @@ description: Use when an authorized Web/JS reverse route is approved and must be
 
 ## Phase Mapping
 
-本 Skill 对应 CLAUDE.md Phase 1-3（流量分析→加密定位→方案制定）：
+本 Skill 对应 参考方法中的 Phase 1-3（流量分析→加密定位→方案制定）：
 
 | Phase | 本 Skill 的角色 | 与专业 Skill 的协作 |
 |-------|----------------|-------------------|

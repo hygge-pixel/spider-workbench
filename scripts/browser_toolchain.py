@@ -33,7 +33,7 @@ def write_json(path, value):
         temporary.unlink(missing_ok=True)
 
 
-def build_definitions(root, python, candidates=('chrome', 'cloak'), *, node=None):
+def build_definitions(root, python, candidates=('chrome',), *, node=None):
     if node is None:
         raise ValueError('Node executable required for the single-process MCP launcher')
     names = {'chrome': 'js-reverse', 'cloak': 'js-reverse-cloak'}

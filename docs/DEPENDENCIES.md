@@ -18,13 +18,17 @@ npm 使用完整 lock，公共版把三个非 vendor lock 的镜像 resolved URL
 
 ## 漏洞审计状态
 
-2026-10-18 整理时尝试查询随包 MCP 的 npm advisories：本机默认镜像安全接口返回不支持，显式官方 registry 的请求超时。因此该项没有得到有效漏洞数量，状态为未完成，不能解释为零漏洞。具体本轮结果见包外验收报告。安装/构建通过与依赖漏洞查询是两类证据。
+2026-10-18 从实际 GitHub main 新克隆审计：初始 MCP 锁依赖返回 40 项告警（3 critical、28 high、7 moderate、2 low）。兼容范围更新后仍有 11 项，因此分别升级并锁定 MCP SDK 1.32.1、Puppeteer 25.14.0、Rollup 4.64.9 与 sm-crypto 0.5.7，并适配 Puppeteer 25 的连接状态、点击参数和独立 issue 事件。没有使用 audit fix --force，也没有删除告警数据库或排除运行所需的 devDependencies。
 
-维护者发布前在可访问官方接口的环境重新执行，并审查是否影响实际使用路径：
+修补后四份 npm lock（根、AST Skill、MCP、Playwright CLI）通过官方 registry 的 package-lock-only audit，均返回 0 项。这个结果只代表当日已知依赖告警，不是未来安全承诺或全部代码审计。原始 snapshot 哈希保留输入来源；修改后的发布字节以当前 manifest 为准。
+
+重新 npm ci、prepare、TypeScript build 后，在本机已有 Chrome 151 上通过项目启动器归属预检、MCP 初始化/工具目录、合成页面求值、预加载后重载、双击、独立 issue 事件，以及 SM3 向量和 SM2 签名校验。没有下载新浏览器；临时 Profile 已清理。这不是所有 MCP 工具、任意浏览器版本或真实站点验收。
+
+维护者发布前重新执行：
 
 ```console
-npm audit --json --registry=https://registry.npmjs.org --prefix vendor/js-reverse-mcp
-npm audit --json --registry=https://registry.npmjs.org
+npm audit --package-lock-only --json --registry=https://registry.npmjs.org --prefix vendor/js-reverse-mcp
+npm audit --package-lock-only --json --registry=https://registry.npmjs.org
 ```
 
-Python 的 advisories 也需在所选隔离环境独立审计；pip check 不是漏洞扫描。若有告警，保留实际报告、区分开发/运行依赖，按上游修复兼容性升级并重新构建/回归，不直接 audit fix --force。CI当前验证功能和构建，不宣称依赖安全审计已经全部通过。
+其余两份 lock 也在对应目录查询。Python advisories 尚未独立审计；pip check 只验证依赖兼容性。上游完整测试目录未随最小源码包发布，不能把本项目构建/探针通过写成上游全部测试通过。后续依赖升级必须重新构建并验收实际调用链。

@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-18: Use Puppeteer 25 connected property.
 import type { Browser, Page } from 'puppeteer';
 import puppeteer from 'puppeteer';
 import { spawn, type ChildProcess } from 'child_process';
@@ -196,7 +197,7 @@ export class BrowserModeManager {
   }
 
   async launch(): Promise<Browser> {
-    if (this.browser && this.browser.isConnected()) {
+    if (this.browser && this.browser.connected) {
       logger.info('🔁 Browser already connected, reusing existing session.');
       return this.browser;
     }

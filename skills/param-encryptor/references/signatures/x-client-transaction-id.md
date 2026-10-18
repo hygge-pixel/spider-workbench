@@ -32,6 +32,6 @@ def generate(self, method, path, timestamp=None, rand_byte=None):
     return base64.b64encode(bytes([rb]+[b^rb for b in arr])).decode().rstrip("=")
 ```
 - **依赖**：纯标准库（hashlib/base64/math/re）。
-- **验证**：✅ verify_golden 逐字节一致；真实请求 200。
+- **验证状态**：此处是参考方法，未携带当次运行证据。目标任务必须重新做逐字节对拍，并核验新请求返回的目标业务数据。
 
 ---

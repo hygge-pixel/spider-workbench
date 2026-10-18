@@ -180,7 +180,7 @@ web-reverse-workflow
 
 ## Phase Mapping
 
-本 Skill 在 CLAUDE.md Phase 0-4 工作流中的定位：
+本 Skill 在 参考方法中的 Phase 0-4 工作流中的定位：
 
 | Phase | 路由目标 | 说明 |
 |-------|---------|------|

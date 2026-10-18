@@ -1,21 +1,37 @@
 # 升级与迁移
 
-公共仓库从 framework-toolchain v2 的干净内容快照整理，核心采集逻辑保持一致，增加许可证归属、公开文档、CI 和发布工具。公共版版本号从 0.1.0 开始，与本机部署包 v1/v2 名称分别管理。
+公共仓库是干净框架，不包含旧采集器、记录、Profile 或凭据。新电脑按 README 打开工作区并交给 Agent，部署工单是 INSTALL_WITH_AGENT.md。不要复制旧机器 .git、虚拟环境、全局 Agent 配置或会话。
 
-## 新电脑
+## 已部署目录的保留式调整
 
-从公共源码开始，现场安装 Python/Node/浏览器和依赖，创建本机 Skill 链接及配置，逐层验收。不要迁移旧机器的 .git、Profile、cookies.json、全局 Agent 配置和虚拟环境。原始 package-lock 的镜像 resolved 地址已转官方 registry，版本/integrity 不变。
+保留目标项目，新源码解压到项目外的独立目录，先核验 manifest。下面命令从新源码根执行；python 指本机已确认的 Python 3.11，目标路径按本机实际填写。
 
-## 已部署私有 v1/v2
+```powershell
+python scripts/verify_distribution.py
+python scripts/upgrade_framework.py --target '<现有项目绝对路径>'
+```
 
-保留现有项目，不全目录覆盖。新包解压到项目外独立目录，先 verify_distribution，再运行 upgrade_framework.py --target 实际目录，只读查看 changes/conflicts/preserved；审核冲突后才 --apply。
+默认只读列出 changes/conflicts/preserved，不写目标目录。升级器内置 framework-only v1 基线，只支持基于文件哈希的三方比较；对公共版 0.1.1、已改动的 v2 或其它分支，不保证自动合并。冲突逐个比较，保留本机修改并合入新规则。--accept-local 仅用于已人工审核的单个文件，不批量跳过冲突。审核后再执行：
 
-升级器带 v1 基线，适合昨天 v1 的三方比较。目标若已有 v2 或其它分支，修改过的文件会报告冲突，不宣称自动语义合并。逐项比较后保留本机修改并合入新规则，使用 --accept-local 只标记已人工审核文件，不批量跳过冲突。
+```powershell
+python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --apply
+```
 
-已有 experiments、注册表、本机配置、runs/tmp/outputs 和凭据受保护。文件位置被目录或父文件占用也会提前报冲突。回退只覆盖本次仍未再次修改的框架文件，不覆盖升级后新增工作。依赖、浏览器、宿主配置与人工规则合并需要单独记录差异。
+已有 experiments、注册表、本机配置、runs/tmp/outputs 和凭据受保护。更新前记录 target、差异和返回的 backup 路径；备份放在目标 outputs/framework-upgrade/。文件被目录或父文件占用会报冲突。回退命令：
 
-详细命令和受保护回退流程见[旧版调整工单](已部署旧版的调整工单.md)。其中旧版日期说明仅用于识别原部署，不应被当成目标机器已验收。后续公共版本需要自己的基线与迁移说明。
+```powershell
+python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --rollback '<本次返回的 backup 绝对路径>' --apply
+```
 
-## 未来版本
+回退要求本次写入的文件未再次修改，不覆盖升级后新增工作。不要整目录覆盖。升级器只处理新包声明的文件，不自动删除新版本已移除的旧文件；旧专项 Skills、过期工单按差异审核后另行归档，避免宿主继续发现旧入口。
 
-0.x 阶段变更 CLI/Task/证据 schema 时同时更新测试、迁移说明和 CHANGELOG。旧 proof 是验证快照，不自动升级为当前在线证明。每次真实任务用到哪个历史能力，再迁移和验证哪个，不批量引入旧平台。
+## 0.1.2 的具体变化
+
+- 默认 Chrome for Testing / chrome / 9222。压力证据尊重已配置默认浏览器，生成器默认只输出 js-reverse。旧 cloak 槽位保留兼容 schema，不安装或自动启用。
+- 当前包保留 13 个通用 Skills，已移除验证码、小程序、Android、原生逆向与 REA 专项。验证码暂停规则保留。
+- 旧工单归并到 INSTALL_WITH_AGENT、CHROME_FOR_TESTING、BROWSER_MCP 和本说明；Skill/tool 名称与会话保存规则以新入口为准。
+- MCP 依赖锁有修补。备份已有配置，重新按锁安装并构建，再做初始化、实际 CDP 和宿主加载验收；只替换锁文件不代表升级完成。
+
+重新检查 Python 3.11、Node 24+ 与隔离环境版本。保留旧版本，不全局覆盖 PATH；既有虚拟环境版本不符时保留后建立新环境。浏览器程序与 Profile 分开，退出后再备份 Profile，切换按 CHROME_FOR_TESTING 工单执行。
+
+最后运行完整回归与离线例子。此步骤验证框架；当前在线平台仍须用本次真实请求和业务数据验收，旧 proof 不自动升级。

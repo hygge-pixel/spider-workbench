@@ -115,8 +115,8 @@ class BrowserConfigTests(unittest.TestCase):
 class RepositoryBrowserConfigTests(unittest.TestCase):
 
 
-    def test_browser_evidence_prefers_cloak_by_default(self) -> None:
-        self.assertEqual(select_browser_candidate(BrowserEvidence()), "cloak")
+    def test_browser_evidence_defaults_to_chrome_without_enabling_cloak(self) -> None:
+        self.assertEqual(select_browser_candidate(BrowserEvidence()), "chrome")
         for field in (
             "fingerprint_pressure",
             "anti_debugger_pressure",
@@ -125,7 +125,11 @@ class RepositoryBrowserConfigTests(unittest.TestCase):
         ):
             with self.subTest(field=field):
                 evidence = BrowserEvidence.from_dict({field: True})
-                self.assertEqual(select_browser_candidate(evidence), "cloak")
+                self.assertEqual(select_browser_candidate(evidence), "chrome")
+                self.assertEqual(select_browser_candidate(evidence, default_candidate="chrome"), "chrome")
+
+    def test_explicit_legacy_preference_remains_an_explicit_choice(self) -> None:
+        self.assertEqual(select_browser_candidate(BrowserEvidence(), default_candidate="cloak"), "cloak")
 
     def test_browser_evidence_rejects_unknown_and_non_boolean_fields(self) -> None:
         with self.assertRaisesRegex(

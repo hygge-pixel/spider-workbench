@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "public_version": "0.1.1",
+  "public_version": "0.1.2",
   "prepared_on": "2026-10-18",
   "base_edition": "framework-toolchain-v2",
   "base_archive_sha256": "288eb774d3ac139e06093c8869b407350f715fb5e558f051a1007ae906297091",
@@ -24,7 +24,8 @@
     "npm mirror resolved URLs changed to official registry; versions/integrity unchanged",
     "public project metadata; runtime collection core unchanged",
     "0.1.1: beginner README, user guide, Agent install prompt and explicit bootstrap installer wrapper",
-    "Current main: remove five optional specialist Skills and their bundled materials; synchronize health and routing; add Python runtime mismatch preflight"
+    "Current main: remove five optional specialist Skills and their bundled materials; synchronize health and routing; add Python runtime mismatch preflight",
+    "0.1.2: respect configured default browser, generate Chrome-only MCP by default, consolidate deployment docs and correct Skill/tool references; dependency changes recorded in CHANGELOG"
   ],
   "original_git_history_included": false,
   "legacy_collectors_or_data_included": false,

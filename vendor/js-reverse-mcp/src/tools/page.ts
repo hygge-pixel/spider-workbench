@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-18: Use Puppeteer 25 connected property.
 import {zod} from '../third_party/index.js';
 import {defineTool} from './ToolDefinition.js';
 import {ToolCategory} from './categories.js';
@@ -444,7 +445,7 @@ export const checkBrowserHealth = defineTool({
     const runtime = getJSHookRuntime();
     const issues: Array<{code: string; message: string}> = [];
     const browser = runtime.browserManager.getBrowser();
-    let connected = Boolean(browser && browser.isConnected());
+    let connected = Boolean(browser && browser.connected);
     try {
       const status = await runtime.collector.getStatus();
       connected = connected || status.running;

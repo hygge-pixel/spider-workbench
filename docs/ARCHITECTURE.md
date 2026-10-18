@@ -32,7 +32,7 @@ Task → runner 创建独立 runs/run_id → 子进程收到 --task / --output-d
 
 ## 4. 浏览器工具链
 
-config/workspace_browser.json 是唯一浏览器配置源。agent_platform_compat 生成本机候选；browser_toolchain 生成两项 MCP 启动定义；start_js_reverser.mjs 调短时 Python 身份预检，再在同一个 Node 进程载入 MCP。MCP 的 artifacts、debugger-sessions 和 cache 经适配留在 runs/_mcp。
+config/workspace_browser.json 是唯一浏览器配置源。agent_platform_compat 生成本机候选；browser_toolchain 默认只生成 js-reverse 启动定义；start_js_reverser.mjs 调短时 Python 身份预检，再在同一个 Node 进程载入 MCP。MCP 的 artifacts、debugger-sessions 和 cache 经适配留在 runs/_mcp。
 
 默认部署 Chrome for Testing/chrome/9222 与 js-reverse；Cloak 不安装或启用，生成器中的另一项只为历史兼容保留。Playwright 通过配置的 CDP 地址连接同一项目浏览器；合成检查只关闭自己创建的标签。浏览器能够连接不等于归属正确，更不代表账号数据可用。
 
@@ -45,3 +45,9 @@ config/workspace_browser.json 是唯一浏览器配置源。agent_platform_compa
 ## 6. 核心扩展原则
 
 先留在任务目录，至少三个真实用例证明共性后再考虑核心。核心保持 Python 3.11 标准库，HTTP、浏览器和站点解析依赖按需、隔离、就近声明。行为变化先失败测试，提供错误路径与数据完整性证据。
+
+## 7. 批量边界
+
+runner 不自动实现分页、限速、重试、游标或断点恢复；这些由具体 collector 实现并保存证据。当前结果校验会整体读取 normalized.jsonl，子进程 stdout/stderr 也会缓冲，内存随输出规模增长；大任务应分片、限制日志并验证每片的完整性。
+
+本轮离线合成检查覆盖十万条正常记录，以及各两万条的重复键、缺失字段、数量不足路径。它证明所测输出合同正常，不代表真实站点速度、网络恢复或无限规模容量。

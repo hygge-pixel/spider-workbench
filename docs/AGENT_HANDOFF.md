@@ -11,7 +11,7 @@
 3. setup 建立本机 Skill 发现链接；已有目录冲突保留并报告，不清空。
 4. 安装器先计划，再 component all --apply；保留旧环境，隔离到 .venv-toolchain。
 5. 从 Google 官方查询并安装最新 Stable Chrome for Testing，配置 chrome/9222、独立 tmp/chrome-mcp Profile 并设为默认；不安装或启用 Cloak，见 CHROME_FOR_TESTING。
-6. 生成本机 MCP 定义，只按实际 Agent 宿主格式合并 js-reverse，忽略未使用的 js-reverse-cloak；不覆盖其它配置或用户全局设置，不调用会导入两项的 --write-project-mcp。
+6. 生成本机 MCP 定义，只按实际 Agent 宿主格式合并 js-reverse，忽略未使用的 js-reverse-cloak；不覆盖其它配置或用户全局设置，当前生成器默认只有 js-reverse，项目写入开关仅用于支持 mcpServers 格式的宿主。
 7. 分别做 mcp-smoke stdio、只读调用、cdp-smoke；重连宿主，实际发现并调用工具。
 8. 运行完整框架回归和公开发布扫描；如有本机新任务，运行其测试，不删除任务来满足空框架假设。
 
