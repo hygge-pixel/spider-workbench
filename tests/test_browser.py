@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import threading
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 from unittest import mock
 
@@ -519,11 +520,21 @@ class BrowserRuntimeTests(BrowserConfigTests):
             browser_module.subprocess,
             "run",
             return_value=completed,
-        ) as runner:
+        ) as runner, mock.patch.object(browser_module, "os", SimpleNamespace(name="nt")):
             self.assertFalse(browser_module._windows_process_matches(config))
 
         self.assertEqual(runner.call_args.kwargs["encoding"], "utf-8")
         self.assertEqual(runner.call_args.kwargs["errors"], "replace")
+
+    def test_non_windows_process_inspection_does_not_launch_powershell(self) -> None:
+        config = BrowserConfig(
+            executable=Path("browser"), cdp_url="http://127.0.0.1:9222",
+            user_data_dir=Path("profile"), startup_timeout_seconds=5,
+        )
+        with mock.patch.object(browser_module, "os", SimpleNamespace(name="posix")), \
+             mock.patch.object(browser_module.subprocess, "run") as runner:
+            self.assertFalse(browser_module._windows_process_matches(config))
+        runner.assert_not_called()
 
 
 if __name__ == "__main__":

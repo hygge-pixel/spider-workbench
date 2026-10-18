@@ -15,7 +15,7 @@ class PortableSetupTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix='framework space ')
         self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name)
+        self.root = Path(self.temporary.name).resolve()
         skill = self.root / 'skills/demo'
         skill.mkdir(parents=True)
         (skill / 'SKILL.md').write_text('---\nname: demo\n---\n', encoding='utf-8')

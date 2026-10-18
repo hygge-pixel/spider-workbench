@@ -5,6 +5,7 @@
 首次独立开源源码整理与易用性改进版。尚未自动创建远程仓库、tag 或 GitHub Release。
 
 - 新增 bootstrap.py：默认一条命令离线体验，显式 --install 安装隔离工具并生成MCP定义。
+- 根据首次真实 GitHub Actions 结果修正测试的 Windows/POSIX 路径假设和 Windows 短路径别名比较，增加两种可选后端布局与非 Windows 不启动 PowerShell 的覆盖；采集核心行为不变。
 - 重写README并新增用户指南/Agent安装提示词，区分工具安装、浏览器接通与宿主加载。
 - 保留标准库 CLI/核心、18 个通用 Skills、空注册表及离线三条示例。
 - 保留 JSReverser2.0.3 源码快照、Playwright CDP、隔离安装、保留式升级与分层验收。

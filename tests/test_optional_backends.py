@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
+
+from spider_core import optional_backends as optional_module
 
 from spider_core.optional_backends import (
     BackendRequest,
@@ -35,7 +38,7 @@ def tun_fake_ip_resolver(host: str, port: int, **kwargs: object):
 class OptionalBackendTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
-        self.root = Path(self.temporary.name)
+        self.root = Path(self.temporary.name).resolve()
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -114,10 +117,17 @@ class OptionalBackendTests(unittest.TestCase):
         result = runtime_python(self.root, "scrapling")
 
         self.assertTrue(result.is_absolute())
-        self.assertEqual(result.parent.name, "Scripts")
+        self.assertEqual(result.parent.name, "Scripts" if os.name == "nt" else "bin")
+        self.assertEqual(result.name, "python.exe" if os.name == "nt" else "python")
         self.assertEqual(result.parents[2], self.root / "tmp" / "runtimes")
         with self.assertRaises(ValueError):
             runtime_python(self.root, "../escape")
+
+    def test_runtime_python_uses_each_platform_layout_without_leaving_workspace(self) -> None:
+        for platform, folder, program in (("nt", "Scripts", "python.exe"), ("posix", "bin", "python")):
+            with self.subTest(platform=platform), patch.object(optional_module, "os", SimpleNamespace(name=platform)):
+                actual = runtime_python(self.root, "scrapling")
+            self.assertEqual(actual, self.root / "tmp/runtimes/scrapling" / folder / program)
 
     def test_missing_runtime_has_safe_remediation(self) -> None:
         request = BackendRequest(

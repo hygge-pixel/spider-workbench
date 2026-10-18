@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import tempfile
 import sys
 import unittest
@@ -91,8 +92,17 @@ class OptionalBackendSetupTests(unittest.TestCase):
 
         self.assertNotIn("venv", " ".join(sum(scrapling, [])))
         self.assertEqual(scrapling[-1][-1], "install")
-        self.assertTrue(scrapling[-1][0].endswith("scrapling.exe"))
+        self.assertEqual(Path(scrapling[-1][0]).name, "scrapling.exe" if os.name == "nt" else "scrapling")
         self.assertEqual(camoufox[-1][-3:], ["-m", "camoufox", "fetch"])
+
+    def test_runtime_executables_have_explicit_windows_and_posix_layouts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            spec = get_runtime_spec(Path(directory), "scrapling")
+            for platform, folder, python, cli in (("nt", "Scripts", "python.exe", "scrapling.exe"),
+                                                  ("posix", "bin", "python", "scrapling")):
+                with self.subTest(platform=platform), mock.patch.object(setup_optional_backend, "os", SimpleNamespace(name=platform)):
+                    self.assertEqual(spec.python, spec.runtime_dir / folder / python)
+                    self.assertEqual(spec.scrapling_cli, spec.runtime_dir / folder / cli)
 
     def test_missing_lock_is_rejected_before_any_command(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
