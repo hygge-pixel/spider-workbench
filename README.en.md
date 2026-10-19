@@ -42,3 +42,5 @@ The repository starts without website collectors or business data. Browser binar
 Original contributions use [Apache-2.0](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md), [architecture](docs/ARCHITECTURE.md), [tests](docs/TESTING.md) and [contributing](CONTRIBUTING.md).
 
 Project rule entrypoints cover Codex, Claude Code, Gemini CLI, Cursor, GitHub Copilot, Windsurf, Cline, Roo Code, Kiro, OpenCode and TRAE. AGENTS.md is canonical and includes a directly readable Skill index. Workspace trust, disabled rules, custom agents and actual MCP loading remain host-specific. See [compatibility and acceptance](docs/AGENT_COMPATIBILITY.md).
+
+Deployment uses a preflight and resumable stage runner; verified dependencies and the configured browser are reused. Host trust, effective configuration and an actual tool call are accepted separately. See [deployment stages](docs/NEW_MACHINE_DEPLOYMENT.md). A host_pending result remains incomplete until the Agent observes the current host call.

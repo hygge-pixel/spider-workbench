@@ -20,6 +20,8 @@
 
 Chrome for Testing 是浏览器；CDP 是连接协议；JSReverser 是 MCP 服务；Playwright 是脚本客户端。更换浏览器不等于移除逆向工具层。MCP/CDP 使用完整 Chrome，不要求下载 ChromeDriver；headless-shell 也不替代本工单要求的完整浏览器。
 
+新电脑统一由 scripts/deploy.py 编排，内置 scripts/setup_chrome.py 执行官方 Windows Stable 下载、缓存校验与原子安装，不再要求 Agent 临时重写下载脚本。已有有效配置复用，见 [部署流程](NEW_MACHINE_DEPLOYMENT.md)。
+
 ## 2. 获取最新 Stable
 
 1. 检查目标机器系统与实际架构，读取官方 JSON，选择 Stable.downloads.chrome 中匹配的资源。Windows x64 对应 win64；其它平台以当次官方资源列表为准。无匹配资源时明确记录限制。

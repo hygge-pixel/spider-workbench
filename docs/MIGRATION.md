@@ -43,3 +43,17 @@ python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --roll
 不删除已有浏览器程序/会话目录。旧宿主中的本项目备用 MCP 定义先备份并停用，保留其它项目和用户服务；新的默认定义只有 js-reverse。不要仅删除 JSON 的一个键而留下不匹配的 default_candidate。
 
 新增规则入口随新包提供，默认会进入仓库和 ZIP。升级时保留用户对已有入口的定制，发生同名冲突逐项比较；不要将本机 Skill junction 提交或拷到其它机器。README 的用户操作仍只有打开工作区并发送提示词。
+
+## 0.1.4 安装编排与已有目录调整
+
+适用于已完成部署的旧项目。把本文与新版源码交给原项目 Agent；不要将新 ZIP 直接覆盖旧目录。新版源码不包含旧电脑的 Python/Node 路径、浏览器、登录态、输出或安装记录。
+
+1. 读取旧目录的 deployment_acceptance、相关会话和源码补丁，核对当前版本及工作树；保存框架文件与配置的哈希清单。备份改动文件到本机 runs/_deployment_backups/<时间>/。
+2. 按 MIGRATION.md 与 upgrade_framework.py 的计划/审核机制三方比对。框架代码和说明按差异更新；保留 experiments、platforms、runs、outputs、tmp、现有虚拟环境、浏览器和宿主配置。旧版中文路径 UTF-8 修复已进入新版 browser.py，保留其它本机补丁，冲突逐项审核。
+3. 新版分发清单必须来自完整新版源码；不要把新版清单单独放入尚未升级完的旧代码树。仍有本机定制时逐项建立 source_patches.local.json，保留原分发来源；不自动刷新旧 proof 或注册。
+4. 从 config/agent_tools.local.json 检查实际 Python 3.11、Node24+/npm 路径。旧 Codex 包装脚本固定指向应用缓存的，重新发现并验证 CLI 后再调整；不修改全局 PATH 或个人审批设置。
+5. 先由 Agent 执行 deploy.py preflight，再 apply。已有浏览器配置会复用，不为升级框架重装浏览器或切换 Profile。旧安装没有组件收据时，首次新流程会重新检查/安装相应依赖；以后凭输入指纹与探针复用，不伪造成功收据。
+6. 对同名配置差异先备份审核；按当前宿主合并本项目 js-reverse，检查有效配置、必要时重连，并在实际会话调用 list_pages，按 NEW_MACHINE_DEPLOYMENT.md 完成 accept-host。
+7. 运行框架和本机新增任务的完整回归；对比升级前后保留内容哈希。报告实际通过、失败、未执行和备份路径。未经用户指示不提交或推送 GitHub。
+
+本工单的目的是增量升级现有工作区。若只想测试新电脑的全新安装体验，将新版源码解压到一个新空目录，以同一段 README 提示词部署；不要共用旧目录的浏览器 Profile，也不要接管已被另一项目占用的 9222 端口。

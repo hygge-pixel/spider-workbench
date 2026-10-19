@@ -15,8 +15,8 @@ ROOT = Path(__file__).resolve().parent
 
 
 def check_integrity(root):
-    from scripts.verify_distribution import verify
-    if not verify(Path(root))['passed']:
+    from scripts.verify_distribution import verify_installation
+    if not verify_installation(Path(root))['passed']:
         raise ValueError('源码完整性检查失败。首次安装请重新解压完整源码；已有定制项目请按迁移文档处理。')
 
 
@@ -112,6 +112,10 @@ def onboard(root, *, install=False,node=None):
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, 'reconfigure', None)
+        if callable(reconfigure):
+            reconfigure(encoding='utf-8', errors='replace')
     parser=argparse.ArgumentParser(description='首次使用：默认离线体验；--install 安装隔离工具链并生成 MCP 定义。')
     parser.add_argument('--install',action='store_true',help='联网安装本项目工具依赖，需要完整 Node24+/npm')
     parser.add_argument('--node',type=Path,help='可选：Node程序绝对路径；默认从PATH发现')
@@ -125,7 +129,7 @@ def main():
             print('工具依赖安装完成，MCP 启动定义已生成。浏览器连接与 Agent 加载仍需按指南完成。')
         else:
             print('本次未联网安装依赖、未启动浏览器；需要完整工具时运行同一命令并加 --install。')
-        print('下一步：打开 docs/USER_GUIDE.md，复制其中提示词给你的 Agent。')
+        print('下一步：Agent 继续执行 scripts/deploy.py 的待验收阶段，见 docs/INSTALL_WITH_AGENT.md；无需重复发送安装提示词。')
         return 0
     except (OSError,ValueError,RuntimeError,subprocess.SubprocessError) as error:
         message=str(error) if isinstance(error,(ValueError,RuntimeError)) else type(error).__name__

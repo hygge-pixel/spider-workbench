@@ -41,6 +41,33 @@ def verify(root: Path) -> dict:
         return {'passed': False, 'error': str(error)}
 
 
+def verify_installation(root: Path) -> dict:
+    """Keep release provenance strict; accept only exact explicitly reviewed local deltas."""
+    root = Path(root).resolve()
+    result = verify(root)
+    if result['passed'] or result.get('missing') or 'error' in result:
+        return result
+    try:
+        record = json.loads((root / 'config/source_patches.local.json').read_text(encoding='utf-8'))
+        manifest_path = root / 'MANIFEST.sha256.json'
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))['files']
+        if record.get('schema_version') != 1 or record.get('manifest_sha256') != hashlib.sha256(manifest_path.read_bytes()).hexdigest():
+            return result
+        approved = record['files']
+        if set(approved) != set(result['changed']):
+            return result
+        for name in result['changed']:
+            patch = approved[name]
+            if (patch.get('reviewed') is not True or not isinstance(patch.get('reason'), str)
+                    or not patch['reason'].strip() or patch.get('before') != manifest[name]
+                    or patch.get('after') != hashlib.sha256((root / name).read_bytes()).hexdigest()):
+                return result
+        return dict(result, passed=True, original_distribution_passed=False,
+                    reviewed_local_changes=sorted(approved), scope='reviewed local installation; not original release')
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return result
+
+
 if __name__ == '__main__':
     result = verify(ROOT)
     print(json.dumps(result, ensure_ascii=False, indent=2))

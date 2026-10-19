@@ -24,6 +24,8 @@ SpiderFramework/
 │   └── optional_backends.py        隔离后端调用与资源诊断
 ├── skills/                          13 个通用 Skill 及 scripts/references
 ├── scripts/
+│   ├── deploy.py                    新电脑预检、可恢复编排及宿主续验
+│   ├── setup_chrome.py              官方 Stable 下载、缓存与独立安装
 │   ├── agent_platform_compat.py     本机 Skill 入口和可选浏览器配置
 │   ├── verify_distribution.py       原始分发文件完整性检查
 │   ├── run_full_regression.py       框架版跨平台测试入口

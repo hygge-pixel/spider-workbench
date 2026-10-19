@@ -451,5 +451,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    from spider_core.project_runtime import reexec_project
+    reexec_project(Path(__file__).resolve().parent)
     _configure_utf8_stdio()
     raise SystemExit(main())

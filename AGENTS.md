@@ -30,6 +30,9 @@
 
 ## 本机资源与平台适配
 
+- 新电脑完整部署使用 scripts/deploy.py：preflight → apply → status/宿主续验 → accept-host，见 docs/NEW_MACHINE_DEPLOYMENT.md。底层安装命令只作为子步骤或排错；不要求用户重复发送安装提示词。host_pending 必须继续真实宿主验收。
+- 本机工具 Python 统一读取 config/agent_tools.local.json；显式 SPIDER_PYTHON 或回归 -PythonExecutable 优先。已有定制源码用经审核、与原清单绑定的 source_patches.local.json 留痕，不自动刷新原分发清单。
+
 - 浏览器配置唯一来源是 `config/workspace_browser.json`，由目标机器显式配置；不得复用其他项目或个人日常 Profile。
 - 默认从 Google 官方安装部署当天最新 Stable Chrome for Testing，使用 chrome/9222 与项目 tmp/chrome-mcp 独立 Profile。日常任务复用已验收版本。
 - `scripts/agent_platform_compat.py setup --json` 只创建 `.agents/skills`、`.claude/skills`、`.gemini/skills` 的本机链接，不安装软件、不启动 MCP/浏览器。

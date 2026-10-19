@@ -1,5 +1,7 @@
 # 安装与快速开始
 
+完整部署优先由 Agent 执行 scripts/deploy.py，见 [统一部署流程](NEW_MACHINE_DEPLOYMENT.md)。下面的单项命令用于理解与排错，不要求用户手动逐条安装。
+
 用户只需按 README 打开工作区并发送提示词；后续由 Agent 按 [部署工单](INSTALL_WITH_AGENT.md)执行。本文件是供 Agent/维护者排错和复用环境的技术参考，不是另一套用户必做步骤。默认 Chrome for Testing/chrome/9222 与 js-reverse MCP。
 
 ## 1. 选择体验层级

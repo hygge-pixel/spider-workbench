@@ -1,26 +1,20 @@
 # 交给 Agent 的部署工单
 
-用户只需把源码文件夹作为工作区打开，然后发送 README 中的提示词。下面是目标 Agent 的执行约定，适用于首次安装和已有项目调整；不要要求用户逐条手工安装。
+用户只需打开工作区并发送 README 的提示词，后续步骤由 Agent 执行。完整编排、退出码和宿主续验见 [新电脑部署流程](NEW_MACHINE_DEPLOYMENT.md)，旧项目先读 [增量调整工单](MIGRATION.md)。
 
-## 工作范围
+## 执行约定
 
-先读取 AGENTS.md，再按 docs/AGENT_COMPATIBILITY.md 核对当前宿主的默认入口；部署细节按 README、docs/AGENT_HANDOFF.md、docs/BROWSER_MCP.md 和脚本帮助读取。保护已有任务、数据、凭据、Profile 与个人 Agent 配置。常规可逆安装、构建与本项目配置调整已由部署提示词授权，连续推进。
+1. 阅读 AGENTS.md、README.md、docs/AGENT_COMPATIBILITY.md，说明当前实际使用的规则入口和需要的 Skill，不一次性加载全部参考材料。保护任务、数据、凭据、Profile 和个人配置；常规可逆部署连续推进。
+2. 发现真实 Python/Node/npm 路径和宿主版本。选择 Python 3.11、完整 Node24+/npm；缺失或版本不符时按官方来源并行安装，不卸载旧环境、不修改其它项目。Codex 另选择能读取当前配置的兼容 CLI，不抄源机器路径。
+3. 由 Agent 执行 scripts/deploy.py preflight --node <真实路径>；Codex 可另传 --codex <兼容CLI真实路径>。先解决版本、TS 能力、端口归属、来源及项目配置生效问题，再安装大依赖。临时失败不永久封禁某个版本。
+4. 执行 scripts/deploy.py apply 使用相同参数。它串联离线示例、Skill 发现、依赖分阶段安装、Chrome for Testing、项目启动定义、MCP/CDP 检查与完整回归。已有配置/收据先检查复用，失败修复后重复 apply，保留其它工作；禁止通过删数据或关闭检查取得通过。
+5. 新浏览器从 Google 官方最新 Stable 下载；使用 chrome/9222、本项目 tmp/chrome-mcp 独立 Profile。复用已验收浏览器，不自动升级、不复制个人 Profile、不接管另一项目端口。Windows 为当前完整自动验收基线，其它系统列出实际限制。
+6. 读取 outputs/deployment_acceptance.json 与 runs/_mcp/generated/mcp_config.json。apply 返回 2/host_pending 表示技术阶段完成，Agent 继续按宿主实际格式合并 js-reverse，保留其它服务。项目配置/信任未生效时用真实有效配置检查定位，必要的信任或重连只集中要求一次；不改全局模型、登录和审批设置。
+7. 在实际 Agent 会话调用 js-reverse list_pages；按 NEW_MACHINE_DEPLOYMENT.md 记录脱敏观察声明并执行 accept-host。初始化、工具目录、只读调用、宿主配置生效与当前会话调用分别记录。没有实际调用证据保持 null/host_pending，不伪造 JSON 让验收变绿。
+8. 报告实际通过、失败与待处理项及输出位置。真实网站采集仍按当次证据选路并经 spider.py run；工具部署不证明网站业务能力。没有用户明确指示不注册、不提交 Git、不发布仓库、不发送通知。
 
-## 执行顺序
+## 中断后继续
 
-1. 检查本机系统/架构与 Python、Node/npm 的真实程序路径。核心使用 Python 3.11，工具链要求 Node 24+。已有版本不符时保留旧版本，选用或并行安装兼容运行时；不卸载旧程序，不改其它项目环境。已有虚拟环境版本不符时保留并建立新的隔离环境，不原地混装。
-2. 执行分发清单校验。先完成 bootstrap 的离线三条示例，再用 agent_platform_compat.py setup 创建本机 Skill 发现链接；AGENTS.md 的 13 项 canonical Skill 索引在 setup 前也可按任务读取。
-3. 使用 scripts/install_browser_toolchain.py 的 all 安装计划，在已授权范围内执行 Python 工具环境、根 Babel、锁定 CLI 与随包 MCP 的局部安装。MCP 显式 npm ci --ignore-scripts 后运行 prepare/build；禁止隐式下载另一套浏览器。pip check、构建成功与漏洞审计分别记录，详见 DEPENDENCIES。
-4. 按 CHROME_FOR_TESTING 从 Google 官方元数据读取本次最新 Stable 的版本、目标平台与完整 chrome ZIP 下载 URL，下载解压到 tmp/browsers/chrome-for-testing/<version>/<platform>/。验证程序可执行、版本与来源，保存下载 URL、ZIP SHA-256 和实际路径。ChromeDriver 不属于本 CDP 链路的必需项。网络失败保留原因，不关闭 TLS 验证或改用不明来源。
-5. 浏览器唯一配置为 config/workspace_browser.json。schema_version=2、default_candidate=chrome、candidates 仅含 chrome；CDP 为 http://127.0.0.1:9222，Profile 为本项目 tmp/chrome-mcp，executable 使用真实绝对路径，launch_args=[]、environment={}。新配置使用 configure-browser；既有多候选或路径冲突先备份，按 MIGRATION 审核迁移，不自动覆盖已有设置或删除程序/Profile。
-6. 使用 browser_toolchain.py configure 生成 js-reverse 的本机 Node command/args。按当前宿主实际支持的配置格式合并，保留其它服务和用户设置；同名冲突先审核。不要把 mcpServers JSON 当作所有宿主通用格式，不自行更改模型、登录或审批设置。
-7. 分层验收：程序/端口/Profile 归属、CDP 版本和目标列表、MCP stdio 初始化、tools/list、list_pages、Playwright CDP 合成页面，再重连/新会话在当前 Agent 中实际调用工具。只创建和关闭自己的合成标签，不操作私人页面。没有宿主调用证据就保留 host_tool_call_passed=false/null。
-8. 用默认 browser status/ensure 确认唯一 chrome 候选；运行完整回归 scripts/run_full_regression.py，Windows 可用 scripts/run_full_regression.ps1。本包的浏览器进程归属核验当前以 Windows 为基线，非 Windows 缺适配时如实报告，不删除检查或用框架 CI 替代真实浏览器验收。
-9. 将实际通过、失败、未执行项写入 outputs/deployment_acceptance.md 和 JSON。记录宿主/版本、规则实际读取入口、Skill 原生发现或文件读取方式、Python/Node 路径和版本、Stable 浏览器来源/版本/hash、唯一候选和 CDP、MCP 服务与各层结果、完整回归和剩余限制。
-10. 日常按当次证据选路：必要时在独立 Chrome 中观察接口，随后优先本地 Python/Node 请求重放与样本对拍，再验证业务数据并扩大范围；采集统一经 spider.py run。确认验证码时保存进度并暂停。没有用户明确指示不注册能力；日常不重新下载或自动升级浏览器。
+新会话先运行 deploy.py status，读取最后阶段和 next_action。若只是宿主重连，直接继续宿主验收；若阶段失败则修复原因后 apply，复用已验证依赖和缓存。超过有效期或源码/配置改变时重新执行技术验收，不搬用历史成功布尔值。
 
-## 报告与边界
-
-至少区分 rule_entry_read、skill_access、core_offline_passed、dependency_install_passed、existing_work_preserved、browser_version/source/hash、browser_identity_passed、cdp_passed、mcp_stdio_passed、mcp_read_only_call_passed、playwright_cdp_passed、host_tool_call_passed、full_regression_passed 和 limitations。字段存在不是证据；未执行用 null 并说明原因。
-
-只在真实缺权限、需要用户登录或宿主重连时保留明确待办。部署不包含真实网站批采、不提交 Git、不发布仓库、不发送通知、不复制登录态。不要把框架或工具部署成功写成任意网站都已采集成功。
+完整性检查遇本机修复时保留原 manifest，审核逐文件 before/after、理由及测试结果；仅对精确匹配的已审核补丁建立本机记录。未知变化继续停止，不能批量刷新清单掩盖差异。

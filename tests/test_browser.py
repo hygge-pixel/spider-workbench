@@ -511,6 +511,31 @@ class BrowserRuntimeTests(BrowserConfigTests):
             self.assertFalse(browser_module._windows_process_matches(config))
         runner.assert_not_called()
 
+    def test_background_process_inspection_preserves_chinese_paths(self) -> None:
+        config = BrowserConfig(
+            executable=Path("D:/项目源码/chrome.exe"),
+            cdp_url="http://127.0.0.1:9222",
+            user_data_dir=Path("D:/项目源码/tmp/chrome-mcp"),
+            startup_timeout_seconds=5,
+        )
+        payload = json.dumps([{
+            "ExecutablePath": str(config.executable),
+            "CommandLine": f'chrome.exe --remote-debugging-port=9222 --user-data-dir="{config.user_data_dir}"',
+        }], ensure_ascii=False)
+
+        def background_powershell(command, **kwargs):
+            # A hidden Windows PowerShell uses the legacy code page unless
+            # its redirected console output encoding is explicitly selected.
+            script = command[-1]
+            utf8 = "[Console]::OutputEncoding" in script and "UTF8Encoding" in script
+            raw = payload.encode("utf-8" if utf8 else "gbk")
+            return subprocess.CompletedProcess(command, 0, raw.decode(
+                kwargs["encoding"], errors=kwargs["errors"]), "")
+
+        with mock.patch.object(browser_module, "os", SimpleNamespace(name="nt")), \
+             mock.patch.object(browser_module.subprocess, "run", side_effect=background_powershell):
+            self.assertTrue(browser_module._windows_process_matches(config))
+
 
 if __name__ == "__main__":
     unittest.main()

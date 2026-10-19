@@ -27,7 +27,7 @@
 
 > 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的部署；已经部署的部分先检查并复用。请自动检查并补齐环境和隔离工具依赖，从 Google 官方 Chrome for Testing 下载部署当天最新 Stable 浏览器，配置项目独立 Profile、Chrome/9222 和 js-reverse MCP。完成离线示例、浏览器连接、MCP 实际调用和完整回归，保留已有任务与配置，最后告诉我实际通过和待处理的项目。已授权部署所需的常规可逆安装、构建与本项目配置调整，请连续推进。
 
-Agent 会按[完整部署工单](docs/INSTALL_WITH_AGENT.md)执行后续步骤。需要能操作本机文件、终端并配置工具的 Agent；普通网页聊天窗口不会仅凭这段话自动部署电脑。完整浏览器流程推荐先在 Windows 上使用；其它系统的支持范围由 Agent 实际检查和报告。电脑上已有 Python/Node 版本不符时，Agent 会保留旧环境并选择或并行安装兼容版本；浏览器下载、连接和宿主加载分别验收，详见[版本与部署说明](docs/RUNTIME_COMPATIBILITY.md)。
+Agent 会按[完整部署工单](docs/INSTALL_WITH_AGENT.md)执行后续步骤。统一部署入口先预检，再按阶段安装与验收；中断后复用已验证的依赖和浏览器，接着处理剩余步骤。需要宿主信任或重连时，Agent 会明确说明，重新打开后继续验收。实际状态和下一步统一写入 outputs/deployment_acceptance.md。需要能操作本机文件、终端并配置工具的 Agent；普通网页聊天窗口不会仅凭这段话自动部署电脑。完整浏览器流程推荐先在 Windows 上使用；其它系统的支持范围由 Agent 实际检查和报告。电脑上已有 Python/Node 版本不符时，Agent 会保留旧环境并选择或并行安装兼容版本；浏览器下载、连接和宿主加载分别验收，详见[版本与部署说明](docs/RUNTIME_COMPATIBILITY.md)。
 
 ## 框架怎样处理一次任务？
 

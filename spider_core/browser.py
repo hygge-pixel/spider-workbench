@@ -332,6 +332,7 @@ def _windows_process_matches(config: BrowserConfig) -> bool:
         return False
     script = (
         "$ErrorActionPreference='Stop'; "
+        "[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false); "
         "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | "
         "Select-Object ExecutablePath,CommandLine | ConvertTo-Json -Compress"
     )

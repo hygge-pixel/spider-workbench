@@ -11,6 +11,8 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 EXCLUDED = {'node_modules', '.venv', '__pycache__', '.git', 'tmp', 'runs', 'outputs'}
 
 
@@ -104,4 +106,6 @@ def main():
 
 
 if __name__ == '__main__':
+    from spider_core.project_runtime import reexec_project
+    reexec_project(ROOT)
     raise SystemExit(main())
