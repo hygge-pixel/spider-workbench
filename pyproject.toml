@@ -1,6 +1,6 @@
 [project]
 name = "spider-workbench"
-version = "0.1.7"
+version = "0.1.8"
 description = "Evidence-first collection and Web/JavaScript reverse-engineering workbench for coding agents."
 requires-python = ">=3.11,<3.12"
 license = "Apache-2.0"

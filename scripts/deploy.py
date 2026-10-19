@@ -340,10 +340,14 @@ def deployment_status(root):
     except (WorkspaceBrowserError, StageFailure, OSError, ValueError, subprocess.SubprocessError) as error:
         live = {'passed': False, **diagnostic(error), 'mcp_host_call': 'not_retested'}
     live['checked_at'] = datetime.now(timezone.utc).isoformat()
+    next_action = (historical.get('next_action', 'run apply') if live['passed'] else
+                   'run spider.py browser ensure --json; reconnect host MCP; call list_pages')
+    if live.get('code') in {'browser_ownership_permission_denied', 'browser_ownership_unverified'}:
+        next_action = ('verify process-inspection permissions in the intended host context, then rerun status; '
+                       'ownership is unverified; preserve browser and ACL; do not bypass checks or reinstall')
     return {'passed': bool(historical.get('passed') and live['passed']),
             'last_acceptance': historical, 'live_health': live,
-            'next_action': historical.get('next_action', 'run apply') if live['passed'] else
-                'run spider.py browser ensure --json; reconnect host MCP; call list_pages'}
+            'next_action': next_action}
 
 
 def main():

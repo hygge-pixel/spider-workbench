@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-19: Expose current MCP browser connectivity for read-only health.
 /**
  * @license
  * Copyright 2025 Google LLC
@@ -87,6 +88,7 @@ export interface Response {
  * Only add methods required by tools/*.
  */
 export type Context = Readonly<{
+  isBrowserConnected(): boolean;
   isRunningPerformanceTrace(): boolean;
   setIsRunningPerformanceTrace(x: boolean): void;
   recordedTraces(): TraceResult[];

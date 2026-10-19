@@ -15,6 +15,8 @@
 - src/McpContext.ts：过滤欢迎页后零页面仍是有效快照，避免首次只读查询崩溃。
 - src/browser.ts：远程连接关闭时 disconnect，不关闭用户项目浏览器。
 
+- 0.1.8 的 src/tools/page.ts、src/tools/ToolDefinition.ts 与 src/McpContext.ts：健康检查读取当前 MCP 连接和选中页面，移除辅助浏览器探针的启动副作用。
+
 ## 更新流程
 
 1. 独立暂存上游源码，记录 URL、确定的提交、许可证；保留版权头及原始输入哈希。

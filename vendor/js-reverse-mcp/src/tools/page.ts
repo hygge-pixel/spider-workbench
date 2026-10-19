@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-19: Probe the current MCP context without launching a secondary browser.
 // Modified by Spider Workbench, 2026-10-18: Use Puppeteer 25 connected property.
 import {zod} from '../third_party/index.js';
 import {defineTool} from './ToolDefinition.js';
@@ -439,30 +440,22 @@ export const checkBrowserHealth = defineTool({
   description: 'Check browser connectivity and active page readiness before running reverse workflows.',
   annotations: {category: ToolCategory.NAVIGATION, readOnlyHint: true},
   schema: {},
-  handler: async (_request, response) => {
-    ensureCleanupLoop();
-    cleanupExpiredSessions();
-    const runtime = getJSHookRuntime();
+  handler: async (_request, response, context) => {
     const issues: Array<{code: string; message: string}> = [];
-    const browser = runtime.browserManager.getBrowser();
-    let connected = Boolean(browser && browser.connected);
-    try {
-      const status = await runtime.collector.getStatus();
-      connected = connected || status.running;
-    } catch {
-      // Fall through to page-level probes below.
-    }
+    const connected = context.isBrowserConnected();
 
     let pageReady = false;
     let url: string | null = null;
     let title: string | null = null;
     try {
-      const page = await runtime.pageController.getPage();
-      pageReady = true;
-      connected = true;
+      if (!connected) {
+        throw new Error('MCP browser disconnected');
+      }
+      const page = context.getSelectedPage();
       url = page.url();
       title = await page.title();
-      await runtime.pageController.evaluate('1+1');
+      await page.evaluate(() => 1 + 1);
+      pageReady = true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       issues.push({
@@ -479,6 +472,7 @@ export const checkBrowserHealth = defineTool({
     }
 
     const result = {
+      state: !connected ? 'disconnected' : pageReady ? 'ready' : 'connected_no_active_page',
       healthy: issues.length === 0,
       connected,
       pageReady,

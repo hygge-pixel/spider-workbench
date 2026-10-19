@@ -30,3 +30,15 @@
 - 欢迎页而 Pages 为空：可见目标被过滤后的合法空列表，需要交互时创建目标页，不覆盖已有标签页。
 - 历史 completed 但 live_health 失败：读取 last_acceptance 的验收时间，ensure 项目浏览器并重连宿主 MCP 后复查。
 - Harness 同名冲突：核对实际 Profile 范围和其它工作区，参考 DEEPSEEK_HARNESS.md 迁移或使用独立 overlay。
+
+## 0.1.8：权限不足与端口冲突
+
+- browser_ownership_permission_denied：Windows 进程查询返回明确拒绝访问。保持浏览器与 ACL，核对宿主运行身份和进程查询权限；在允许的执行上下文重新运行检查。不自动提权、改权限或绕过归属检查。
+- browser_ownership_unverified：进程查询失败/超时、输出损坏或部分关键字段不可读，无法确定归属。先诊断查询；不是端口冲突证据，仍停止验收。
+- cdp_port_conflict：CDP 可达但可读进程没有匹配项目程序/Profile/端口，或端口占用而 CDP 不可用；只报告不匹配，不接管或关闭别人的进程。
+
+这些错误不会覆盖历史 last_acceptance。当前 live_health.passed=false 就是当前检查未通过；历史成功不是当前健康证据。受限令牌下查询受阻是新电脑报告中的合理解释，本机模拟覆盖分类，不等于目标电脑修复已复测。
+
+check_browser_health 的 connected 表示当前 MCP 连接；pageReady 表示选中页面实际探针通过。state=connected_no_active_page 表示已连接但没有可用活动页，healthy=false，不要求重连或自动启动浏览器；由 Agent 按需 new_page about:blank 再检查。state=disconnected 才提示重连；state=ready 才表示页面也就绪。此工具为只读检查，不创建页面。
+
+测试输出 Ran N tests / OK (skipped=S) 应记录总计 N、执行通过 N-S、跳过 S；Git 检出测试依据 Git 可执行程序是否存在跳过，不依据当前目录是否有 .git。

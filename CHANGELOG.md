@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.8 — 2026-10-19
+
+- Browser process inspection now distinguishes denied permission and unverifiable ownership from a confirmed mismatch. Unknown ownership still blocks acceptance; no ACL modification or ownership bypass is added.
+- status preserves historical acceptance and provides permission-specific guidance without suggesting reinstall/restart for unverifiable ownership.
+- check_browser_health reads the actual MCP context; connected-but-no-page is distinct from disconnected. Health inspection no longer invokes a secondary controller that could launch a browser.
+- Add offline denial/query/status regressions and MCP health regressions; provide a focused 0.1.8 in-place upgrade/retest work order. Restricted-token acceptance on the user's new PC remains pending.
+
+
 ## 0.1.7 — 2026-10-19
 
 - Restore maintained framework/Skill/MCP regression sources in the repository and source ZIP; keep developer suites out of the independently manifested install ZIP. Default source regression runs developer tests; deployment uses explicit delivery-only checks.

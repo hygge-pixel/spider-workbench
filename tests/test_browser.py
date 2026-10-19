@@ -511,6 +511,27 @@ class BrowserRuntimeTests(BrowserConfigTests):
             self.assertFalse(browser_module._windows_process_matches(config))
         runner.assert_not_called()
 
+    def test_process_query_permission_failure_is_not_a_port_conflict(self):
+        config = BrowserConfig(executable=Path('chrome.exe'), cdp_url='http://127.0.0.1:9222',
+                               user_data_dir=Path('profile'), startup_timeout_seconds=5)
+        completed = SimpleNamespace(returncode=0, stdout='{"inspection_error":"permission_denied"}')
+        with mock.patch.object(browser_module, 'os', SimpleNamespace(name='nt')), \
+             mock.patch.object(browser_module.subprocess, 'run', return_value=completed):
+            with self.assertRaisesRegex(WorkspaceBrowserError, '^browser_ownership_permission_denied$'):
+                browser_module._windows_process_matches(config)
+
+    def test_process_query_failure_remains_unknown_ownership(self):
+        config = BrowserConfig(executable=Path('chrome.exe'), cdp_url='http://127.0.0.1:9222',
+                               user_data_dir=Path('profile'), startup_timeout_seconds=5)
+        for completed in (SimpleNamespace(returncode=1, stdout=''),
+                          SimpleNamespace(returncode=0, stdout='not json'),
+                          SimpleNamespace(returncode=0, stdout='[{"ExecutablePath":null,"CommandLine":null}]')):
+            with self.subTest(output=completed.stdout), \
+                 mock.patch.object(browser_module, 'os', SimpleNamespace(name='nt')), \
+                 mock.patch.object(browser_module.subprocess, 'run', return_value=completed):
+                with self.assertRaisesRegex(WorkspaceBrowserError, '^browser_ownership_unverified$'):
+                    browser_module._windows_process_matches(config)
+
     def test_background_process_inspection_preserves_chinese_paths(self) -> None:
         config = BrowserConfig(
             executable=Path("D:/项目源码/chrome.exe"),

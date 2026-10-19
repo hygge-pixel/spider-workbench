@@ -75,6 +75,25 @@ class ChromeSetupTests(unittest.TestCase):
 
 
 class DeploymentStateTests(unittest.TestCase):
+    def test_status_unknown_ownership_preserves_history_and_gives_permission_guidance(self):
+        from scripts import deploy
+        from spider_core.browser import WorkspaceBrowserError
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root/'outputs/deployment_acceptance.json'
+            path.parent.mkdir()
+            path.write_text('{"passed":true,"status":"completed"}', encoding='utf-8')
+            before = path.read_bytes()
+            with mock.patch('spider_core.browser.status_browser_candidate',
+                            side_effect=WorkspaceBrowserError('browser_ownership_permission_denied')):
+                result = deploy.deployment_status(root)
+            self.assertFalse(result['passed'])
+            self.assertTrue(result['last_acceptance']['passed'])
+            self.assertEqual(result['live_health']['mcp_host_call'], 'not_retested')
+            self.assertIn('process-inspection', result['next_action'])
+            self.assertNotIn('browser ensure', result['next_action'])
+            self.assertEqual(path.read_bytes(), before)
+
     def test_cli_json_is_utf8_even_with_legacy_parent_codepage(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

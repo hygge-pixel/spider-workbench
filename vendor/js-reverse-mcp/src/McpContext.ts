@@ -326,6 +326,10 @@ export class McpContext implements Context {
     this.#dialog = undefined;
   }
 
+  isBrowserConnected(): boolean {
+    return this.browser.connected;
+  }
+
   getSelectedPage(): Page {
     const page = this.#selectedPage;
     if (!page) {

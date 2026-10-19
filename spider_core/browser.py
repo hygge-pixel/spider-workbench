@@ -333,8 +333,12 @@ def _windows_process_matches(config: BrowserConfig) -> bool:
     script = (
         "$ErrorActionPreference='Stop'; "
         "[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false); "
-        "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | "
-        "Select-Object ExecutablePath,CommandLine | ConvertTo-Json -Compress"
+        "try { @(Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | "
+        "Select-Object ExecutablePath,CommandLine) | ConvertTo-Json -Compress } catch { "
+        "$denied = $_.CategoryInfo.Category -eq 'PermissionDenied' -or "
+        "$_.Exception.HResult -in @(-2147024891,-2147217405); "
+        "@{inspection_error=$(if ($denied) {'permission_denied'} else {'query_failed'})} | "
+        "ConvertTo-Json -Compress }"
     )
     try:
         completed = subprocess.run(
@@ -354,21 +358,28 @@ def _windows_process_matches(config: BrowserConfig) -> bool:
             timeout=5,
         )
         if completed.returncode != 0 or not completed.stdout.strip():
-            return False
+            raise WorkspaceBrowserError('browser_ownership_unverified')
         payload = json.loads(completed.stdout)
+        if isinstance(payload, dict) and 'inspection_error' in payload:
+            code = ('browser_ownership_permission_denied' if payload['inspection_error'] == 'permission_denied'
+                    else 'browser_ownership_unverified')
+            raise WorkspaceBrowserError(code)
         processes = payload if isinstance(payload, list) else [payload]
     except (OSError, subprocess.SubprocessError, json.JSONDecodeError):
-        return False
+        raise WorkspaceBrowserError('browser_ownership_unverified') from None
 
     expected_executable = config.executable.as_posix().casefold()
     expected_profile = config.user_data_dir.as_posix().casefold()
     expected_port = urlsplit(config.cdp_url).port
+    incomplete = False
     for process in processes:
         if not isinstance(process, dict):
+            incomplete = True
             continue
         executable = process.get("ExecutablePath")
         command_line = process.get("CommandLine")
         if not isinstance(executable, str) or not isinstance(command_line, str):
+            incomplete = True
             continue
         normalized_executable = executable.replace("\\", "/").casefold()
         normalized_command = _normalized_command_line(command_line)
@@ -378,6 +389,8 @@ def _windows_process_matches(config: BrowserConfig) -> bool:
             and f"--user-data-dir={expected_profile}" in normalized_command
         ):
             return True
+    if incomplete:
+        raise WorkspaceBrowserError('browser_ownership_unverified')
     return False
 
 
