@@ -58,9 +58,9 @@ class BootstrapTests(unittest.TestCase):
             self.assertTrue((root/'outputs/onboarding.json').is_file())
 
     def test_missing_node_is_reported_before_any_dependency_install(self):
-        with mock.patch.object(bootstrap.shutil,'which',return_value=None):
-            with self.assertRaisesRegex(ValueError,'Node'):
-                bootstrap.resolve_node(None)
+        with tempfile.TemporaryDirectory() as directory, mock.patch.dict(bootstrap.os.environ, {}, clear=True), mock.patch.object(bootstrap.shutil,'which',return_value=None):
+            with self.assertRaisesRegex(ValueError,'node_executable_missing'):
+                bootstrap.resolve_node(None, Path(directory))
 
     def test_selected_node_is_forwarded_to_existing_installer_and_generator(self):
         with tempfile.TemporaryDirectory() as directory:

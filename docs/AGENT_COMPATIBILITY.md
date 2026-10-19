@@ -47,3 +47,7 @@ Chrome for Testing 是独立浏览器；唯一候选 chrome/9222，服务名 js-
 5. 按 INSTALL_WITH_AGENT 完成 Chrome/MCP 的独立验收；报告 rule_entry_read、skill_access、mcp_initialized、host_tool_call_passed，未执行项写原因。
 
 本地测试核验 11 项入口、引用、完整 Skill 索引、无安装前提、manifest/ZIP 包含情况和 doctor 的证据区分。它不运行所有商业产品，也不绕过用户的信任与规则设置。
+
+## DeepSeek Harness
+
+0.1.0-rc.6 的实际部署已验证文件读取与宿主 MCP 调用；使用 [Harness 专用部署说明](DEEPSEEK_HARNESS.md)。提供 Cordis insert overlay 生成及有备份的合并/撤销工具，不将 mcpServers JSON 原样写入 Cordis Profile。不从其它 Agent 的成功推断当前会话加载。

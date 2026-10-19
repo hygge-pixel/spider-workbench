@@ -31,7 +31,7 @@
 ## 本机资源与平台适配
 
 - 新电脑完整部署使用 scripts/deploy.py：preflight → apply → status/宿主续验 → accept-host，见 docs/NEW_MACHINE_DEPLOYMENT.md。底层安装命令只作为子步骤或排错；不要求用户重复发送安装提示词。host_pending 必须继续真实宿主验收。
-- 本机工具 Python 统一读取 config/agent_tools.local.json；显式 SPIDER_PYTHON 或回归 -PythonExecutable 优先。已有定制源码用经审核、与原清单绑定的 source_patches.local.json 留痕，不自动刷新原分发清单。
+- Windows 新电脑先执行 scripts/setup_runtime.ps1，缺少 Python 时也使用该入口；本机工具 Python/Node 统一读取 config/agent_tools.local.json；显式 SPIDER_PYTHON 或回归 -PythonExecutable 优先。已有定制源码用经审核、与原清单绑定的 source_patches.local.json 留痕，不自动刷新原分发清单。
 
 - 浏览器配置唯一来源是 `config/workspace_browser.json`，由目标机器显式配置；不得复用其他项目或个人日常 Profile。
 - 默认从 Google 官方安装部署当天最新 Stable Chrome for Testing，使用 chrome/9222 与项目 tmp/chrome-mcp 独立 Profile。日常任务复用已验收版本。
@@ -79,3 +79,5 @@ python scripts/run_full_regression.py
 | 独立 CDP 的可选交互诊断 | `skills/playwright-cli/SKILL.md` |
 
 主流 Agent 的默认入口、原生 Skill 发现与宿主限制见 docs/AGENT_COMPATIBILITY.md。新会话首次读取说明当前使用的入口和所需 Skill 路径；只有宿主实际调用证据才标记已加载。
+
+部署状态区分 last_acceptance 与 live_health；DeepSeek Harness 按 docs/DEEPSEEK_HARNESS.md 配置，不拆查宿主程序猜格式。浏览器关闭后启动器 ensure 项目浏览器，已有 MCP 服务需要重连；不接管其它项目端口。

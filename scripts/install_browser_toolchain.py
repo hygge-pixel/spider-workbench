@@ -11,6 +11,9 @@ import platform
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from spider_core.project_runtime import select_node, npm_cli
 
 
 def plans(component, node):
@@ -37,12 +40,8 @@ def plans(component, node):
         tasks.append((ROOT, [str(python), '-m', 'pip', 'install', '-r', 'requirements-collection.txt', '-r', 'requirements-dev.txt']))
         tasks.append((ROOT, [str(python), '-m', 'pip', 'check']))
     if component in ('mcp', 'cli', 'ast', 'all'):
-        node = Path(node or shutil.which('node') or '').resolve()
-        if not node.is_file():
-            raise ValueError('provide an existing Node 24+ executable with --node')
-        npm = node.parent / 'node_modules/npm/bin/npm-cli.js'
-        if not npm.is_file():
-            raise ValueError('npm-cli.js missing next to the supplied Node; use a complete Node installation')
+        node = select_node(ROOT, node)
+        npm = npm_cli(node)
         version = subprocess.run([str(node), '--version'], text=True, capture_output=True, check=True, timeout=15).stdout.strip()
         if int(version.lstrip('v').split('.')[0]) < 24:
             raise ValueError('Node 24+ required by the tested MCP build')

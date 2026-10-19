@@ -8,7 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.browser_toolchain import launch_spec
-from spider_core.browser import status_browser_candidate
+from spider_core.browser import ensure_browser_candidate
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--describe', action='store_true', required=True)
     args = parser.parse_args()
     try:
-        status_browser_candidate(ROOT, args.candidate)
+        ensure_browser_candidate(ROOT, args.candidate)
         command, runtime, overrides = launch_spec(args.candidate)
         import json
         print(json.dumps({'command': command, 'cwd': str(runtime), 'env': overrides}))

@@ -38,17 +38,9 @@ def run_command(root, command, *, json_result=True):
     return report
 
 
-def resolve_node(node):
-    found = node or shutil.which('node')
-    if not found or not Path(found).is_file():
-        raise ValueError('未找到 Node.js。请先安装完整 Node 24+ 并重新打开终端，或使用 --node 指定程序路径。')
-    selected=Path(found).resolve()
-    version=subprocess.run([str(selected),'--version'],capture_output=True,text=True,check=True).stdout.strip()
-    if int(version.lstrip('v').split('.')[0])<24:
-        raise ValueError('Node.js 版本过低，请选择 Node 24+。')
-    if not (selected.parent/'node_modules/npm/bin/npm-cli.js').is_file():
-        raise ValueError('此 Node 安装缺少相邻 npm；请使用完整 Node 安装，或按工具链文档配置。')
-    return selected
+def resolve_node(node, root=None):
+    from spider_core.project_runtime import select_node
+    return select_node(root or ROOT, node)
 
 
 def tool_python(root):
@@ -72,7 +64,7 @@ def onboard(root, *, install=False,node=None):
         raise ValueError('本项目部署入口需要 Python 3.11；请保留已有 Python，选择或并行安装 3.11，并使用其真实路径重新执行。')
     root=Path(root).resolve()
     check_integrity(root)
-    selected=resolve_node(node) if install else None
+    selected=resolve_node(node, root) if install else None
     if install:
         install_tools(root,selected)
     python=tool_python(root) if install else Path(sys.executable)

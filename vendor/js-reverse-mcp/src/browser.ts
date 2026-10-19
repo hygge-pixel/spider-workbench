@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-19: Fix empty-page and attached-browser lifecycle behavior.
 // Modified by Spider Workbench, 2026-10-18: Puppeteer 25 exposes resize publicly; remove obsolete type suppression.
 /**
  * @license
@@ -629,7 +630,12 @@ export class BrowserManager {
     // Close browser
     if (this.browser) {
       try {
-        await this.browser.close();
+        // Spider Workbench: the workspace owns a remote browser's lifetime.
+        if (this.config.browserURL || this.config.wsEndpoint || this.config.remoteDebuggingUrl) {
+          this.browser.disconnect();
+        } else {
+          await this.browser.close();
+        }
         logger('Browser closed successfully');
       } catch (error) {
         logger('Error closing browser:', error);

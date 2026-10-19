@@ -49,11 +49,13 @@ def main():
     parser.add_argument('--node', help='existing Node executable for discovered Node tests')
     args = parser.parse_args()
     environment = dict(os.environ, PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1')
-    if args.node:
-        selected_node = Path(args.node).resolve()
-        if not selected_node.is_file():
-            parser.error('--node must point to an existing executable')
-        environment['PATH'] = str(selected_node.parent) + os.pathsep + environment.get('PATH', '')
+    from spider_core.project_runtime import select_node
+    try:
+        selected_node = select_node(ROOT, args.node)
+    except (ValueError, OSError, subprocess.SubprocessError) as error:
+        parser.error(str(error))
+    args.node = str(selected_node)
+    environment['PATH'] = str(selected_node.parent) + os.pathsep + environment.get('PATH', '')
     def stage(label, command, env=None):
         print(f'[{label}]', flush=True)
         subprocess.run(command, cwd=ROOT, env=env or environment, check=True)
@@ -82,6 +84,10 @@ def main():
             stage('node-tests', [node, '--test', *map(str, node_tests)])
         else:
             print('[node-tests] no Node test files in this framework edition', flush=True)
+        if (ROOT / 'vendor/js-reverse-mcp/build/src/McpContext.js').is_file():
+            stage('mcp-lifecycle', [args.node, '--test', str(ROOT / 'tests/mcp_lifecycle.test.mjs')])
+        else:
+            print('[mcp-lifecycle] build not installed; covered by separate mcp-build CI job', flush=True)
         count = 0
         for directory in ('spider_core', 'scripts', 'tools', 'tests', 'experiments', 'platforms', 'skills'):
             for path in files(directory, '*.py'):

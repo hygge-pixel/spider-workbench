@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "public_version": "0.1.4",
+  "public_version": "0.1.5",
   "prepared_on": "2026-10-19",
   "base_edition": "framework-toolchain-v2",
   "base_archive_sha256": "288eb774d3ac139e06093c8869b407350f715fb5e558f051a1007ae906297091",
@@ -27,7 +27,8 @@
     "Current main: remove five optional specialist Skills and their bundled materials; synchronize health and routing; add Python runtime mismatch preflight",
     "0.1.2: respect configured default browser, generate Chrome-only MCP by default, consolidate deployment docs and correct Skill/tool references; dependency changes recorded in CHANGELOG",
     "0.1.3: single Chrome candidate, canonical rule/Skill index, eleven documented Agent entrypoints and separate host-loading acceptance",
-    "0.1.4: resumable deployment, official Stable browser installer, UTF-8 process identity, reviewed local patches and consistent project runtime"
+    "0.1.4: resumable deployment, official Stable browser installer, UTF-8 process identity, reviewed local patches and consistent project runtime",
+    "0.1.5: unified runtime selection/bootstrap, HTTPS fallback, zero-page MCP and remote lifecycle fixes, Harness profile adapter and live health"
   ],
   "original_git_history_included": false,
   "legacy_collectors_or_data_included": false,

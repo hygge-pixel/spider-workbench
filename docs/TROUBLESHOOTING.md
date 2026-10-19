@@ -22,3 +22,11 @@
 | 回滚拒绝 changed since upgrade | 升级后有新工作，保护而停止；人工审核差异，不能强制覆盖新内容 |
 
 报告问题时附 OS、Python/Node/包版本、准确命令、错误类别与合成最小复现。不要粘贴账号、Cookie、Token、完整签名请求、客户文档或私人绝对路径。发布完整度边界见 SECURITY 与 EVIDENCE。
+
+## 部署恢复常见状态
+
+- node_version_too_old / node_executable_missing：运行 setup_runtime.ps1；已有项目 pin 失效则核对其路径，不覆盖其它项目。
+- official_download_tls_failed：证书校验失败，保留失败；检查系统时间、受信任证书和实际代理。不要追加 --insecure。
+- 欢迎页而 Pages 为空：可见目标被过滤后的合法空列表，需要交互时创建目标页，不覆盖已有标签页。
+- 历史 completed 但 live_health 失败：读取 last_acceptance 的验收时间，ensure 项目浏览器并重连宿主 MCP 后复查。
+- Harness 同名冲突：核对实际 Profile 范围和其它工作区，参考 DEEPSEEK_HARNESS.md 迁移或使用独立 overlay。

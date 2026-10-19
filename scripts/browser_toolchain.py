@@ -166,9 +166,16 @@ def configure(python, node, entry, *, write_project=False, replace_managed=False
     config = ROOT / 'config/agent_tools.local.json'
     data = json.loads(config.read_text(encoding='utf-8')) if config.is_file() else {}
     managed = {'python_executable': str(python), 'node_executable': str(node), 'js_reverser_entry': str(entry)}
-    if 'browser_toolchain' in data and data['browser_toolchain'] != managed and not replace_managed:
+    prior = data.get('browser_toolchain', {})
+    bootstrap = data.get('runtime_bootstrap', {})
+    initial_runtime = (bootstrap.get('toolchain_pending') is True and not prior.get('js_reverser_entry')
+                       and prior == {'python_executable': bootstrap.get('python'), 'node_executable': str(node)}
+                       and bootstrap.get('node') == str(node))
+    if 'browser_toolchain' in data and prior != managed and not replace_managed and not initial_runtime:
         raise ValueError('existing toolchain settings differ; review before --replace-managed')
     data['browser_toolchain'] = managed
+    if initial_runtime:
+        data['runtime_bootstrap']['toolchain_pending'] = False
     write_json(config, data)
     write_json(generated, {'mcpServers': definitions})
     for path, content in destinations:

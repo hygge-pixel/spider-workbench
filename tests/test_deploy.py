@@ -83,7 +83,7 @@ class DeploymentStateTests(unittest.TestCase):
             program = f"from scripts import deploy; from pathlib import Path; deploy.ROOT=Path({str(root)!a}); deploy.sys.argv=['deploy','status']; raise SystemExit(deploy.main())"
             result = subprocess.run([sys.executable, '-c', program], cwd=Path(__file__).resolve().parents[1],
                                     env=dict(os.environ, PYTHONIOENCODING='cp936'), capture_output=True)
-            self.assertEqual(json.loads(result.stdout.decode('utf-8'))['label'], '中文路径')
+            self.assertEqual(json.loads(result.stdout.decode('utf-8'))['last_acceptance']['label'], '中文路径')
 
     def test_child_error_category_is_preserved_without_tool_payload(self):
         module = self.module()
@@ -132,6 +132,9 @@ class DeploymentStateTests(unittest.TestCase):
         module = self.module()
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            npm = root / 'node_modules/npm/bin/npm-cli.js'
+            npm.parent.mkdir(parents=True)
+            npm.write_text('fixture')
             with mock.patch.object(module, 'verify_installation', return_value={'passed': True}), \
                  mock.patch('bootstrap.resolve_node', return_value=root / 'node.exe'), \
                  mock.patch.object(module.subprocess, 'run', side_effect=[mock.Mock(stdout='v24.14.1'), mock.Mock(returncode=-10, stdout='')]):

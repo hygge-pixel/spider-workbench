@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.5 — 2026-10-19
+
+- Unify project Node selection across bootstrap, deployment and regression; add Windows runtime bootstrap with official Python installer signature and Node checksum verification.
+- Retry official browser metadata and add a bounded HTTPS curl fallback without disabling TLS or source validation.
+- Fix MCP initialization/response rendering when only filtered browser pages exist; disconnect attached remote browsers on MCP shutdown.
+- Restore the project browser when the host launcher reconnects; preserve profile and port ownership checks.
+- Add an idempotent DeepSeek Harness profile overlay adapter, conflict detection, backups and managed-only removal.
+- Separate saved acceptance from live health and preserve elapsed stage times, safe error categories and regression counts.
+
+
 ## 0.1.4 — 2026-10-19
 
 - 新电脑统一预检与分阶段部署，记录中断、复用已验证依赖，宿主调用单独续验。

@@ -16,3 +16,5 @@ The JSReverser snapshot contains Apache-2.0 file headers crediting Google LLC, i
 Python and npm packages are installed separately. Their transitive licenses are described by their installed metadata and lockfiles; this document is not a complete binary-distribution SBOM. Before distributing an executable or installed dependency tree, generate a dependency license inventory for that exact build. The source release intentionally excludes node_modules, virtual environments and browser executables.
 
 Historical input Git history is not redistributed. Hashes document content provenance and integrity, not copyright ownership or a third-party certification. Contributors must have the rights to contribute their changes; report any provenance correction through the repository's contribution or security channels.
+
+Spider Workbench 0.1.5 modifies bundled JSReverser `src/McpContext.ts` to support empty filtered page snapshots and `src/browser.ts` to disconnect attached remote browsers without closing them. Original copyright and Apache-2.0 notices are retained.

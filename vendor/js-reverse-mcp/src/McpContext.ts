@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-19: Fix empty-page and attached-browser lifecycle behavior.
 // Modified by Spider Workbench, 2026-10-18: Subscribe to the separate aggregated DevTools issue event.
 /**
  * @license
@@ -159,6 +160,9 @@ export class McpContext implements Context {
   }
 
   async #initDebuggerForFrame(frame?: Frame): Promise<void> {
+    if (!this.#selectedPage || this.#selectedPage.isClosed()) {
+      return;
+    }
     const page = this.getSelectedPage();
     if (!page) {
       return;
@@ -289,6 +293,7 @@ export class McpContext implements Context {
   }
 
   getNetworkConditions(): string | null {
+    if (!this.#selectedPage) return null;
     const page = this.getSelectedPage();
     return this.#networkConditionsMap.get(page) ?? null;
   }
@@ -300,6 +305,7 @@ export class McpContext implements Context {
   }
 
   getCpuThrottlingRate(): number {
+    if (!this.#selectedPage) return 1;
     const page = this.getSelectedPage();
     return this.#cpuThrottlingRateMap.get(page) ?? 1;
   }
@@ -414,7 +420,13 @@ export class McpContext implements Context {
       );
     });
 
-    if (!this.#selectedPage || this.#pages.indexOf(this.#selectedPage) === -1) {
+    // Spider Workbench: filtered welcome/internal pages can leave an empty snapshot.
+    // list_pages must remain read-only; do not create or navigate a user's tab.
+    if (!this.#pages.length) {
+      this.#selectedPage?.off('dialog', this.#dialogHandler);
+      this.#selectedPage = undefined;
+      this.#selectedFrame = undefined;
+    } else if (!this.#selectedPage || this.#pages.indexOf(this.#selectedPage) === -1) {
       this.selectPage(this.#pages[0]);
     }
 

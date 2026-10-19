@@ -77,3 +77,17 @@ bootstrap.py 继续提供离线体验，`--install` 继续提供工具依赖子�
 MANIFEST.sha256.json 始终保留原始发布清单。安装检查可另外读取被 Git 忽略的 config/source_patches.local.json：schema_version=1、manifest_sha256 为原清单文件 SHA-256、files 为逐文件记录（before=原清单哈希、after=审核后实际文件哈希、reason=审核原因、reviewed=true）。记录必须与全部变更精确匹配，缺失文件、未知变更或后续修改仍失败。
 
 只在 Agent 已逐项审核补丁并运行对应验证后建立记录；禁止按当前目录批量重生成此记录来消除报错。它不是签名或防篡改机制，不替代来源审核。verify_distribution.py 的原始分发校验与公开发布检查仍严格失败，维护者只有在正式整理新版源码时才重建该新版清单。旧项目迁移见 MIGRATION.md。
+
+## v0.1.5 的运行时与恢复入口
+
+Windows Agent 首先运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup_runtime.ps1`。`-Plan` 只输出计划，不安装。入口在没有 Python 时也能执行；复用 Python 3.11，否则下载 python.org 的 3.11.9 Windows 安装器，校验 Windows Authenticode 有效且签名主体为 Python Software Foundation，安装到项目 tmp/runtimes/python，不卸载旧版本、不修改系统 PATH。3.11.9 是官方完整 Windows 安装器兼容基线，不称为最新安全补丁版本；可以通过 -PythonExecutable 选择组织维护的兼容 Python 3.11。安装器会使用当前用户的 Windows 安装登记信息，不能保证完全无注册表操作；若本机已有同版本安装登记冲突，保留现场并报告。
+
+Node 默认复用已配置版本；只有未配置且系统 Node 缺失、低于24或 TS 探针失败时安装隔离 v24.22.0。先从 nodejs.org 获取 SHASUMS256 再核对 ZIP，保留收据。错误的显式/项目 pin 需要审核，不能用自动切换掩盖。离线、证书验证失败或官方来源不可达都保留失败，不通过关闭 TLS 校验完成部署。
+
+Node 解析顺序为显式参数 → SPIDER_NODE → agent_tools.local.json → PATH；Python 对应显式参数/SPIDER_PYTHON → 项目配置 → .venv-toolchain → 当前解释器。bootstrap、deploy 和完整回归共用选择逻辑。旧文档中的显式 --node 仍可使用，日常无需重复输入。
+
+浏览器元数据有有界重试；Python HTTPS 失败后可使用系统 curl HTTPS 兜底，不允许重定向到未知地址，不关闭证书检查。ZIP 仍经过路径/CRC/哈希检查。首次只有被过滤的欢迎页时，MCP 只读返回空列表；需要页面时由 Agent 显式 new_page。MCP 退出对远程浏览器执行 disconnect，启动器重新连接前会 ensure 项目浏览器。已运行服务遇浏览器断开时须重连服务，仍保留端口归属检查。
+
+status 不再把保存的报告原样当成实时状态：last_acceptance 是历史；live_health 会检查浏览器归属、项目运行时及脚本级 MCP 只读调用，并标明宿主调用未重测。它不启动资源、不改历史结果；命令退出0需历史通过且本次检查通过，退出2表示未同时满足。阶段报告增加 elapsed_seconds、稳定错误码以及完整回归的计数摘要，原始业务载荷不落盘。
+
+DeepSeek Harness 的 overlay、Profile 范围、幂等、冲突与撤销见 [专用说明](DEEPSEEK_HARNESS.md)。

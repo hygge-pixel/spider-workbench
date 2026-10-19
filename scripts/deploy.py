@@ -12,14 +12,18 @@ import subprocess
 import sys
 import tempfile
 import uuid
+import time
+import re
+from urllib.error import URLError, HTTPError
+import ssl
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.setup_chrome import atomic_json, installation_lock
+from scripts.setup_chrome import atomic_json, installation_lock, OfficialDownloadError
 from scripts.verify_distribution import verify_installation
-from spider_core.project_runtime import select_python
+from spider_core.project_runtime import select_python, npm_cli
 from spider_core.browser import WorkspaceBrowserError
 
 TECHNICAL_STAGES = ('preflight', 'core', 'dependencies', 'browser_install', 'configuration',
@@ -33,8 +37,14 @@ class StageFailure(RuntimeError):
 
 
 def diagnostic(error):
-    if isinstance(error, (StageFailure, WorkspaceBrowserError)):
+    if isinstance(error, (StageFailure, WorkspaceBrowserError, OfficialDownloadError)):
         code = error.code
+    elif isinstance(error, HTTPError):
+        code = 'official_http_error_' + str(error.code)
+    elif isinstance(error, URLError):
+        code = 'network_tls_verification_failed' if isinstance(error.reason, ssl.SSLError) else 'network_connection_failed'
+    elif isinstance(error, ValueError) and str(error).split(';')[0] in {'node_executable_missing', 'node_version_too_old', 'node_npm_missing'}:
+        code = str(error).split(';')[0]
     elif isinstance(error, subprocess.TimeoutExpired):
         code = 'command_timeout'
     elif isinstance(error, subprocess.CalledProcessError):
@@ -64,7 +74,15 @@ def command(root, argv, *, json_result=True, timeout=120):
             pass
         raise StageFailure(category, process.returncode)
     if not json_result:
-        return {'passed': True, 'exit_code': 0}
+        output = process.stdout + '\n' + process.stderr
+        result = {'passed': True, 'exit_code': 0}
+        # Persist counts only, not arbitrary output from tests or tools.
+        for label, pattern in [('python_tests', r'Ran (\d+) tests'), ('python_sources', r'\[compile\] (\d+)'),
+                               ('skill_cases', r'\[SUMMARY\] all (\d+) cases passed')]:
+            match = re.search(pattern, output)
+            if match:
+                result[label] = int(match[1])
+        return result
     try:
         result = json.loads(process.stdout)
     except ValueError:
@@ -112,6 +130,7 @@ class Deployment:
             temporary.unlink(missing_ok=True)
 
     def stage(self, name, operation):
+        started = time.monotonic()
         print('[deployment] ' + name, file=sys.stderr, flush=True)
         self.report['stages'][name] = {'status': 'running'}
         self.save()
@@ -119,11 +138,11 @@ class Deployment:
             result = operation()
             if not isinstance(result, dict) or result.get('passed', result.get('ok', True)) is False:
                 raise StageFailure('stage_reported_failure')
-            self.report['stages'][name] = {'status': 'passed', 'result': result}
+            self.report['stages'][name] = {'status': 'passed', 'result': result, 'elapsed_seconds': round(time.monotonic() - started, 3)}
             self.save()
             return result
         except Exception as error:
-            self.report['stages'][name] = dict(status='failed', **diagnostic(error))
+            self.report['stages'][name] = dict(status='failed', elapsed_seconds=round(time.monotonic() - started, 3), **diagnostic(error))
             self.report.update(status='failed', passed=False, next_action=f'resolve {name}; rerun apply to reuse verified components')
             self.save()
             raise
@@ -148,8 +167,8 @@ def preflight(root, node=None, codex=None):
     if not integrity['passed']:
         raise StageFailure('source_integrity_failed; review_exact_local_patches')
     from bootstrap import resolve_node
-    selected = resolve_node(node)
-    npm = selected.parent / 'node_modules/npm/bin/npm-cli.js'
+    selected = resolve_node(node, root)
+    npm = npm_cli(selected)
     version = subprocess.run([str(selected), '--version'], capture_output=True, text=True, check=True, timeout=15).stdout.strip()
     with tempfile.TemporaryDirectory(prefix='spider-node-preflight-') as directory:
         probe = Path(directory) / 'probe.ts'
@@ -302,6 +321,31 @@ def accept_host(root, evidence_path):
     return deployment.report
 
 
+def deployment_status(root):
+    """Read-only live check; immutable saved acceptance remains explicitly historical."""
+    root = Path(root)
+    path = root / 'outputs/deployment_acceptance.json'
+    historical = json.loads(path.read_text(encoding='utf-8')) if path.is_file() else {'passed': False, 'status': 'not_deployed'}
+    from spider_core.browser import status_browser_candidate
+    try:
+        browser = status_browser_candidate(root, 'chrome')
+        runtime_python = select_python(root)
+        from spider_core.project_runtime import select_node
+        runtime_node = select_node(root)
+        mcp = command(root, [runtime_python, 'scripts/browser_toolchain.py', 'mcp-smoke', '--candidate', 'chrome'], timeout=70)
+        live = {'passed': True, 'browser': browser, 'mcp_read_only': mcp, 'python': str(runtime_python),
+                'node': str(runtime_node), 'mcp_host_call': 'not_retested'}
+        if historical.get('source_sha256') and source_fingerprint(root) != historical['source_sha256']:
+            live.update(passed=False, code='deployment_changed_since_acceptance')
+    except (WorkspaceBrowserError, StageFailure, OSError, ValueError, subprocess.SubprocessError) as error:
+        live = {'passed': False, **diagnostic(error), 'mcp_host_call': 'not_retested'}
+    live['checked_at'] = datetime.now(timezone.utc).isoformat()
+    return {'passed': bool(historical.get('passed') and live['passed']),
+            'last_acceptance': historical, 'live_health': live,
+            'next_action': historical.get('next_action', 'run apply') if live['passed'] else
+                'run spider.py browser ensure --json; reconnect host MCP; call list_pages'}
+
+
 def main():
     for stream in (sys.stdout, sys.stderr):
         reconfigure = getattr(stream, 'reconfigure', None)
@@ -315,7 +359,7 @@ def main():
     args = parser.parse_args()
     try:
         if args.action == 'status':
-            result = json.loads((ROOT / 'outputs/deployment_acceptance.json').read_text(encoding='utf-8'))
+            result = deployment_status(ROOT)
         elif args.action == 'preflight':
             result = preflight(ROOT, args.node, args.codex)
         elif args.action == 'accept-host':

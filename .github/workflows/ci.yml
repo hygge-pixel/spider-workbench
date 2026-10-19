@@ -50,3 +50,4 @@ jobs:
         working-directory: vendor/js-reverse-mcp
       - run: npm run build
         working-directory: vendor/js-reverse-mcp
+      - run: node --test tests/mcp_lifecycle.test.mjs

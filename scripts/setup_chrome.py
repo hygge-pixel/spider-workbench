@@ -15,6 +15,7 @@ import tempfile
 import time
 from urllib.parse import urlparse
 from urllib.request import HTTPSHandler, HTTPRedirectHandler, build_opener
+from urllib.error import URLError
 import zipfile
 
 METADATA = 'https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json'
@@ -63,9 +64,46 @@ def validate_url(url):
     return url
 
 
+class OfficialDownloadError(RuntimeError):
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
+def curl_fetch(url, validator=validate_url):
+    """Use platform curl TLS/proxy support without redirects or insecure flags."""
+    validator(url)
+    curl = shutil.which('curl.exe' if os.name == 'nt' else 'curl')
+    if not curl:
+        raise OfficialDownloadError('official_download_failed_no_curl_fallback')
+    stream = tempfile.TemporaryFile('w+b')
+    try:
+        result = subprocess.run([curl, '--silent', '--show-error', '--fail', '--proto', '=https',
+                                 '--max-redirs', '0', '--connect-timeout', '20', '--max-time', '300',
+                                 '--retry', '2', '--retry-delay', '1', '--write-out', '%{stderr}\nSTATUS:%{http_code}', url],
+                                stdout=stream, stderr=subprocess.PIPE, timeout=950,
+                                creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        diagnostic = result.stderr.decode('utf-8', errors='replace')
+        if result.returncode or not diagnostic.rstrip().endswith('STATUS:200'):
+            code = 'official_download_tls_failed' if result.returncode in (51, 60) else 'official_download_failed_after_fallback'
+            raise OfficialDownloadError(code)
+        stream.seek(0)
+        return stream
+    except BaseException:
+        stream.close()
+        raise
+
+
 def fetch(url):
     validate_url(url)
-    return build_opener(HTTPSHandler(), OfficialRedirects()).open(url, timeout=60)
+    for attempt in range(3):
+        try:
+            return build_opener(HTTPSHandler(), OfficialRedirects()).open(url, timeout=60)
+        except (URLError, TimeoutError, OSError):
+            if attempt < 2:
+                time.sleep(attempt + 1)
+    print('[official-download] Python transport failed; trying validated HTTPS curl', file=sys.stderr, flush=True)
+    return curl_fetch(url)
 
 
 def select_asset(metadata, target):

@@ -76,7 +76,7 @@ flowchart LR
 
 ## Agent 兼容
 
-项目已提供 Codex、Claude Code、Gemini CLI、Cursor、GitHub Copilot、Windsurf、Cline、Roo Code、Kiro、OpenCode、TRAE 的默认规则入口。核心规则统一在 AGENTS.md，Skill 索引可直接读取，部署时再建立本机发现链接；各宿主的 MCP 配置分别适配。用户仍只需打开工作区并发送上面的提示词。
+项目已提供 Codex、Claude Code、Gemini CLI、Cursor、GitHub Copilot、Windsurf、Cline、Roo Code、Kiro、OpenCode、TRAE 的默认规则入口。核心规则统一在 AGENTS.md，Skill 索引可直接读取，部署时再建立本机发现链接；各宿主的 MCP 配置分别适配；DeepSeek Harness 另提供[专用适配与恢复说明](docs/DEEPSEEK_HARNESS.md)。用户仍只需打开工作区并发送上面的提示词。
 
 入口按各产品官方机制配置并有本地合同检查。首次打开需满足宿主的工作区信任、规则开关和文件权限；实际读取/工具连接状态由目标 Agent 现场验收，见 [兼容矩阵](docs/AGENT_COMPATIBILITY.md)。
 

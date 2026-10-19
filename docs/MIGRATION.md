@@ -57,3 +57,9 @@ python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --roll
 7. 运行框架和本机新增任务的完整回归；对比升级前后保留内容哈希。报告实际通过、失败、未执行和备份路径。未经用户指示不提交或推送 GitHub。
 
 本工单的目的是增量升级现有工作区。若只想测试新电脑的全新安装体验，将新版源码解压到一个新空目录，以同一段 README 提示词部署；不要共用旧目录的浏览器 Profile，也不要接管已被另一项目占用的 9222 端口。
+
+## 升级到 0.1.5
+
+先备份/核对差异，再替换新版分发源码并保留 config/*.local.json、workspace_browser.json、任务、runs、outputs、隔离运行时与 Profile。维护者在新发行包生成新 manifest；目标机不重建清单掩盖修改。运行 setup_runtime.ps1 检查复用 → deploy.py preflight → apply → 宿主实际调用 → accept-host。已有工具配置会复用；变更 Node 或 MCP 源码会触发相应依赖重建。
+
+status 输出调整为 last_acceptance/live_health，自动化读取方须同步。DeepSeek Harness 既有未标记 js-reverse 配置不会被自动覆盖，先审核原定义与本项目定义的对应关系，再采用专用适配；保留其它服务与设置。
