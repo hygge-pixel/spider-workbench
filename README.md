@@ -25,7 +25,7 @@
 
 将下载并解压后的项目文件夹作为 **coding Agent 的工作区**打开，然后发送：
 
-> 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的部署；已经部署的部分先检查并复用。请自动检查并补齐环境和隔离工具依赖，从 Google 官方 Chrome for Testing 下载部署当天最新 Stable 浏览器，配置项目独立 Profile、Chrome/9222 和 js-reverse MCP，不安装或启用 Cloak。完成离线示例、浏览器连接、MCP 实际调用和完整回归，保留已有任务与配置，最后告诉我实际通过和待处理的项目。已授权部署所需的常规可逆安装、构建与本项目配置调整，请连续推进。
+> 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的部署；已经部署的部分先检查并复用。请自动检查并补齐环境和隔离工具依赖，从 Google 官方 Chrome for Testing 下载部署当天最新 Stable 浏览器，配置项目独立 Profile、Chrome/9222 和 js-reverse MCP。完成离线示例、浏览器连接、MCP 实际调用和完整回归，保留已有任务与配置，最后告诉我实际通过和待处理的项目。已授权部署所需的常规可逆安装、构建与本项目配置调整，请连续推进。
 
 Agent 会按[完整部署工单](docs/INSTALL_WITH_AGENT.md)执行后续步骤。需要能操作本机文件、终端并配置工具的 Agent；普通网页聊天窗口不会仅凭这段话自动部署电脑。完整浏览器流程推荐先在 Windows 上使用；其它系统的支持范围由 Agent 实际检查和报告。电脑上已有 Python/Node 版本不符时，Agent 会保留旧环境并选择或并行安装兼容版本；浏览器下载、连接和宿主加载分别验收，详见[版本与部署说明](docs/RUNTIME_COMPATIBILITY.md)。
 
@@ -73,6 +73,12 @@ flowchart LR
 适合使用 coding Agent 开展数据采集、接口分析和 Web / JavaScript 逆向的个人与团队，也适合作为新项目的起点。框架初始不附带具体网站采集器；网站适配、分页、字段语义与完整性需要逐任务验证。工具安装通过，也需要继续验证目标网站的真实业务结果。
 
 源码不携带历史客户数据、账号、Cookie、浏览器 Profile 或个人 Agent 设置。Python、Node、浏览器本体在目标机部署，Agent 账户由用户准备。可选外部应用按需要接入；通用框架不承诺任意网站都能直接采集，也不等同于已经打包好的客户桌面软件。
+
+## Agent 兼容
+
+项目已提供 Codex、Claude Code、Gemini CLI、Cursor、GitHub Copilot、Windsurf、Cline、Roo Code、Kiro、OpenCode、TRAE 的默认规则入口。核心规则统一在 AGENTS.md，Skill 索引可直接读取，部署时再建立本机发现链接；各宿主的 MCP 配置分别适配。用户仍只需打开工作区并发送上面的提示词。
+
+入口按各产品官方机制配置并有本地合同检查。首次打开需满足宿主的工作区信任、规则开关和文件权限；实际读取/工具连接状态由目标 Agent 现场验收，见 [兼容矩阵](docs/AGENT_COMPATIBILITY.md)。
 
 ## 进一步了解
 

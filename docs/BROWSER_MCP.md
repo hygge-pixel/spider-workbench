@@ -2,7 +2,7 @@
 
 ## 默认连接关系
 
-Chrome for Testing 是浏览器，CDP 是连接协议，JSReverser 是 MCP 服务，Playwright 是脚本客户端。默认部署由 Agent 从 Google 官方查询并安装最新 Stable Chrome for Testing，使用项目专用 Profile 和 js-reverse MCP；不安装或启用 Cloak。
+Chrome for Testing 是浏览器，CDP 是连接协议，JSReverser 是 MCP 服务，Playwright 是脚本客户端。默认部署由 Agent 从 Google 官方查询并安装最新 Stable Chrome for Testing，使用项目专用 Profile 和 js-reverse MCP。
 
 ```text
 Agent → js-reverse MCP → http://127.0.0.1:9222 → Chrome for Testing
@@ -17,17 +17,17 @@ Agent 安装隔离工具并构建随包 JSReverser，读取官方 Stable 元数�
 
 程序和 Profile 分开。浏览器不设为系统默认，不导入个人 Chrome 数据，不复用其它项目 Profile。升级按版本保留旧程序和配置，退出后备份 Profile，再切换和验收。端口被其它项目占用时保留现场，不结束或接管别人进程。
 
-现有核心保留 chrome/9222 和 cloak/9232 两个候选的兼容 schema；未启用的 cloak 用项目 unconfigured 路径占位，不下载、启动或连接它。Chrome 参数为空，不携带 Cloak 指纹参数或环境变量。
+配置仅允许 chrome 候选和 9222 本机回环端口，不保留备用候选槽位。Chrome 的默认 launch_args=[]、environment={}。
 
 ## MCP 宿主接入
 
-生成器默认只输出 js-reverse，连接 chrome/9222。按实际宿主格式合并；--write-project-mcp 仅用于已确认支持 mcpServers 格式的项目配置，并保留其它服务。不启用 js-reverse-cloak；旧项目作用域定义经核对备份后停用，保留其它项目和用户全局服务。
+生成器默认只输出 js-reverse，连接 chrome/9222。按实际宿主格式合并；--write-project-mcp 仅用于已确认支持 mcpServers 格式的项目配置，并保留其它服务。旧项目作用域定义经核对备份后停用，保留其它项目和用户全局服务。
 
 MCP 启动器 scripts/start_js_reverser.mjs 先核验浏览器归属，再在宿主管理的同一个 Node 进程导入 build/src/index.js。command/args 使用目标机绝对路径，JSON/TOML 按实际宿主格式映射。运行材料在 runs/_mcp/js-reverse，不写入 vendor 源码。密钥不写入配置 JSON。
 
 ## 分层验收
 
-依次核验程序/端口/Profile、CDP 版本与目标列表、MCP 初始化与工具目录、list_pages 只读调用、Playwright 合成页面和 Agent 宿主实际工具调用。最后运行框架完整回归。配置存在、CLI 探针成功与宿主已加载分别报告；Cloak 的真实连接检查为 not_required。
+依次核验程序/端口/Profile、CDP 版本与目标列表、MCP 初始化与工具目录、list_pages 只读调用、Playwright 合成页面和 Agent 宿主实际工具调用。最后运行框架完整回归。配置存在、CLI 探针成功与宿主已加载分别报告。
 
 检查只创建并关闭自己的合成标签，不读取或输出私人页面内容、Cookie 或 MCP 原始载荷。工具连接成功不代表网站适配和真实数据验证通过；业务仍走统一 runner。
 

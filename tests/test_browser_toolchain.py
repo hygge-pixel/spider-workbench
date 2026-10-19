@@ -16,8 +16,8 @@ class BrowserToolchainTests(unittest.TestCase):
     def test_definitions_use_launcher_and_candidate_from_current_workspace(self):
         with tempfile.TemporaryDirectory(prefix='tools space ') as directory:
             root = Path(directory)
-            definitions = build_definitions(root, Path(sys.executable), ('chrome', 'cloak'), node=Path(sys.executable))
-            for name, candidate in (('js-reverse', 'chrome'), ('js-reverse-cloak', 'cloak')):
+            definitions = build_definitions(root, Path(sys.executable), ('chrome',), node=Path(sys.executable))
+            for name, candidate in (('js-reverse', 'chrome'),):
                 self.assertEqual(definitions[name]['command'], sys.executable)
                 self.assertIn(str(root / 'scripts/start_js_reverser.mjs'), definitions[name]['args'])
                 self.assertEqual(definitions[name]['args'][-1], candidate)

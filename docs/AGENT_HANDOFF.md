@@ -10,8 +10,8 @@
 2. 从新源码目录校验 verify_distribution，查看初始空注册表，运行离线三条，读取 validation。
 3. setup 建立本机 Skill 发现链接；已有目录冲突保留并报告，不清空。
 4. 安装器先计划，再 component all --apply；保留旧环境，隔离到 .venv-toolchain。
-5. 从 Google 官方查询并安装最新 Stable Chrome for Testing，配置 chrome/9222、独立 tmp/chrome-mcp Profile 并设为默认；不安装或启用 Cloak，见 CHROME_FOR_TESTING。
-6. 生成本机 MCP 定义，只按实际 Agent 宿主格式合并 js-reverse，忽略未使用的 js-reverse-cloak；不覆盖其它配置或用户全局设置，当前生成器默认只有 js-reverse，项目写入开关仅用于支持 mcpServers 格式的宿主。
+5. 从 Google 官方查询并安装最新 Stable Chrome for Testing，配置 chrome/9222、独立 tmp/chrome-mcp Profile 并设为默认，见 CHROME_FOR_TESTING。
+6. 生成本机 MCP 定义，只按实际 Agent 宿主格式合并 js-reverse；不覆盖其它配置或用户全局设置，当前生成器默认只有 js-reverse，项目写入开关仅用于支持 mcpServers 格式的宿主。
 7. 分别做 mcp-smoke stdio、只读调用、cdp-smoke；重连宿主，实际发现并调用工具。
 8. 运行完整框架回归和公开发布扫描；如有本机新任务，运行其测试，不删除任务来满足空框架假设。
 
@@ -40,4 +40,6 @@
 }
 ```
 
-模板的 false 是待验证初值，只有本次真实成功才改 true；未执行项注明原因。另记 Chrome for Testing Stable 实际版本、官方来源、default_browser_candidate=chrome、mcp_service=js-reverse、cloak_status=not_required。另记版本、实际路径、冲突、备份、升级保留哈希与回归输出。没有任务就不跑真实网站批量采集，不复制旧登录态、不提交业务数据、不发送通知、不发布 GitHub。
+模板的 false 是待验证初值，只有本次真实成功才改 true；未执行项注明原因。另记 Chrome for Testing Stable 实际版本、官方来源、default_browser_candidate=chrome、mcp_service=js-reverse。另记版本、实际路径、冲突、备份、升级保留哈希与回归输出。没有任务就不跑真实网站批量采集，不复制旧登录态、不提交业务数据、不发送通知、不发布 GitHub。
+
+当前宿主首先按 docs/AGENT_COMPATIBILITY.md 核对默认规则入口；读取 AGENTS.md 的 Skill 索引。分别验收规则读取、原生 Skill 发现/文件读取与 MCP 实际调用，不把生成 mcpServers JSON 视为所有宿主都已配置。

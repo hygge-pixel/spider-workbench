@@ -9,8 +9,8 @@ const argv = process.argv.slice(2);
 const value = name => argv[argv.indexOf(name) + 1];
 const python = value('--python');
 const candidate = value('--candidate');
-if (!argv.includes('--python') || !argv.includes('--candidate') || !['chrome', 'cloak'].includes(candidate)) {
-  console.error('Use --python <project-tool-python> --candidate chrome|cloak');
+if (!argv.includes('--python') || !argv.includes('--candidate') || candidate !== 'chrome') {
+  console.error('Use --python <project-tool-python> --candidate chrome');
   process.exit(1);
 }
 const preflight = spawnSync(python, [path.join(root, 'scripts/start_js_reverser.py'), '--candidate', candidate, '--describe'], {

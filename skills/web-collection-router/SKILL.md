@@ -11,7 +11,7 @@ description: Use when a user asks to collect, crawl, scrape, export, monitor, or
 
 ## 自适应优先级与参考文档
 
-Cloak/MCP 侦察、纯算法、Node.js 补环境、Python/Node HTTP、资料检索、同范围 App 接口和浏览器补采都是候选优先级，不是必须走完的固定路线。按当前证据跳过已完成或无关阶段，有界失败后保存进度再换等价候选；不因首选工具不可用就结束任务。已有当前已对拍协议无需重复 Network 侦察。验证码暂停、授权与数据验收仍是边界条件。
+Chrome/MCP 侦察、纯算法、Node.js 补环境、Python/Node HTTP、资料检索、同范围 App 接口和浏览器补采都是候选优先级，不是必须走完的固定路线。按当前证据跳过已完成或无关阶段，有界失败后保存进度再换等价候选；不因首选工具不可用就结束任务。已有当前已对拍协议无需重复 Network 侦察。验证码暂停、授权与数据验收仍是边界条件。
 
 将老师或外部逆向文档用于方法参考时，阅读 [协议优先逆向与采集适配](references/protocol-first-adaptation.md)：先最小重放，再判断是否需要逆向；多输入算法对拍后，必须验证本地新请求返回业务数据。不要照搬固定 Phase、浏览器全禁、单一路线、请求格式即验收、删除测试或其他项目路径。
 
@@ -50,7 +50,7 @@ py -3.11 spider.py browser ensure --json
 
 Task 声明 `captcha_present=true` 时，普通 `spider.py run` 在浏览器或 collector 启动前返回 `captcha_user_instruction_required`。只有用户针对当前运行明确要求处理后，才追加一次性 `--allow-captcha`；不得把该许可固化进 Task，也不得自动执行验证码处理；本分发不包含验证码求解 Skill。
 
-需要登录态、交互或 Network 观察的任务，在 `task.json` 顶层显式声明 `{"browser":{"ensure":true}}`。`spider.py run` 会在创建运行目录前复用或启动配置的默认浏览器（当前 Chrome for Testing／9222；Cloak 不安装或启用），普通 HTTP/HTML 任务不会启动它。对用户明确要求的采集任务，选中 browser-context candidate 后可以自动复用已有默认浏览器 Cookies 和登录态；会话可留在浏览器、进程内存或本次 `runs/` 树内名为 `cookies.json` 的本地缓存，缓存禁止提交 Git、禁止复制到 `runs/` 之外，不能写进 Task、日志或可迁移证据。账号密码/API Key/代理凭据只使用忽略的 `config/local_credentials/*.env` 或进程环境变量。
+需要登录态、交互或 Network 观察的任务，在 `task.json` 顶层显式声明 `{"browser":{"ensure":true}}`。`spider.py run` 会在创建运行目录前复用或启动配置的默认浏览器（当前 Chrome for Testing／9222），普通 HTTP/HTML 任务不会启动它。对用户明确要求的采集任务，选中 browser-context candidate 后可以自动复用已有默认浏览器 Cookies 和登录态；会话可留在浏览器、进程内存或本次 `runs/` 树内名为 `cookies.json` 的本地缓存，缓存禁止提交 Git、禁止复制到 `runs/` 之外，不能写进 Task、日志或可迁移证据。账号密码/API Key/代理凭据只使用忽略的 `config/local_credentials/*.env` 或进程环境变量。
 
 任务可在顶层写 `routing_evidence`。Runner 会在执行 collector 前用这些证据生成 `route_decision.json`，并在 `validation.json` 与 `run.json` 中记录建议 route/backend、实际 route/backend 和 `preference_applied`。这条决定是只读优先级，不强迫 Adapter 使用自己没有实现的分支。任务还可用 `execution.timeout_seconds` 设置 1–86400 秒总超时（默认 1800）；超时后保留已写入的标准文件与日志，并明确记录 `collector_timeout`，不得标成完成。
 

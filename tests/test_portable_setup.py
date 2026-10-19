@@ -53,8 +53,7 @@ class PortableSetupTests(unittest.TestCase):
         path = self.root / 'config/workspace_browser.json'
         payload = json.loads(path.read_text(encoding='utf-8'))
         self.assertEqual(payload['default_candidate'], 'chrome')
-        self.assertEqual(set(payload['candidates']), {'chrome', 'cloak'})
-        self.assertFalse(Path(payload['candidates']['cloak']['executable']).exists())
+        self.assertEqual(set(payload['candidates']), {'chrome'})
         profile = Path(payload['candidates']['chrome']['user_data_dir'])
         self.assertEqual(profile, self.root / 'tmp/chrome-mcp')
         self.assertEqual(payload['candidates']['chrome']['launch_args'], [])
@@ -68,16 +67,16 @@ class PortableSetupTests(unittest.TestCase):
             configure_browser(self.root, 'chrome', other)
         self.assertEqual(before, path.read_bytes())
 
-    def test_browser_config_adds_candidate_only_with_explicit_merge(self):
+    def test_browser_config_rejects_unknown_candidate_even_with_merge(self):
         program = self.root / 'browser.exe'
-        program.write_bytes(b'fixture')
+        program.touch()
         configure_browser(self.root, 'chrome', program)
-        with self.assertRaises(FileExistsError):
-            configure_browser(self.root, 'cloak', program)
-        configure_browser(self.root, 'cloak', program, merge=True)
-        data = json.loads((self.root / 'config/workspace_browser.json').read_text(encoding='utf-8'))
-        self.assertEqual(set(data['candidates']), {'chrome', 'cloak'})
-        self.assertEqual(data['default_candidate'], 'chrome')
+        path = self.root / 'config/workspace_browser.json'
+        before = path.read_bytes()
+        for merge in (False, True):
+            with self.assertRaises(ValueError):
+                configure_browser(self.root, 'unsupported', program, merge=merge)
+        self.assertEqual(path.read_bytes(), before)
 
     def test_doctor_is_read_only_and_optional_tools_do_not_block_core(self):
         setup(self.root)
@@ -89,19 +88,16 @@ class PortableSetupTests(unittest.TestCase):
         self.assertEqual(result['browser']['status'], 'not_configured')
         self.assertIn('optional_tools', result)
 
-    def test_cloak_configuration_matches_source_workflow_and_can_become_default(self):
+    def test_setting_default_preserves_the_configured_chrome(self):
         program = self.root / 'browser.exe'
-        program.write_bytes(b'fixture')
+        program.touch()
         configure_browser(self.root, 'chrome', program)
-        configure_browser(self.root, 'cloak', program, merge=True)
         path = self.root / 'config/workspace_browser.json'
-        before = json.loads(path.read_text(encoding='utf-8'))
-        self.assertIn('--fingerprint=20260629', before['candidates']['cloak']['launch_args'])
-        self.assertEqual(before['candidates']['cloak']['environment'], {'CLOAK_NO_DEBUGGER': '1'})
-        set_default_browser(self.root, 'cloak')
-        after = json.loads(path.read_text(encoding='utf-8'))
-        self.assertEqual(after['default_candidate'], 'cloak')
-        self.assertEqual(before['candidates'], after['candidates'])
+        before = path.read_bytes()
+        set_default_browser(self.root, 'chrome')
+        self.assertEqual(json.loads(before), json.loads(path.read_bytes()))
+        with self.assertRaises(ValueError):
+            set_default_browser(self.root, 'unsupported')
 
     def test_link_conflict_does_not_follow_an_external_directory(self):
         outside = self.root / 'outside'

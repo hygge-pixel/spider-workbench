@@ -8,6 +8,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.browser_toolchain import cdp_smoke
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--candidate', choices=('chrome', 'cloak'), required=True)
+parser.add_argument('--candidate', choices=('chrome',), required=True)
 args = parser.parse_args()
 print(json.dumps(cdp_smoke(args.candidate), ensure_ascii=False, indent=2))

@@ -27,7 +27,7 @@ python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --roll
 
 ## 0.1.2 的具体变化
 
-- 默认 Chrome for Testing / chrome / 9222。压力证据尊重已配置默认浏览器，生成器默认只输出 js-reverse。旧 cloak 槽位保留兼容 schema，不安装或自动启用。
+- 默认 Chrome for Testing / chrome / 9222。压力证据尊重已配置默认浏览器，生成器默认只输出 js-reverse。本版只允许 chrome 候选，不保留备用槽位。
 - 当前包保留 13 个通用 Skills，已移除验证码、小程序、Android、原生逆向与 REA 专项。验证码暂停规则保留。
 - 旧工单归并到 INSTALL_WITH_AGENT、CHROME_FOR_TESTING、BROWSER_MCP 和本说明；Skill/tool 名称与会话保存规则以新入口为准。
 - MCP 依赖锁有修补。备份已有配置，重新按锁安装并构建，再做初始化、实际 CDP 和宿主加载验收；只替换锁文件不代表升级完成。
@@ -35,3 +35,11 @@ python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --roll
 重新检查 Python 3.11、Node 24+ 与隔离环境版本。保留旧版本，不全局覆盖 PATH；既有虚拟环境版本不符时保留后建立新环境。浏览器程序与 Profile 分开，退出后再备份 Profile，切换按 CHROME_FOR_TESTING 工单执行。
 
 最后运行完整回归与离线例子。此步骤验证框架；当前在线平台仍须用本次真实请求和业务数据验收，旧 proof 不自动升级。
+
+## 0.1.3 单浏览器与入口迁移
+
+本版 schema_version=2 只允许 default_candidate=chrome、candidates 只有 chrome 键；旧的多候选配置会被拒绝，原文件保持不变。目标 Agent 必须先备份 config/workspace_browser.json 到本机 runs/_deployment_backups/<时间>/，读取并审核既有 Chrome 的真实程序、9222 地址、Profile、超时参数，再原子写入单 Chrome 配置并用 browser status 验证。已存在旧单 Chrome schema_version=1 仍可读取；调整前同样备份。
+
+不删除已有浏览器程序/会话目录。旧宿主中的本项目备用 MCP 定义先备份并停用，保留其它项目和用户服务；新的默认定义只有 js-reverse。不要仅删除 JSON 的一个键而留下不匹配的 default_candidate。
+
+新增规则入口随新包提供，默认会进入仓库和 ZIP。升级时保留用户对已有入口的定制，发生同名冲突逐项比较；不要将本机 Skill junction 提交或拷到其它机器。README 的用户操作仍只有打开工作区并发送提示词。

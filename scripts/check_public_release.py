@@ -17,8 +17,12 @@ ROOT_FILES = {
     'MANIFEST.sha256.json', 'spider.py', 'bootstrap.py', 'pyproject.toml', 'package.json', 'package-lock.json',
     'requirements-collection.txt', 'requirements-dev.txt',
 }
+AGENT_ENTRY_FILES = {
+    '.github/copilot-instructions.md', '.clinerules/00-spider-workbench.md',
+    '.roo/rules/00-spider-workbench.md', '.trae/rules/project_rules.md',
+}
 SOURCE_DIRS = {'spider_core', 'scripts', 'skills', 'tests', 'docs', 'examples',
-               'requirements-backends', '.github', 'upgrade'}
+               'requirements-backends', '.github', 'upgrade', '.clinerules', '.roo', '.trae'}
 LOCAL_DIRS = {'.git', 'node_modules', '__pycache__', '.venv', '.venv-toolchain',
               '.pytest_cache', 'selftest_tmp', 'build', '.cache', 'debugger-sessions'}
 EXTENSIONS = {'.py', '.js', '.mjs', '.cjs', '.ts', '.json', '.md', '.txt', '.toml',
@@ -28,6 +32,7 @@ REQUIRED = {'README.md', 'README.en.md', 'bootstrap.py', 'docs/USER_GUIDE.md', '
             'SOURCE_PROVENANCE.json', 'spider.py', 'platforms/registry.json',
             '.github/workflows/ci.yml', 'docs/QUICKSTART.md', 'docs/OPEN_SOURCE_RELEASE.md',
             'vendor/js-reverse-mcp/LICENSE', 'skills/playwright-cli/LICENSE'}
+REQUIRED |= AGENT_ENTRY_FILES | {'docs/AGENT_COMPATIBILITY.md'}
 
 # High-confidence formats only; no claim of exhaustive credential detection.
 SECRET = re.compile(r'gh[pousr]_[A-Za-z0-9]{30,255}|github_pat_[A-Za-z0-9_]{40,255}|'
@@ -47,6 +52,8 @@ def public_path(name):
         return False
     if len(p.parts) == 1:
         return name in ROOT_FILES
+    if p.parts[0] in {'.clinerules', '.roo', '.trae'}:
+        return name in AGENT_ENTRY_FILES
     if p.parts[0] in {'runs', 'outputs', 'tmp', 'tools'}:
         return len(p.parts) == 2 and p.name == '.gitkeep'
     if name == 'platforms/registry.json':

@@ -17,7 +17,7 @@ python scripts/check_public_release.py
 
 .github/workflows/ci.yml 包含 Windows/Ubuntu 的 Python3.11+Node24 离线框架回归、公共发布检查与源码完整性；另有 MCP npm ci/prepare/build 任务。Actions 使用完整 commit SHA、只读 contents 权限，不读取业务密钥，不触发自动 GitHub Release，不使用 pull_request_target 执行 PR 代码。
 
-这些是随仓库交付的配置。实际云端通过状态以首次推送后的 Actions 输出为准，本机验收报告不能改称云端已通过。真实浏览器只在有独立本机程序的环境手动验收，不要求托管 CI 拥有 Cloak。
+这些是随仓库交付的配置。实际云端通过状态以首次推送后的 Actions 输出为准，本机验收报告不能改称云端已通过。真实浏览器只在有独立本机程序的环境手动验收，不要求托管 CI 安装真实浏览器。
 
 ## 发布检查器
 

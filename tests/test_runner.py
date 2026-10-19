@@ -555,17 +555,17 @@ class RunnerTests(unittest.TestCase):
         )
         self.assertEqual(outcome.status, "completed")
 
-    def test_browser_task_accepts_cloak_loopback_aliases(self) -> None:
+    def test_browser_task_accepts_chrome_loopback_aliases(self) -> None:
         task = self.task_for(
             [{"id": "1", "title": "one"}],
             collector_result={"source_exhausted": False, "route": "browser_context", "backend": "chrome_cdp"},
         )
         task["browser"] = {"ensure": True}
         task_path = self.write_task(task)
-        for url in ("http://localhost:9232", "http://[::1]:9232"):
+        for url in ("http://localhost:9222", "http://[::1]:9222"):
             with self.subTest(url=url):
                 safe_result = {
-                    "status": "ready", "candidate": "cloak", "action": "reused",
+                    "status": "ready", "candidate": "chrome", "action": "reused",
                     "cdp_url": url, "browser": "Chrome/142.0.7444.175",
                     "protocol_version": "1.3", "page_targets": 1,
                 }
@@ -573,10 +573,10 @@ class RunnerTests(unittest.TestCase):
                 self.assertEqual(outcome.status, "completed")
                 self.assertEqual(json.loads((outcome.run_dir / "browser.json").read_text(encoding="utf-8")), safe_result)
 
-    def test_browser_task_accepts_cloak_and_rejects_mismatched_endpoint(self) -> None:
+    def test_browser_task_accepts_chrome_and_rejects_mismatched_endpoint(self) -> None:
         safe_result = {
-            "status": "ready", "candidate": "cloak", "action": "reused",
-            "cdp_url": "http://127.0.0.1:9232", "browser": "Chrome/142.0.7444.175",
+            "status": "ready", "candidate": "chrome", "action": "reused",
+            "cdp_url": "http://127.0.0.1:9222", "browser": "Chrome/142.0.7444.175",
             "protocol_version": "1.3", "page_targets": 1,
         }
         task = self.task_for(
@@ -588,8 +588,8 @@ class RunnerTests(unittest.TestCase):
         outcome = run_collector(self.root, self.collector, task_path, browser_ensurer=lambda _: safe_result)
         self.assertEqual(outcome.status, "completed")
         self.assertEqual(json.loads((outcome.run_dir / "browser.json").read_text(encoding="utf-8")), safe_result)
-        for url in ("http://127.0.0.1:9222", "http://127.0.0.1:9333", "http://0.0.0.0:9232",
-                    "http://localhost:9222", "http://user@localhost:9232", "http://localhost:9232/json"):
+        for url in ("http://127.0.0.1:9232", "http://127.0.0.1:9333", "http://0.0.0.0:9222",
+                    "http://localhost:9232", "http://user@localhost:9222", "http://localhost:9222/json"):
             with self.subTest(url=url), self.assertRaisesRegex(RunError, "invalid result"):
                 run_collector(self.root, self.collector, task_path, browser_ensurer=lambda _: {**safe_result, "cdp_url": url})
 

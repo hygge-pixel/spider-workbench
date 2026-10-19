@@ -34,7 +34,7 @@ Task → runner 创建独立 runs/run_id → 子进程收到 --task / --output-d
 
 config/workspace_browser.json 是唯一浏览器配置源。agent_platform_compat 生成本机候选；browser_toolchain 默认只生成 js-reverse 启动定义；start_js_reverser.mjs 调短时 Python 身份预检，再在同一个 Node 进程载入 MCP。MCP 的 artifacts、debugger-sessions 和 cache 经适配留在 runs/_mcp。
 
-默认部署 Chrome for Testing/chrome/9222 与 js-reverse；Cloak 不安装或启用，生成器中的另一项只为历史兼容保留。Playwright 通过配置的 CDP 地址连接同一项目浏览器；合成检查只关闭自己创建的标签。浏览器能够连接不等于归属正确，更不代表账号数据可用。
+默认部署 Chrome for Testing/chrome/9222 与 js-reverse，仅支持 chrome 候选。Playwright 通过配置的 CDP 地址连接同一项目浏览器；合成检查只关闭自己创建的标签。浏览器能够连接不等于归属正确，更不代表账号数据可用。
 
 ## 5. 目录约定
 

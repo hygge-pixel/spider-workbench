@@ -1,11 +1,10 @@
 {
   "edition": "public-source",
-  "version": "0.1.2",
-  "prepared_on": "2026-10-18",
+  "version": "0.1.3",
+  "prepared_on": "2026-10-19",
   "upgrade_from": "framework-only-2026-10-16",
   "default_browser_preference": "chrome",
   "browser_endpoints": {
-    "cloak": "http://localhost:9232",
     "chrome": "http://127.0.0.1:9222"
   },
   "mcp_services": [

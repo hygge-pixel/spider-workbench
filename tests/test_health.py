@@ -19,40 +19,35 @@ def write_browser_pool(root: Path, default: str = "chrome") -> None:
             "user_data_dir": str(root / "tmp" / name),
             "cdp_url": f"http://127.0.0.1:{port}",
             "startup_timeout_seconds": 10, "launch_args": [], "environment": {},
-        } for name, port in (("chrome", 9222), ("cloak", 9232))},
+        } for name, port in (("chrome", 9222),)},
     }), encoding="utf-8")
 
 
 class CollectionHealthTests(unittest.TestCase):
-    def test_configured_cloak_is_ready_when_chrome_is_offline(self) -> None:
+    def test_configured_chrome_is_the_only_ready_candidate(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            write_browser_pool(root, "cloak")
-            before = sorted(str(p.relative_to(root)) for p in root.rglob("*"))
-
-            def status(workspace: Path, candidate: str):
-                if candidate == "chrome":
-                    raise WorkspaceBrowserError("browser_unavailable")
+            write_browser_pool(root)
+            calls = []
+            def status(workspace, candidate):
+                calls.append(candidate)
                 return {"status": "ready", "candidate": candidate}
+            health = collection_health(root, find_spec=lambda _: None, browser_status=status,
+                                       skill_names=(), optional_inspector=lambda *_: {})
+            self.assertEqual(calls, ["chrome"])
+            self.assertEqual(health["browser"], {"status": "ready", "candidate": "chrome"})
+            self.assertEqual(health["available_browser_candidates"], ["chrome"])
 
-            health = collection_health(root, find_spec=lambda _: None,
-                                       browser_status=status, skill_names=(),
-                                       optional_inspector=lambda *_: {})
-            self.assertEqual(health["browser"], {"status": "ready", "candidate": "cloak"})
-            self.assertEqual(health["default_browser_candidate"], "cloak")
-            self.assertEqual(health["available_browser_candidates"], ["cloak"])
-            self.assertEqual(before, sorted(str(p.relative_to(root)) for p in root.rglob("*")))
-
-    def test_available_alternative_does_not_hide_default_browser_failure(self) -> None:
+    def test_unavailable_chrome_is_reported_without_fallback(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            write_browser_pool(root, "cloak")
-            health = collection_health(
-                root, find_spec=lambda _: None, skill_names=(), optional_inspector=lambda *_: {},
-                browser_status=lambda _, name: {"status": "ready" if name == "chrome" else "unavailable"},
-            )
+            write_browser_pool(root)
+            def unavailable(*_):
+                raise WorkspaceBrowserError("browser_unavailable")
+            health = collection_health(root, find_spec=lambda _: None, browser_status=unavailable,
+                                       skill_names=(), optional_inspector=lambda *_: {})
             self.assertEqual(health["browser"]["status"], "unavailable")
-            self.assertEqual(health["available_browser_candidates"], ["chrome"])
+            self.assertEqual(health["available_browser_candidates"], [])
 
     def test_invalid_default_is_reported_without_choosing_a_browser(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -104,7 +99,7 @@ class CollectionHealthTests(unittest.TestCase):
                     "status": "ready",
                     "candidate": candidate,
                     "action": "available",
-                    "cdp_url": f"http://127.0.0.1:{9222 if candidate == 'chrome' else 9232}",
+                    "cdp_url": "http://127.0.0.1:9222",
                     "browser": "Chrome/151.0.7922.137",
                     "protocol_version": "1.3",
                     "page_targets": 1,
@@ -124,10 +119,10 @@ class CollectionHealthTests(unittest.TestCase):
         self.assertIn("DrissionPage", looked_up)
         self.assertEqual(
             browser_calls,
-            [(root.resolve(), "chrome"), (root.resolve(), "cloak")],
+            [(root.resolve(), "chrome")],
         )
         self.assertEqual(health["browser"]["status"], "ready")
-        self.assertEqual(set(health["browser_candidates"]), {"chrome", "cloak"})
+        self.assertEqual(set(health["browser_candidates"]), {"chrome"})
         self.assertEqual(health["browser"], health["browser_candidates"]["chrome"])
         self.assertEqual(
             health["skills"]["web-collection-router"],
@@ -173,10 +168,7 @@ class CollectionHealthTests(unittest.TestCase):
             health["browser"],
             {"status": "unavailable", "error": "browser_unavailable"},
         )
-        self.assertEqual(
-            health["browser_candidates"]["cloak"],
-            {"status": "unavailable", "error": "browser_executable_missing"},
-        )
+        self.assertEqual(set(health["browser_candidates"]), {"chrome"})
 
 
 if __name__ == "__main__":

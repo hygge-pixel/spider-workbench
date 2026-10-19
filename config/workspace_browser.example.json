@@ -9,14 +9,6 @@
       "startup_timeout_seconds": 15,
       "launch_args": [],
       "environment": {}
-    },
-    "cloak": {
-      "executable": "PROJECT_ABSOLUTE_PATH/tmp/unconfigured-cloak-browser",
-      "cdp_url": "http://localhost:9232",
-      "user_data_dir": "PROJECT_ABSOLUTE_PATH/tmp/cloak-mcp",
-      "startup_timeout_seconds": 15,
-      "launch_args": [],
-      "environment": {}
     }
   }
 }

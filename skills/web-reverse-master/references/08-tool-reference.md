@@ -10,7 +10,7 @@
 
 - 不要因为本文出现 `MCP:` 前缀就发起不存在的 tool call。
 - 不要把 `evaluate-script` 和 `evaluate_script` 当成同一个工具的两个拼写；它们属于不同外部工具示例。
-- 不要把 AdsPower、9222 Chrome、9232 Cloak、JSReverser 或 CDP WebSocket 页面视为天然共享的浏览器上下文。
+- 不要把 AdsPower、9222 Chrome、JSReverser 或 CDP WebSocket 页面视为天然共享的浏览器上下文。
 - 不要通过 shell 伪造不存在的 MCP 调用。
 
 安全降级：
@@ -21,7 +21,7 @@
 
 ## ⚠️ 核心原则
 
-**adspower-browser**、9222 `js-reverse` 和 9232 `js-reverse-cloak` 是独立浏览器上下文，不能把它们的页面状态或证据混用。普通登录态、交互、Network、源码与断点缺口默认用 Chrome for Testing/9222/js-reverse；Cloak 不安装或启用。显式使用 `spider.py browser ensure --candidate chrome`，不要使用旧 auto 规则因压力证据选择未启用 Cloak。压力缺口按本次证据分析，不自动升级工具。切换候选必须重建或分别取得 Cookie、Storage、页面、Hook 与断点状态。
+**adspower-browser**、9222 `js-reverse` 和 其它独立工具是不同浏览器上下文，不能把它们的页面状态或证据混用。普通登录态、交互、Network、源码与断点缺口默认用 Chrome for Testing/9222/js-reverse。使用 `spider.py browser ensure --candidate chrome`。压力缺口按本次证据分析，不自动升级工具。切换候选必须重建或分别取得 Cookie、Storage、页面、Hook 与断点状态。
 
 ---
 
@@ -91,7 +91,7 @@ adspower-browser → open-browser → get-opened-browser → 获取CDP端口
 
 ## 路线B：JSReverser 连接具名浏览器（深度调试优先）
 
-默认使用连接 Chrome for Testing/9222 的 `js-reverse`；`js-reverse-cloak` 是未启用的历史兼容定义，不作为部署必需项。工具引用不等于当前可用，按 [mcp-capability-routing.md](mcp-capability-routing.md) 的当次证据选择。
+默认使用连接 Chrome for Testing/9222 的 `js-reverse`。工具引用不等于当前可用，按 [mcp-capability-routing.md](mcp-capability-routing.md) 的当次证据选择。
 
 ### 能力边界
 - ✅ 断点调试（set_breakpoint_on_text）

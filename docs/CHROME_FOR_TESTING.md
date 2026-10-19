@@ -1,6 +1,6 @@
 # 已部署 Agent 调整工单：默认使用 Chrome for Testing
 
-适用对象：已经部署 Spider Workbench 的另一台电脑，以及首次安装的 Agent。用户已决定改用 Google 官方 Chrome for Testing；本工单替代旧部署说明中的 Cloak 默认偏好。原有采集流程继续使用。
+适用对象：首次部署或调整 Spider Workbench 的目标 Agent。项目只使用 Google 官方 Chrome for Testing，采集与验收规则按 AGENTS.md 执行。
 
 最便捷方式：直接复制同目录 [完整部署提示词](INSTALL_WITH_AGENT.md) 中完整提示词。下面是具体调整和验收依据。
 
@@ -17,7 +17,6 @@
 | CDP | http://127.0.0.1:9222 |
 | 独立 Profile | 项目 tmp/chrome-mcp |
 | 启用的项目 MCP | js-reverse |
-| Cloak | 不安装、不启用，真实浏览器验收 not_required |
 
 Chrome for Testing 是浏览器；CDP 是连接协议；JSReverser 是 MCP 服务；Playwright 是脚本客户端。更换浏览器不等于移除逆向工具层。MCP/CDP 使用完整 Chrome，不要求下载 ChromeDriver；headless-shell 也不替代本工单要求的完整浏览器。
 
@@ -47,9 +46,9 @@ $toolPython = (Resolve-Path '.venv-toolchain/Scripts/python.exe').Path
 
 上面适合新配置；已有文件时先审查。configure-browser 的 --merge 只补未配置槽位，不覆盖已有真实候选。旧 Chrome 路径需更换时，先将原 config/workspace_browser.json 备份到本机 runs/_deployment_backups/<时间>/，保留其它字段、按目标值合并，验证 JSON/schema 后原子替换。
 
-旧版 schema 要求 chrome 和 cloak 两个键，不应直接删 cloak 键导致 config_invalid。将 cloak.executable 指向本项目 tmp/unconfigured-cloak-browser，保留 schema 要求的端口/Profile 字段并清空其 launch_args/environment；default_candidate 设为 chrome。这个占位不安装程序、不创建运行连接，也不是日常候选。已有 Cloak 文件和 Profile 原地保留。
+当前 schema_version=2 仅允许 candidates.chrome，default_candidate=chrome。旧多候选配置先备份到本机 runs/_deployment_backups/<时间>/，按 docs/MIGRATION.md 只迁移 Chrome 配置并验证；不得保留占位候选，也不得自动删除旧程序或 Profile。
 
-Chrome 项的 launch_args=[]、environment={}，不沿用 --fingerprint 或 CLOAK_NO_DEBUGGER。浏览器身份检查继续核对程序、端口、Profile。不要直接绕过 runner 或复制浏览器启动命令到 collector；占用 9222 的非本项目进程不接管、不终止。
+Chrome 项的 launch_args=[]、environment={}，不沿用旧的指纹参数或环境变量。浏览器身份检查继续核对程序、端口、Profile。不要直接绕过 runner 或复制浏览器启动命令到 collector；占用 9222 的非本项目进程不接管、不终止。
 
 ## 4. 只接通 js-reverse MCP
 
@@ -57,15 +56,15 @@ Chrome 项的 launch_args=[]、environment={}，不沿用 --fingerprint 或 CLOA
 & $toolPython scripts/browser_toolchain.py configure --python $toolPython --node $nodeExecutable
 ```
 
-读取 runs/_mcp/generated/mcp_config.json，只将 mcpServers.js-reverse 合并到宿主实际支持的配置。入口仍使用生成的 scripts/start_js_reverser.mjs 与本机实际路径。当前生成器默认只有 js-reverse；旧生成器的 js-reverse-cloak 不导入。项目写入开关只用于支持 mcpServers 格式的宿主。
+读取 runs/_mcp/generated/mcp_config.json，只将 mcpServers.js-reverse 合并到宿主实际支持的配置。入口仍使用生成的 scripts/start_js_reverser.mjs 与本机实际路径。当前生成器只有 js-reverse。项目写入开关只用于支持 mcpServers 格式的宿主。
 
-已有项目作用域的 js-reverse-cloak 配置先备份，确认由本项目管理后停用/移除；不删除用户全局或其它项目的配置。保留其它 MCP。宿主使用 TOML 或专用 CLI 时按真实格式配置，随后重连/新开会话完成实际工具调用。
+已有项目作用域的 旧备用 MCP 服务 配置先备份，确认由本项目管理后停用/移除；不删除用户全局或其它项目的配置。保留其它 MCP。宿主使用 TOML 或专用 CLI 时按真实格式配置，随后重连/新开会话完成实际工具调用。
 
 ## 5. 避免旧说明把默认浏览器改回去
 
 新源码已有当前默认规则，不重复修改。旧部署先校验分发清单，再备份并按差异调整实际生效的规则和部署说明中的浏览器默认选择：AGENTS.md、CLAUDE.md、GEMINI.md（实际存在且含相关规则时），以及 docs/INSTALL_WITH_AGENT.md、docs/BROWSER_MCP.md、docs/AGENT_HANDOFF.md 和 canonical skills/ 中的相关偏好。
 
-将默认浏览器统一为 Chrome for Testing/chrome/9222，将真实部署验收改为 js-reverse 一项。保留历史证据与兼容性测试，不全局替换所有 Cloak 字样，不删除旧实现或重写核心。维护定制差异，不改写官方 MANIFEST 让修改伪装成原始发行版；后续完整性检查出现预期定制差异时据实说明，升级按保留定制流程处理。
+项目仅保留 Chrome for Testing/chrome/9222 和 js-reverse。旧配置迁移先备份并保留本机定制，再按 MIGRATION 审核为单候选；新版本修改必须经过真实回归和重新生成的分发清单验收。
 
 ## 6. 验收命令与结果
 
@@ -86,7 +85,7 @@ ensure 不传候选是为了验证默认已切换为 chrome。检查其输出中
 - browser_distribution=chrome-for-testing、browser_channel=Stable、实际版本/平台/官方 URL/查询时间/下载哈希。
 - default_browser_candidate=chrome、实际 executable/cdp_url/Profile、mcp_service=js-reverse。
 - 离线示例、依赖、原有工作保留、浏览器身份、CDP、MCP stdio、MCP 只读调用、Playwright CDP、Agent 实际加载、完整回归的分项真实结果。
-- cloak_status=not_required；未执行项用 null 和具体原因，不用 true 掩盖。失败分类和下一步明确列出。
+- 未执行项用 null 并注明原因；失败分类和下一步明确列出。
 
 非 Windows 的原生浏览器进程身份检查在旧框架中仍需适配；下载到了对应浏览器不代表所有平台均已接通。工具部署通过只证明工具链；网站能力仍需本次真实样本和业务数据校验。
 

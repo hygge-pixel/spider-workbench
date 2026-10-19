@@ -13,7 +13,7 @@ from spider_core.browser import status_browser_candidate
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--candidate', choices=('chrome', 'cloak'), required=True)
+    parser.add_argument('--candidate', choices=('chrome',), required=True)
     parser.add_argument('--describe', action='store_true', required=True)
     args = parser.parse_args()
     try:

@@ -6,14 +6,14 @@
 
 `installed 不等于 live_verified`。配置存在、入口可启动、宿主可用和目标验证成功是四种不同状态；当前会话未暴露的 MCP 不能伪造成工具调用。无 MCP 也是正常候选，可使用 9222 Chrome、DevTools/HAR、`spider.py route`、本地 Hook 与验证脚本。
 
-浏览器地址从 `config/workspace_browser.json` 读取。默认 Chrome for Testing/9222/js-reverse；Cloak 不安装或启用。使用下面命令启动已配置 Chrome；旧 auto 规则在出现压力证据时可能选择 Cloak，因此本部署不用该规则升级浏览器：
+浏览器地址从 `config/workspace_browser.json` 读取。默认 Chrome for Testing/9222/js-reverse。使用下面命令启动已配置 Chrome；候选固定为 chrome：
 
 ```powershell
 py -3.11 spider.py browser ensure --candidate chrome --json
 ```
 
 - 普通登录态、页面交互、Network、源码、请求发起者和断点缺口：使用 `chrome` / `js-reverse` / 9222，保持本项目独立 Profile。
-- 已观察到指纹压力、反调试、JavaScript VM/JSVMP 或 WASM 缺口：据实保存相应证据，使用相关 Skill/本地分析或报告限制；不自动下载、启用或切换到 Cloak。
+- 已观察到指纹压力、反调试、JavaScript VM/JSVMP 或 WASM 缺口：据实保存相应证据，使用相关 Skill/本地分析或报告限制；不自动下载或切换浏览器。
 
 压力字段仍可记录为 `fingerprint_pressure`、`anti_debugger_pressure`、`javascript_vm_pressure`、`wasm_runtime_pressure`。这四项必须是当次证据，不是网站永久标签，也不代表允许启用未部署的浏览器。候选失败后仍可尝试 AdsPower、Reqable、No-MCP、Scrapling 或 Camoufox 等独立候选，但要遵守各自的授权与升级条件。
 

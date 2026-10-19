@@ -277,7 +277,7 @@ def case_boundaries() -> None:
             "javascript_vm_pressure",
             "wasm_runtime_pressure",
             "js-reverse",
-            "不自动下载、启用或切换到 Cloak",
+            "不自动下载或切换浏览器",
             "不得共享 Cookie",
         ],
     }

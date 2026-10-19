@@ -72,7 +72,7 @@ $toolPython = (Resolve-Path -LiteralPath '.venv-toolchain/Scripts/python.exe').P
 & $toolPython -m pip check
 ```
 
-第一条安装器命令只输出计划，第二条才安装；all 包含 Python 工具、MCP、CLI 和 Babel，支持分项执行。Python 工具放 .venv-toolchain，保留已有 .venv；npm 局部安装。安装器跳过浏览器自动下载，不包含 Node/Python/Cloak 本体。
+第一条安装器命令只输出计划，第二条才安装；all 包含 Python 工具、MCP、CLI 和 Babel，支持分项执行。Python 工具放 .venv-toolchain，保留已有 .venv；npm 局部安装。安装器跳过浏览器自动下载，不包含 Node/Python/浏览器本体。
 
 然后按[浏览器与 MCP](BROWSER_MCP.md)配置。依赖安装、浏览器配置、MCP 工具发现、CDP 以及 Agent 宿主加载是五件不同的事，逐层记录实际结果。
 

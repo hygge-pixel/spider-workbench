@@ -115,7 +115,7 @@ class BrowserConfigTests(unittest.TestCase):
 class RepositoryBrowserConfigTests(unittest.TestCase):
 
 
-    def test_browser_evidence_defaults_to_chrome_without_enabling_cloak(self) -> None:
+    def test_browser_evidence_defaults_to_chrome_without_enabling_other_candidates(self) -> None:
         self.assertEqual(select_browser_candidate(BrowserEvidence()), "chrome")
         for field in (
             "fingerprint_pressure",
@@ -128,8 +128,9 @@ class RepositoryBrowserConfigTests(unittest.TestCase):
                 self.assertEqual(select_browser_candidate(evidence), "chrome")
                 self.assertEqual(select_browser_candidate(evidence, default_candidate="chrome"), "chrome")
 
-    def test_explicit_legacy_preference_remains_an_explicit_choice(self) -> None:
-        self.assertEqual(select_browser_candidate(BrowserEvidence(), default_candidate="cloak"), "cloak")
+    def test_unsupported_preference_is_rejected(self) -> None:
+        with self.assertRaises(WorkspaceBrowserError):
+            select_browser_candidate(BrowserEvidence(), default_candidate="unsupported")
 
     def test_browser_evidence_rejects_unknown_and_non_boolean_fields(self) -> None:
         with self.assertRaisesRegex(
@@ -144,16 +145,16 @@ class RepositoryBrowserConfigTests(unittest.TestCase):
             BrowserEvidence.from_dict({"fingerprint_pressure": 1})
 
     def test_candidate_endpoint_accepts_only_safe_same_port_loopback_aliases(self) -> None:
-        for url in ("http://127.0.0.1:9232", "http://localhost:9232", "http://[::1]:9232"):
+        for url in ("http://127.0.0.1:9222", "http://localhost:9222", "http://[::1]:9222"):
             with self.subTest(url=url):
-                self.assertEqual(browser_candidate_cdp_url("cloak", cdp_url=url), url)
+                self.assertEqual(browser_candidate_cdp_url("chrome", cdp_url=url), url)
         for url in (
-            "http://localhost:9222", "http://localhost:9333", "http://example.com:9232",
-            "http://0.0.0.0:9232", "http://user@localhost:9232", "http://localhost:9232/json",
-            "http://localhost:9232?token=x", "http://localhost:bad", "https://localhost:9232",
+            "http://localhost:9232", "http://localhost:9333", "http://example.com:9222",
+            "http://0.0.0.0:9222", "http://user@localhost:9222", "http://localhost:9222/json",
+            "http://localhost:9222?token=x", "http://localhost:bad", "https://localhost:9222",
         ):
             with self.subTest(url=url), self.assertRaisesRegex(WorkspaceBrowserError, "^browser_config_invalid$"):
-                browser_candidate_cdp_url("cloak", cdp_url=url)
+                browser_candidate_cdp_url("chrome", cdp_url=url)
 
 
 class BrowserRuntimeTests(BrowserConfigTests):
@@ -172,64 +173,38 @@ class BrowserRuntimeTests(BrowserConfigTests):
 
     def pool_workspace(self, temporary: str) -> tuple[Path, dict[str, Path]]:
         workspace = Path(temporary).resolve()
-        executables = {
-            "chrome": workspace / "chrome.exe",
-            "cloak": workspace / "cloak.exe",
-        }
-        for executable in executables.values():
-            executable.touch()
+        executable = workspace / "chrome.exe"
+        executable.touch()
         config_dir = workspace / "config"
-        config_dir.mkdir(parents=True)
-        (config_dir / "workspace_browser.json").write_text(
-            json.dumps(
-                {
-                    "schema_version": 2,
-                    "default_candidate": "chrome",
-                    "candidates": {
-                        "chrome": {
-                            "executable": executables["chrome"].as_posix(),
-                            "cdp_url": "http://127.0.0.1:9222",
-                            "user_data_dir": (workspace / "chrome-profile").as_posix(),
-                            "startup_timeout_seconds": 0.05,
-                            "launch_args": [],
-                            "environment": {},
-                        },
-                        "cloak": {
-                            "executable": executables["cloak"].as_posix(),
-                            "cdp_url": "http://127.0.0.1:9232",
-                            "user_data_dir": (workspace / "cloak-profile").as_posix(),
-                            "startup_timeout_seconds": 0.05,
-                            "launch_args": [
-                                "--disable-blink-features=AutomationControlled",
-                                "--fingerprint=20260629",
-                            ],
-                            "environment": {"CLOAK_NO_DEBUGGER": "1"},
-                        },
-                    },
-                }
-            ),
-            encoding="utf-8",
-        )
-        return workspace, executables
+        config_dir.mkdir()
+        (config_dir / "workspace_browser.json").write_text(json.dumps({
+            "schema_version": 2, "default_candidate": "chrome",
+            "candidates": {"chrome": {
+                "executable": str(executable), "cdp_url": "http://127.0.0.1:9222",
+                "user_data_dir": str(workspace / "chrome-profile"),
+                "startup_timeout_seconds": .05, "launch_args": [], "environment": {},
+            }},
+        }), encoding="utf-8")
+        return workspace, {"chrome": executable}
 
-    def test_default_lifecycle_uses_configured_cloak_without_starting_chrome(self) -> None:
+    def test_default_lifecycle_reuses_configured_chrome_without_launching(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             workspace, executables = self.pool_workspace(temporary)
             config_path = workspace / "config" / "workspace_browser.json"
             payload = json.loads(config_path.read_text(encoding="utf-8"))
-            payload["default_candidate"] = "cloak"
-            payload["candidates"]["cloak"]["cdp_url"] = "http://127.0.0.1:9232"
+            payload["default_candidate"] = "chrome"
+            payload["candidates"]["chrome"]["cdp_url"] = "http://127.0.0.1:9222"
             config_path.write_text(json.dumps(payload), encoding="utf-8")
             inspected = []
             result = ensure_workspace_browser(
                 workspace,
-                probe=lambda url: dict(self.HEALTH) if url.endswith(":9232") else self.fail(url),
+                probe=lambda url: dict(self.HEALTH) if url.endswith(":9222") else self.fail(url),
                 process_inspector=lambda config: inspected.append(config) or True,
-                launcher=lambda _: self.fail("healthy Cloak must be reused"),
+                launcher=lambda _: self.fail("healthy Chrome must be reused"),
             )
-            self.assertEqual(result["candidate"], "cloak")
-            self.assertEqual(result["cdp_url"], "http://127.0.0.1:9232")
-            self.assertEqual(inspected[0].executable, executables["cloak"])
+            self.assertEqual(result["candidate"], "chrome")
+            self.assertEqual(result["cdp_url"], "http://127.0.0.1:9222")
+            self.assertEqual(inspected[0].executable, executables["chrome"])
 
     def test_candidate_lifecycle_uses_named_cdp_and_result(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -238,16 +213,16 @@ class BrowserRuntimeTests(BrowserConfigTests):
 
             result = status_browser_candidate(
                 workspace,
-                "cloak",
+                "chrome",
                 probe=lambda url: dict(self.HEALTH)
-                if url == "http://127.0.0.1:9232"
+                if url == "http://127.0.0.1:9222"
                 else (_ for _ in ()).throw(RuntimeError()),
                 process_inspector=lambda config: inspected.append(config) or True,
             )
 
-            self.assertEqual(result["candidate"], "cloak")
-            self.assertEqual(result["cdp_url"], "http://127.0.0.1:9232")
-            self.assertEqual(inspected[0].candidate, "cloak")
+            self.assertEqual(result["candidate"], "chrome")
+            self.assertEqual(result["cdp_url"], "http://127.0.0.1:9222")
+            self.assertEqual(inspected[0].candidate, "chrome")
 
     def test_candidate_ensure_uses_candidate_specific_lock(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -263,34 +238,30 @@ class BrowserRuntimeTests(BrowserConfigTests):
 
             result = ensure_browser_candidate(
                 workspace,
-                "cloak",
+                "chrome",
                 probe=lambda _: dict(self.HEALTH),
                 process_inspector=lambda _: True,
                 lock_factory=lambda path, _: locks.append(path) or Lock(),
             )
 
-            self.assertEqual(result["candidate"], "cloak")
-            self.assertEqual(locks[0].name, "cloak.lock")
+            self.assertEqual(result["candidate"], "chrome")
+            self.assertEqual(locks[0].name, "chrome.lock")
 
-    def test_launcher_applies_dynamic_port_args_and_environment(self) -> None:
+    def test_launcher_applies_configured_args_and_environment(self) -> None:
+        from dataclasses import replace
         with tempfile.TemporaryDirectory() as temporary:
             workspace, _ = self.pool_workspace(temporary)
-            config = load_workspace_browser_configs(workspace).candidates["cloak"]
+            config = replace(load_workspace_browser_configs(workspace).candidates["chrome"],
+                             launch_args=("--disable-extensions",), environment={"SPIDER_BROWSER_TEST": "1"})
             sentinel = object()
-
-            with mock.patch.object(
-                browser_module.subprocess,
-                "Popen",
-                return_value=sentinel,
-            ) as popen:
+            with mock.patch.object(browser_module.subprocess, "Popen", return_value=sentinel) as popen:
                 result = browser_module._launch_chrome(config)
-
             self.assertIs(result, sentinel)
             arguments = popen.call_args.args[0]
-            self.assertIn("--remote-debugging-port=9232", arguments)
-            self.assertIn("--fingerprint=20260629", arguments)
+            self.assertIn("--remote-debugging-port=9222", arguments)
+            self.assertIn("--disable-extensions", arguments)
             self.assertNotIn("--no-sandbox", arguments)
-            self.assertEqual(popen.call_args.kwargs["env"]["CLOAK_NO_DEBUGGER"], "1")
+            self.assertEqual(popen.call_args.kwargs["env"]["SPIDER_BROWSER_TEST"], "1")
 
     def test_status_reports_unavailable_without_launching(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

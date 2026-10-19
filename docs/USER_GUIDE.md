@@ -6,7 +6,7 @@ Spider Workbench 是给 coding Agent 使用的数据采集与 Web / JavaScript �
 
 将下载、完整解压后的项目文件夹作为 Agent 工作区打开，然后发送：
 
-> 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，完成这个工作区的部署。先检查已有环境，自动补齐依赖，从官方安装最新 Stable Chrome for Testing，使用项目独立 Profile、Chrome/9222 和 js-reverse MCP，不安装或启用 Cloak。保留已有任务与配置，完成各层验收后告诉我实际结果。部署所需的常规可逆安装、构建与项目配置调整已授权，请连续推进。
+> 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，完成这个工作区的部署。先检查已有环境，自动补齐依赖，从官方安装最新 Stable Chrome for Testing，使用项目独立 Profile、Chrome/9222 和 js-reverse MCP。保留已有任务与配置，完成各层验收后告诉我实际结果。部署所需的常规可逆安装、构建与项目配置调整已授权，请连续推进。
 
 后续步骤由 Agent 按[部署工单](INSTALL_WITH_AGENT.md)完成，无需用户逐条执行终端命令。Agent 应有本机文件、终端和配置工具的能力；账户登录、系统权限或宿主重连等确实需要用户操作的部分，应说明具体原因和下一步。
 
@@ -23,7 +23,7 @@ Spider Workbench 是给 coding Agent 使用的数据采集与 Web / JavaScript �
 | MCP 与宿主 | 初始化、工具目录、只读调用、Playwright 合成页面、Agent 实际工具调用 |
 | 验收 | 完整回归、真实分项结果与必要待办 |
 
-默认浏览器候选为 chrome，CDP 为 http://127.0.0.1:9222，Profile 为项目 tmp/chrome-mcp；MCP 使用 js-reverse。旧版 cloak 配置槽位可作为未启用兼容占位保留，不需要安装或验收 Cloak。
+默认浏览器候选为 chrome，CDP 为 http://127.0.0.1:9222，Profile 为项目 tmp/chrome-mcp；MCP 使用 js-reverse。当前配置只含 chrome；旧多候选配置按 MIGRATION 先备份再审核迁移。
 
 最新 Stable 在首次部署或明确升级时查询；日常任务复用已验收版本。现有 bootstrap 安装器负责隔离工具，Chrome 的官方下载与配置由 Agent 按工单继续执行；不会因一条依赖安装命令结束就虚报全部已接通。
 

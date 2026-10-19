@@ -16,6 +16,19 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 PLATFORM_SKILL_PATHS = ('.agents/skills', '.claude/skills', '.gemini/skills')
 RULE_FILES = ('AGENTS.md', 'CLAUDE.md', 'GEMINI.md')
+AGENT_RULE_ENTRIES = {
+    'codex': 'AGENTS.md',
+    'claude-code': 'CLAUDE.md',
+    'gemini-cli': 'GEMINI.md',
+    'cursor': 'AGENTS.md',
+    'copilot': '.github/copilot-instructions.md',
+    'windsurf': 'AGENTS.md',
+    'cline': '.clinerules/00-spider-workbench.md',
+    'roo-code': '.roo/rules/00-spider-workbench.md',
+    'kiro': 'AGENTS.md',
+    'opencode': 'AGENTS.md',
+    'trae': '.trae/rules/project_rules.md',
+}
 
 
 def ensure_junction(link: Path, target: Path) -> dict:
@@ -56,24 +69,26 @@ def setup(root: Path) -> dict:
 
 def configure_browser(root: Path, candidate: str, executable: Path, *, merge: bool = False) -> dict:
     root = Path(root).resolve()
-    if candidate not in {'chrome', 'cloak'}:
-        raise ValueError('candidate must be chrome or cloak')
+    if candidate != 'chrome':
+        raise ValueError('only the chrome candidate is supported')
     executable = Path(executable).expanduser()
     if not executable.is_absolute() or not executable.is_file():
         raise ValueError('browser executable must be an existing absolute file path')
     path = root / 'config/workspace_browser.json'
     item = {
         'executable': str(executable.resolve()),
-        'cdp_url': 'http://127.0.0.1:9222' if candidate == 'chrome' else 'http://localhost:9232',
+        'cdp_url': 'http://127.0.0.1:9222',
         'user_data_dir': str(root / 'tmp' / f'{candidate}-mcp'),
         'startup_timeout_seconds': 15,
-        'launch_args': ['--disable-blink-features=AutomationControlled', '--fingerprint=20260629'] if candidate == 'cloak' else [],
-        'environment': {'CLOAK_NO_DEBUGGER': '1'} if candidate == 'cloak' else {},
+        'launch_args': [],
+        'environment': {},
     }
     if path.exists():
         data = json.loads(path.read_text(encoding='utf-8'))
         if data.get('schema_version') != 2 or not isinstance(data.get('candidates'), dict):
             raise ValueError('existing browser config is invalid; preserve and review it manually')
+        if set(data['candidates']) != {'chrome'} or data.get('default_candidate') != 'chrome':
+            raise ValueError('legacy browser config requires backup and explicit migration; see docs/MIGRATION.md')
         if data['candidates'].get(candidate) == item:
             return {'ok': True, 'status': 'reused', 'path': str(path)}
         if not merge:
@@ -83,15 +98,8 @@ def configure_browser(root: Path, candidate: str, executable: Path, *, merge: bo
             raise FileExistsError('candidate exists with different settings; preserve and review manually')
         data['candidates'][candidate] = item
     else:
-        other = 'cloak' if candidate == 'chrome' else 'chrome'
-        inactive = {
-            'executable': str(root / 'tmp' / f'unconfigured-{other}-browser'),
-            'cdp_url': 'http://127.0.0.1:9222' if other == 'chrome' else 'http://localhost:9232',
-            'user_data_dir': str(root / 'tmp' / f'{other}-mcp'),
-            'startup_timeout_seconds': 15, 'launch_args': [], 'environment': {},
-        }
         data = {'schema_version': 2, 'default_candidate': candidate,
-                'candidates': {candidate: item, other: inactive}}
+                'candidates': {candidate: item}}
     path.parent.mkdir(parents=True, exist_ok=True)
     # Validate before writing and use a same-directory temporary file for atomic replace.
     import tempfile
@@ -163,6 +171,11 @@ def doctor(root: Path) -> dict:
         'scope': 'offline framework readiness; browser and MCP are optional and separately accepted',
         'python': {'version': sys.version.split()[0], 'executable': sys.executable},
         'rules': rules, 'skills': {'count': len(names), 'canonical': names, 'discovery': discovery},
+        'agent_entries': {
+            host: {'path': relative, 'entry_present': (root / relative).is_file(),
+                   'host_loaded_verified': False}
+            for host, relative in AGENT_RULE_ENTRIES.items()
+        },
         'registry_valid': registry_ok, 'browser': browser,
         'optional_tools': {name: {'in_path': shutil.which(name) is not None}
                            for name in ('node', 'npm', 'playwright-cli')},
@@ -178,11 +191,11 @@ def main(argv=None) -> int:
         command.add_argument('--root', type=Path, default=ROOT)
         command.add_argument('--json', action='store_true')
         if name == 'configure-browser':
-            command.add_argument('--candidate', choices=('chrome', 'cloak'), required=True)
+            command.add_argument('--candidate', choices=('chrome',), required=True)
             command.add_argument('--executable', type=Path, required=True)
             command.add_argument('--merge', action='store_true')
         if name == 'set-default':
-            command.add_argument('--candidate', choices=('chrome', 'cloak'), required=True)
+            command.add_argument('--candidate', choices=('chrome',), required=True)
     args = parser.parse_args(argv)
     try:
         if args.action == 'set-default':

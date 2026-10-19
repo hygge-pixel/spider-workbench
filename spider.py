@@ -110,7 +110,7 @@ def _parser() -> argparse.ArgumentParser:
         command = browser_commands.add_parser(name)
         command.add_argument(
             "--candidate",
-            choices=("auto", "chrome", "cloak", "all"),
+            choices=("auto", "chrome", "all"),
             default="auto",
         )
         command.add_argument("--evidence-json", default="{}")
@@ -331,7 +331,7 @@ def _browser(
     if candidate == "all":
         candidates: dict[str, object] = {}
         degraded = False
-        for name in ("chrome", "cloak"):
+        for name in ("chrome",):
             try:
                 candidates[name] = operation(root, name)
             except WorkspaceBrowserError as error:

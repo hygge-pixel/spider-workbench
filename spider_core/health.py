@@ -80,7 +80,7 @@ def collection_health(
     """Inspect packages, Skill discovery and browsers without starting anything."""
     root = Path(workspace).resolve()
     browser_candidates: dict[str, dict[str, Any]] = {}
-    for candidate in ("chrome", "cloak"):
+    for candidate in ("chrome",):
         try:
             browser_candidates[candidate] = browser_status(root, candidate)
         except WorkspaceBrowserError as error:

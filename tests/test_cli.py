@@ -55,13 +55,13 @@ class CliTests(unittest.TestCase):
             {"schema_version": 1, "platforms": []},
         )
         self.write_json(self.root / "config/workspace_browser.json", {
-            "schema_version": 2, "default_candidate": "cloak",
+            "schema_version": 2, "default_candidate": "chrome",
             "candidates": {name: {
                 "executable": str(self.root / name / "browser.exe"),
                 "user_data_dir": str(self.root / "tmp" / name),
                 "cdp_url": f"http://127.0.0.1:{port}",
                 "startup_timeout_seconds": 10, "launch_args": [], "environment": {},
-            } for name, port in (("chrome", 9222), ("cloak", 9232))}
+            } for name, port in (("chrome", 9222),)}
         })
 
     def tearDown(self) -> None:
@@ -520,12 +520,12 @@ class CliTests(unittest.TestCase):
         self.assertEqual(json.loads(status_stdout), status)
         self.assertEqual(json.loads(ensure_stdout), ensured)
 
-    def test_browser_auto_selects_cloak_from_reverse_evidence(self) -> None:
+    def test_browser_auto_selects_chrome_from_reverse_evidence(self) -> None:
         result = {
             "status": "ready",
-            "candidate": "cloak",
+            "candidate": "chrome",
             "action": "reused",
-            "cdp_url": "http://127.0.0.1:9232",
+            "cdp_url": "http://127.0.0.1:9222",
             "browser": "Chrome/142.0.7444.175",
             "protocol_version": "1.3",
             "page_targets": 1,
@@ -548,10 +548,10 @@ class CliTests(unittest.TestCase):
             )
 
         self.assertEqual(code, 0, stderr)
-        self.assertEqual(json.loads(stdout)["candidate"], "cloak")
-        ensure_candidate.assert_called_once_with(SOURCE_ROOT, "cloak")
+        self.assertEqual(json.loads(stdout)["candidate"], "chrome")
+        ensure_candidate.assert_called_once_with(SOURCE_ROOT, "chrome")
 
-    def test_browser_auto_defaults_to_cloak_and_rejects_invalid_evidence(self) -> None:
+    def test_browser_auto_defaults_to_chrome_and_rejects_invalid_evidence(self) -> None:
         result = {
             "status": "ready",
             "candidate": "chrome",
@@ -570,7 +570,7 @@ class CliTests(unittest.TestCase):
                 ["browser", "status", "--candidate", "auto", "--json"]
             )
         self.assertEqual(code, 0, stderr)
-        status_candidate.assert_called_once_with(SOURCE_ROOT, "cloak")
+        status_candidate.assert_called_once_with(SOURCE_ROOT, "chrome")
 
         code, stdout, stderr = self.invoke_main(
             [
@@ -590,13 +590,13 @@ class CliTests(unittest.TestCase):
         )
         self.assertEqual(stderr, "")
 
-    def test_browser_all_aggregates_both_candidates(self) -> None:
+    def test_browser_all_aggregates_supported_candidates(self) -> None:
         def status(_: Path, candidate: str):
             return {
                 "status": "ready",
                 "candidate": candidate,
                 "action": "available",
-                "cdp_url": f"http://127.0.0.1:{9222 if candidate == 'chrome' else 9232}",
+                "cdp_url": "http://127.0.0.1:9222",
                 "browser": "Chrome/test",
                 "protocol_version": "1.3",
                 "page_targets": 1,
@@ -610,7 +610,7 @@ class CliTests(unittest.TestCase):
         payload = json.loads(stdout)
         self.assertEqual(code, 0, stderr)
         self.assertEqual(payload["status"], "ready")
-        self.assertEqual(set(payload["candidates"]), {"chrome", "cloak"})
+        self.assertEqual(set(payload["candidates"]), {"chrome"})
 
     def test_browser_json_error_is_machine_readable(self) -> None:
         with mock.patch.object(

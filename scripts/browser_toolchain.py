@@ -36,7 +36,9 @@ def write_json(path, value):
 def build_definitions(root, python, candidates=('chrome',), *, node=None):
     if node is None:
         raise ValueError('Node executable required for the single-process MCP launcher')
-    names = {'chrome': 'js-reverse', 'cloak': 'js-reverse-cloak'}
+    names = {'chrome': 'js-reverse'}
+    if any(candidate not in names for candidate in candidates):
+        raise ValueError('only the chrome candidate is supported')
     return {names[candidate]: {'command': str(node),
             'args': [str(Path(root) / 'scripts/start_js_reverser.mjs'), '--python', str(python), '--candidate', candidate]}
             for candidate in candidates}
@@ -140,9 +142,9 @@ def launch_spec(candidate):
     node, entry = Path(settings['node_executable']), Path(settings['js_reverser_entry'])
     if not node.is_file() or not entry.is_file():
         raise ValueError('configured Node or built JSReverser entry is missing')
-    runtime = ROOT / 'runs/_mcp' / ('js-reverse-cloak' if candidate == 'cloak' else 'js-reverse')
+    runtime = ROOT / 'runs/_mcp/js-reverse'
     env = {'SPIDER_MCP_RUN_DIR': str(runtime), 'REMOTE_DEBUGGING_URL': browser.cdp_url,
-           'REMOTE_DEBUGGING_PORT': str(9232 if candidate == 'cloak' else 9222)}
+           'REMOTE_DEBUGGING_PORT': '9222'}
     return [str(node), str(entry), '--browserUrl', browser.cdp_url], runtime, env
 
 
@@ -232,7 +234,7 @@ def main():
     configuration.add_argument('--replace-managed', action='store_true')
     for name in ('cdp-smoke', 'mcp-smoke'):
         command = sub.add_parser(name)
-        command.add_argument('--candidate', choices=('chrome', 'cloak'), required=True)
+        command.add_argument('--candidate', choices=('chrome',), required=True)
         if name == 'mcp-smoke':
             command.add_argument('--stdio-only', action='store_true')
     sub.add_parser('doctor')

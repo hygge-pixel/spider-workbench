@@ -88,7 +88,7 @@ _CANDIDATE_CONFIG_KEYS = {
     "launch_args",
     "environment",
 }
-_CANDIDATE_PORTS = {"chrome": 9222, "cloak": 9232}
+_CANDIDATE_PORTS = {"chrome": 9222}
 
 
 def browser_candidate_cdp_url(candidate: str, *, cdp_url: str | None = None) -> str:
