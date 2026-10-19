@@ -4,7 +4,7 @@
 
 你描述网站、数据范围和交付要求，Agent 在同一个工作区里完成环境部署、接口分析、采集实现、样本校验和结果整理。框架将项目规则、13 个通用 Skills、浏览器工具链、统一运行入口与运行证据组织在一起，让每个任务都有清楚的起点、过程和结果。
 
-[下载稳定版 v0.1.8](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.8/spider-workbench-0.1.8-install.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
+[下载稳定版 v0.1.9](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.9/spider-workbench-0.1.9-install.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
 
 ## 为什么使用 Spider Workbench？
 
@@ -92,6 +92,8 @@ flowchart LR
 项目已提供 Codex、Claude Code、Gemini CLI、Cursor、GitHub Copilot、Windsurf、Cline、Roo Code、Kiro、OpenCode、TRAE 的默认规则入口。核心规则统一在 AGENTS.md，Skill 索引可直接读取，部署时再建立本机发现链接；各宿主的 MCP 配置分别适配；DeepSeek Harness 另提供[专用适配与恢复说明](docs/DEEPSEEK_HARNESS.md)。用户仍只需打开工作区并发送上面的提示词。
 
 入口按各产品官方机制配置并有本地合同检查。首次打开需满足宿主的工作区信任、规则开关和文件权限；实际读取/工具连接状态由目标 Agent 现场验收，见 [兼容矩阵](docs/AGENT_COMPATIBILITY.md)。
+
+DSH 0.2.1-rc.2 的一次 Windows 用户反馈中，完整权限模式下部署、宿主调用和业务流程通过，受限模式下项目目录写入未通过。具体兼容性见矩阵，不承诺所有宿主权限模式均已验证。普通排错由 Agent 在授权内继续处理，不要求用户反复运行专项权限测试。
 
 ## 版本与验证范围
 

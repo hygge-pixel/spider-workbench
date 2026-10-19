@@ -68,7 +68,7 @@ git push -u origin main
 - 评估 Dependency graph 与更新 PR；锁文件升级经过构建和回归后合并，不为消告警盲目 npm audit fix --force。
 - 不创建虚假 Sponsor、Logo、Stars、已支持平台或已在线验证徽章。
 
-## 7. 发布 0.1.7 及后续版本
+## 7. 发布新版本
 
 先审阅完整差异与新增文件，再刷新经审核清单，执行公开扫描、源码完整回归，构建双包并独立解压验收。main 对应提交的 Windows/Ubuntu/MCP CI 均通过后，创建与提交对应的版本 tag；禁止在旧 tag 上覆盖新内容。
 
@@ -77,11 +77,11 @@ python scripts/release.py --refresh-manifest
 python scripts/check_public_release.py
 python scripts/run_full_regression.py
 python scripts/release.py --output outputs/releases
-git tag -a v0.1.7 -m "Spider Workbench 0.1.7"
-git push origin v0.1.7
+git tag -a v0.1.9 -m "Spider Workbench 0.1.9"
+git push origin v0.1.9
 ```
 
-Release 同时附 spider-workbench-0.1.7-install.zip、spider-workbench-0.1.7-source.zip 和 SHA256SUMS.txt；README 默认稳定下载指向 install 包，用户操作仍只有打开文件夹并发送提示词。source 包保留有效回归测试，供开发者使用；install 包按代码中的 developer_path 规则排除开发文件，另生成有效清单。main 明确为开发分支。
+Release 同时附 spider-workbench-0.1.9-install.zip、spider-workbench-0.1.9-source.zip 和 SHA256SUMS.txt；README 默认稳定下载指向 install 包，用户操作仍只有打开文件夹并发送提示词。source 包保留有效回归测试，供开发者使用；install 包按代码中的 developer_path 规则排除开发文件，另生成有效清单。main 明确为开发分支。
 
 发布后下载远端两包逐文件校验，并核对 source 包与远端 Git 树；不能要求精简包与整个 Git 树相同。记录真实执行的 CI、离线检查、MCP 构建/调用范围；新电脑完整安装及每个宿主实际调用单独验收，未执行写待验收，不复用历史结论。
 

@@ -4,7 +4,7 @@
 
 Describe the target, scope and output you need. Your coding Agent uses project rules, 13 reusable Skills, browser tooling and a standard-library runner to implement the task, check samples and preserve evidence.
 
-[Download stable v0.1.8](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.8/spider-workbench-0.1.8-install.zip) · [中文](README.md) · [Architecture](docs/ARCHITECTURE.md)
+[Download stable v0.1.9](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.9/spider-workbench-0.1.9-install.zip) · [中文](README.md) · [Architecture](docs/ARCHITECTURE.md)
 
 ## Why use it?
 
@@ -49,4 +49,4 @@ DeepSeek Harness uses a dedicated [Cordis profile adapter](docs/DEEPSEEK_HARNESS
 
 ## Releases and evidence
 
-The download points to the pinned v0.1.8 install ZIP. The repository and source ZIP retain maintained regression tests; the install ZIP excludes developer suites and has its own manifest. The main branch is development. Deployment supports Python 3.11.x; Node 24 LTS is the baseline. Windows/Ubuntu offline CI does not prove every host integration or a clean-machine browser deployment. A clean Windows machine acceptance is still pending. See [verification](docs/VERIFICATION.md) and [compatibility evidence](docs/AGENT_COMPATIBILITY.md).
+The download points to the pinned v0.1.9 install ZIP. The repository and source ZIP retain maintained regression tests; the install ZIP excludes developer suites and has its own manifest. The main branch is development. Deployment supports Python 3.11.x; Node 24 LTS is the baseline. Windows/Ubuntu offline CI does not prove every host integration or a clean-machine browser deployment. A clean Windows machine acceptance is still pending. See [verification](docs/VERIFICATION.md) and [compatibility evidence](docs/AGENT_COMPATIBILITY.md).

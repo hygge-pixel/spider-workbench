@@ -26,7 +26,7 @@ Codex 宿主另传 `--codex <兼容CLI绝对路径>`。不要假定 PATH 中的 
 2. 分别安装/检查 Python、MCP、Playwright CLI 和 Babel。已成功阶段只有在指纹相同且资源探针通过时复用；锁文件、源码或运行时变化会使相应阶段失效。失败阶段不写成功标记。
 3. 已有有效浏览器配置时复用实际程序，不自动升级。新安装读取 Google 官方最新 Stable Chrome for Testing，只下载完整 Chrome，检查 HTTPS、ZIP/成员路径/CRC/实际版本，并记录本地 SHA-256。安装期间使用锁，临时文件不当作成功缓存，同版本程序不被覆盖。
 4. 生成本机 js-reverse 启动定义。已有不同设置保留并报告，由 Agent 对照备份审核后更新；不批量写所有宿主的配置。
-5. 验证默认独立浏览器归属和 CDP、MCP stdio、MCP list_pages、Playwright 合成页面，再运行完整框架回归。
+5. 验证默认独立浏览器归属和 CDP、MCP stdio、MCP list_pages、Playwright 合成页面，再运行交付检查（--delivery-only，不为部署安装开发测试依赖）。
 6. 写 outputs/deployment_acceptance.json 和 Markdown。技术检查通过后返回 `host_pending`，由当前宿主实际加载并调用工具后完成最后验收。
 
 浏览器自动安装/进程身份验收当前以 Windows x64/x86 为基线。其它系统保持离线入口可用，Agent 按官方资源与平台身份机制单独适配并说明限制，不跳过检查声称完整通过。

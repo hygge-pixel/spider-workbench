@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.9 — 2026-10-19
+
+- Documentation and release metadata only; collection core, browser/MCP logic, dependencies and deployment stages are unchanged from 0.1.8. Existing working deployments need no rebuild or redeployment for this release.
+- Keep the one-prompt user entry. Clarify that ordinary authorized troubleshooting continues autonomously; 0.1.8's restricted-permission reproduction is a historical specialist work order, not a default step for every user.
+- Update the user-reported DSH 0.2.1-rc.2 evidence: full-access host/business workflow passed, workspace-write project writes failed. Do not claim a universal host/sandbox fix or silently alter ACLs.
+- Correct delivery-only wording and stale release examples. No new probes, permission-management system, collectors or customer data.
+
+
 ## 0.1.8 — 2026-10-19
 
 - Browser process inspection now distinguishes denied permission and unverifiable ownership from a confirmed mismatch. Unknown ownership still blocks acceptance; no ACL modification or ownership bypass is added.
