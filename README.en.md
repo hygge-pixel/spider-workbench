@@ -19,7 +19,7 @@ Describe the target, scope and output you need. Your coding Agent uses project r
 
 Open the downloaded, extracted project folder as your coding Agent's workspace, then send:
 
-> Read README.md, AGENTS.md and docs/INSTALL_WITH_AGENT.md, then deploy this workspace. Inspect and reuse stages already completed. Check and install the required runtimes and isolated tools. Download the latest Stable Chrome for Testing from Google's official source, configure the project's independent profile, Chrome/9222 and js-reverse MCP. Verify the offline demo, browser connection, actual MCP tool calls and full regression. Preserve existing tasks and configuration, and report what passed and what remains. Routine reversible installation, builds and project configuration are authorized; proceed continuously.
+> Read README.md, AGENTS.md and docs/INSTALL_WITH_AGENT.md, then deploy this workspace. Inspect and reuse stages already completed. Check and install the required runtimes and isolated tools. Download the latest Stable Chrome for Testing from Google's official source, configure the project's independent profile, Chrome/9222 and js-reverse MCP. Verify the offline demo, browser connection, actual MCP tool calls and full delivery verification. Preserve existing tasks and configuration, and report what passed and what remains. Routine reversible installation, builds and project configuration are authorized; proceed continuously.
 
 The [deployment work order](docs/INSTALL_WITH_AGENT.md) supplies the remaining steps. Use a coding Agent with local filesystem, terminal and tool-configuration access. Windows is the current baseline for native browser ownership checks; other systems need equivalent adaptation and acceptance.
 
@@ -39,7 +39,7 @@ Final deliverables belong in outputs/; run data, validation and evidence in runs
 
 The repository starts without website collectors or business data. Browser binaries, credentials, profiles and personal Agent settings are excluded. The Agent installs Chrome for Testing during deployment. Your Agent account and task-specific implementations remain separate requirements; a customer desktop product needs its own packaging and acceptance.
 
-Original contributions use [Apache-2.0](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md), [architecture](docs/ARCHITECTURE.md), [tests](docs/TESTING.md) and [contributing](CONTRIBUTING.md).
+Original contributions use [Apache-2.0](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md), [architecture](docs/ARCHITECTURE.md), [tests](docs/VERIFICATION.md) and [contributing](CONTRIBUTING.md).
 
 Project rule entrypoints cover Codex, Claude Code, Gemini CLI, Cursor, GitHub Copilot, Windsurf, Cline, Roo Code, Kiro, OpenCode and TRAE. AGENTS.md is canonical and includes a directly readable Skill index. Workspace trust, disabled rules, custom agents and actual MCP loading remain host-specific. See [compatibility and acceptance](docs/AGENT_COMPATIBILITY.md).
 

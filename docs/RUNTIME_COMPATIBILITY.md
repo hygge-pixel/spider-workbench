@@ -62,7 +62,7 @@ Agent 具备本机执行权限且网络/系统条件满足时，可以从官方 
 
 完整部署由 Agent 使用 deploy.py 编排，见 [新电脑部署流程](NEW_MACHINE_DEPLOYMENT.md)。Node 除主版本外须通过实际 npm 和原生 TS 探针，再以真实 MCP 构建为准；不从一次失败推断整个版本不可用。
 
-项目工具 Python 从 config/agent_tools.local.json 读取，日常 spider.py 与完整回归保持一致。显式 SPIDER_PYTHON 或 Windows 回归参数优先；配置失效会报告，不静默改用系统解释器。缺失 Python/Node 由 Agent 从 [Python 官方下载](https://www.python.org/downloads/) / [Node 官方下载](https://nodejs.org/en/download) 并行安装，不能用框架脚本在没有 Python 的机器直接启动。
+项目工具 Python 从 config/agent_tools.local.json 读取，日常 spider.py 与完整交付检查保持一致。显式 SPIDER_PYTHON 或 Windows 回归参数优先；配置失效会报告，不静默改用系统解释器。缺失 Python/Node 由 Agent 从 [Python 官方下载](https://www.python.org/downloads/) / [Node 官方下载](https://nodejs.org/en/download) 并行安装，不能用框架脚本在没有 Python 的机器直接启动。
 
 ## Windows 首次运行与项目默认值
 

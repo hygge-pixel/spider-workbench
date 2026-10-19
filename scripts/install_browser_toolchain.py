@@ -37,7 +37,7 @@ def plans(component, node):
             if venv.exists() and any(venv.iterdir()):
                 raise ValueError('existing incomplete .venv-toolchain requires manual review')
             tasks.append((ROOT, [sys.executable, '-m', 'venv', str(venv)]))
-        tasks.append((ROOT, [str(python), '-m', 'pip', 'install', '-r', 'requirements-collection.txt', '-r', 'requirements-dev.txt']))
+        tasks.append((ROOT, [str(python), '-m', 'pip', 'install', '-r', 'requirements-collection.txt']))
         tasks.append((ROOT, [str(python), '-m', 'pip', 'check']))
     if component in ('mcp', 'cli', 'ast', 'all'):
         node = select_node(ROOT, node)
@@ -62,7 +62,7 @@ def plans(component, node):
 def component_fingerprint(component, node):
     paths = [ROOT / 'scripts/install_browser_toolchain.py']
     if component == 'python':
-        paths += [ROOT / 'requirements-collection.txt', ROOT / 'requirements-dev.txt']
+        paths += [ROOT / 'requirements-collection.txt']
         runtime = [sys.executable, sys.version]
     else:
         node = Path(node or shutil.which('node') or '').resolve()
@@ -82,7 +82,7 @@ def component_ready(component, node):
         if component == 'python':
             python = ROOT / '.venv-toolchain' / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
             commands = [[str(python), '-m', 'pip', 'check'], [str(python), '-c',
-                        'import requests,httpx,curl_cffi,bs4,playwright.sync_api,pytest']]
+                        'import requests,httpx,curl_cffi,bs4,playwright.sync_api']]
             cwd = ROOT
         elif component == 'cli':
             cwd = ROOT / 'toolchain/playwright-cli'

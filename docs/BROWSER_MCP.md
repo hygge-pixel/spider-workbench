@@ -27,7 +27,7 @@ MCP 启动器 scripts/start_js_reverser.mjs 先核验浏览器归属，再在宿
 
 ## 分层验收
 
-依次核验程序/端口/Profile、CDP 版本与目标列表、MCP 初始化与工具目录、list_pages 只读调用、Playwright 合成页面和 Agent 宿主实际工具调用。最后运行框架完整回归。配置存在、CLI 探针成功与宿主已加载分别报告。
+依次核验程序/端口/Profile、CDP 版本与目标列表、MCP 初始化与工具目录、list_pages 只读调用、Playwright 合成页面和 Agent 宿主实际工具调用。最后运行框架完整交付检查。配置存在、CLI 探针成功与宿主已加载分别报告。
 
 检查只创建并关闭自己的合成标签，不读取或输出私人页面内容、Cookie 或 MCP 原始载荷。工具连接成功不代表网站适配和真实数据验证通过；业务仍走统一 runner。
 

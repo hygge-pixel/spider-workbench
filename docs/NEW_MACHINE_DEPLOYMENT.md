@@ -66,7 +66,7 @@ python scripts/deploy.py accept-host --evidence runs/_deployment/host_call.json
 
 每次重新执行 apply，上一份本流程生成的报告会保存到 runs/_deployment/attempts/<attempt_id>.json；当前报告只展示本轮检查，不沿用旧的成功状态。遇到旧版或其它工具生成的同名报告时先由 Agent 备份审核，再继续，不静默覆盖。只读工具偶发失败也保留失败分类；后一次成功不证明根因已经修复，未复现的原因写入部署限制，不无限重试。
 
-项目已配置的工具 Python 来自 config/agent_tools.local.json。spider.py 与完整回归会选择这个 Python；尚未配置时优先使用 .venv-toolchain，否则使用当前 Python 3.11。显式 `SPIDER_PYTHON` 或回归包装器的 `-PythonExecutable` 优先，适合有独立任务环境的项目。环境路径失效或版本错误时报错，不悄悄退回另一个解释器。
+项目已配置的工具 Python 来自 config/agent_tools.local.json。spider.py 与完整交付检查会选择这个 Python；尚未配置时优先使用 .venv-toolchain，否则使用当前 Python 3.11。显式 `SPIDER_PYTHON` 或回归包装器的 `-PythonExecutable` 优先，适合有独立任务环境的项目。环境路径失效或版本错误时报错，不悄悄退回另一个解释器。
 
 bootstrap.py 继续提供离线体验，`--install` 继续提供工具依赖子步骤；完整部署由 deploy.py 负责，不再要求用户把另一段安装提示词重新发给 Agent。
 
@@ -84,10 +84,10 @@ Windows Agent 首先运行 `powershell -NoProfile -ExecutionPolicy Bypass -File 
 
 Node 默认复用已配置版本；只有未配置且系统 Node 缺失、低于24或 TS 探针失败时安装隔离 v24.22.0。先从 nodejs.org 获取 SHASUMS256 再核对 ZIP，保留收据。错误的显式/项目 pin 需要审核，不能用自动切换掩盖。离线、证书验证失败或官方来源不可达都保留失败，不通过关闭 TLS 校验完成部署。
 
-Node 解析顺序为显式参数 → SPIDER_NODE → agent_tools.local.json → PATH；Python 对应显式参数/SPIDER_PYTHON → 项目配置 → .venv-toolchain → 当前解释器。bootstrap、deploy 和完整回归共用选择逻辑。旧文档中的显式 --node 仍可使用，日常无需重复输入。
+Node 解析顺序为显式参数 → SPIDER_NODE → agent_tools.local.json → PATH；Python 对应显式参数/SPIDER_PYTHON → 项目配置 → .venv-toolchain → 当前解释器。bootstrap、deploy 和完整交付检查共用选择逻辑。旧文档中的显式 --node 仍可使用，日常无需重复输入。
 
 浏览器元数据有有界重试；Python HTTPS 失败后可使用系统 curl HTTPS 兜底，不允许重定向到未知地址，不关闭证书检查。ZIP 仍经过路径/CRC/哈希检查。首次只有被过滤的欢迎页时，MCP 只读返回空列表；需要页面时由 Agent 显式 new_page。MCP 退出对远程浏览器执行 disconnect，启动器重新连接前会 ensure 项目浏览器。已运行服务遇浏览器断开时须重连服务，仍保留端口归属检查。
 
-status 不再把保存的报告原样当成实时状态：last_acceptance 是历史；live_health 会检查浏览器归属、项目运行时及脚本级 MCP 只读调用，并标明宿主调用未重测。它不启动资源、不改历史结果；命令退出0需历史通过且本次检查通过，退出2表示未同时满足。阶段报告增加 elapsed_seconds、稳定错误码以及完整回归的计数摘要，原始业务载荷不落盘。
+status 不再把保存的报告原样当成实时状态：last_acceptance 是历史；live_health 会检查浏览器归属、项目运行时及脚本级 MCP 只读调用，并标明宿主调用未重测。它不启动资源、不改历史结果；命令退出0需历史通过且本次检查通过，退出2表示未同时满足。阶段报告增加 elapsed_seconds、稳定错误码以及完整交付检查的计数摘要，原始业务载荷不落盘。
 
 DeepSeek Harness 的 overlay、Profile 范围、幂等、冲突与撤销见 [专用说明](DEEPSEEK_HARNESS.md)。

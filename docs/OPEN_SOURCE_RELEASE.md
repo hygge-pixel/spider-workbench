@@ -16,7 +16,7 @@
 
 ## 3. 上传前本地检查
 
-准备 Python3.11、Node24+；执行 verify_distribution、完整回归与公开检查，检查所有新增文件和许可证归属。新 ZIP 需重新解压验证，SHA-256 只证明内容一致，不是安全或权属认证。
+准备 Python3.11、Node24+；执行 verify_distribution、完整交付检查与公开检查，检查所有新增文件和许可证归属。新 ZIP 需重新解压验证，SHA-256 只证明内容一致，不是安全或权属认证。
 
 ```powershell
 python scripts/verify_distribution.py
@@ -70,7 +70,7 @@ git push -u origin main
 
 ## 7. 发布当前 v0.1.4 Release
 
-先确认 main 对应提交的 CI 通过和 CHANGELOG 一致，再本地运行完整回归、公开检查、刷新经审核的 manifest 并构建 ZIP。保存 checksums，独立解压验收。
+先确认 main 对应提交的 CI 通过和 CHANGELOG 一致，再本地运行完整交付检查、公开检查、刷新经审核的 manifest 并构建 ZIP。保存 checksums，独立解压验收。
 
 ```powershell
 python scripts/release.py --output outputs/releases

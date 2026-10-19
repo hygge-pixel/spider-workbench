@@ -68,4 +68,4 @@ ACTUAL_SUCCESSFUL_RUN 必须替换为真实运行目录。先查看 register --h
 
 ## 7. 提交前
 
-运行新任务测试和完整回归，查看 validation 与源数据对拍，再执行公开发布扫描。站点专属 collector 默认留本机；贡献给公共仓库时明确许可证、脱敏 fixture、无需个人会话的可复现验收，以及能力覆盖边界。不要直接把 runs 或 cookies.json 加进 PR。
+运行新任务测试和完整交付检查，查看 validation 与源数据对拍，再执行公开发布扫描。站点专属 collector 默认留本机；贡献给公共仓库时明确许可证、脱敏 fixture、无需个人会话的可复现验收，以及能力覆盖边界。不要直接把 runs 或 cookies.json 加进 PR。

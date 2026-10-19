@@ -76,7 +76,7 @@ Chrome 项的 launch_args=[]、environment={}，不沿用旧的指纹参数或�
 & $toolPython scripts/browser_toolchain.py mcp-smoke --candidate chrome --stdio-only
 & $toolPython scripts/browser_toolchain.py mcp-smoke --candidate chrome
 & $toolPython scripts/browser_toolchain.py cdp-smoke --candidate chrome
-& $toolPython examples/playwright_cdp.py --candidate chrome
+& $toolPython scripts/browser_toolchain.py cdp-smoke --candidate chrome
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run_full_regression.ps1
 ```
 
@@ -86,7 +86,7 @@ ensure 不传候选是为了验证默认已切换为 chrome。检查其输出中
 
 - browser_distribution=chrome-for-testing、browser_channel=Stable、实际版本/平台/官方 URL/查询时间/下载哈希。
 - default_browser_candidate=chrome、实际 executable/cdp_url/Profile、mcp_service=js-reverse。
-- 离线示例、依赖、原有工作保留、浏览器身份、CDP、MCP stdio、MCP 只读调用、Playwright CDP、Agent 实际加载、完整回归的分项真实结果。
+- 离线示例、依赖、原有工作保留、浏览器身份、CDP、MCP stdio、MCP 只读调用、Playwright CDP、Agent 实际加载、完整交付检查的分项真实结果。
 - 未执行项用 null 并注明原因；失败分类和下一步明确列出。
 
 非 Windows 的原生浏览器进程身份检查在旧框架中仍需适配；下载到了对应浏览器不代表所有平台均已接通。工具部署通过只证明工具链；网站能力仍需本次真实样本和业务数据校验。

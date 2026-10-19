@@ -4,7 +4,6 @@
 
 | 声明 | 内容 | 安装位置 |
 |---|---|---|
-| requirements-dev.txt | pytest8.4.2 | .venv 或独立工具环境 |
 | requirements-collection.txt | Playwright1.57.0、requests2.32.5、httpx0.28.1、curl_cffi0.13.0、beautifulsoup4 4.15.0 | .venv-toolchain |
 | 根 package-lock.json | Babel AST 依赖 | 根 node_modules，本机安装 |
 | skills/ast-deobfuscation/package-lock.json | 专项 AST 依赖 | 按该 Skill 需要局部安装 |
@@ -16,19 +15,10 @@ Playwright CLI0.1.18 自己的 lock 依赖 Playwright1.63.0-alpha-2026-08-05，�
 
 npm 使用完整 lock，公共版把三个非 vendor lock 的镜像 resolved URL 改成官方 registry 地址，版本与 integrity 均保持一致。Python只固定直接依赖，传递依赖由目标环境解析，pip check 检查兼容性；不是全系统二进制可重现锁。
 
-## 漏洞审计状态
+## 依赖审核
 
-2026-10-18 从实际 GitHub main 新克隆审计：初始 MCP 锁依赖返回 40 项告警（3 critical、28 high、7 moderate、2 low）。兼容范围更新后仍有 11 项，因此分别升级并锁定 MCP SDK 1.32.1、Puppeteer 25.14.0、Rollup 4.64.9 与 sm-crypto 0.5.7，并适配 Puppeteer 25 的连接状态、点击参数和独立 issue 事件。没有使用 audit fix --force，也没有删除告警数据库或排除运行所需的 devDependencies。
+锁文件描述当前工具快照，不承诺所有版本始终为最新或没有未来漏洞。部署使用固定直接 Python 依赖与各自 npm lock，Python 传递依赖由目标环境解析，并通过 pip check 检查兼容性。
 
-修补后四份 npm lock（根、AST Skill、MCP、Playwright CLI）通过官方 registry 的 package-lock-only audit，均返回 0 项。这个结果只代表当日已知依赖告警，不是未来安全承诺或全部代码审计。原始 snapshot 哈希保留输入来源；修改后的发布字节以当前 manifest 为准。
+维护者更新依赖时分别审核根、AST Skill、JSReverser MCP、Playwright CLI 的锁文件，重新构建并验证对应功能。不能从一种工具通过推定另一工具通过，也不能自动 audit fix --force 修改全部依赖。开发测试工具不属于客户安装依赖。
 
-重新 npm ci、prepare、TypeScript build 后，在本机已有 Chrome 151 上通过项目启动器归属预检、MCP 初始化/工具目录、合成页面求值、预加载后重载、双击、独立 issue 事件，以及 SM3 向量和 SM2 签名校验。没有下载新浏览器；临时 Profile 已清理。这不是所有 MCP 工具、任意浏览器版本或真实站点验收。
-
-维护者发布前重新执行：
-
-```console
-npm audit --package-lock-only --json --registry=https://registry.npmjs.org --prefix vendor/js-reverse-mcp
-npm audit --package-lock-only --json --registry=https://registry.npmjs.org
-```
-
-其余两份 lock 也在对应目录查询。Python advisories 尚未独立审计；pip check 只验证依赖兼容性。上游完整测试目录未随最小源码包发布，不能把本项目构建/探针通过写成上游全部测试通过。后续依赖升级必须重新构建并验收实际调用链。
+浏览器、Python、Node 的来源、版本要求与本机收据见 RUNTIME_COMPATIBILITY.md 和 NEW_MACHINE_DEPLOYMENT.md。源码包不包含运行时本体、安装依赖或历史验收日志。

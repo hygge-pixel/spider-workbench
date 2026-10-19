@@ -270,7 +270,7 @@ def apply(root, node=None, codex=None):
             ('playwright_cdp', [python, 'scripts/browser_toolchain.py', 'cdp-smoke', '--candidate', 'chrome']),
             ('regression', [python, 'scripts/run_full_regression.py', '--node', selected])]
         for name, argv in steps:
-            deployment.stage(name, lambda argv=argv, name=name: command(root, argv, json_result=name != 'regression', timeout=1800 if name == 'regression' else 150))
+            deployment.stage(name, lambda argv=argv, name=name: command(root, argv, timeout=1800 if name == 'regression' else 150))
         deployment.finish()
         return deployment.report
 

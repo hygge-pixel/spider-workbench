@@ -12,16 +12,16 @@ ROOT = Path(__file__).resolve().parents[1]
 ROOT_FILES = {
     '.gitignore', '.gitattributes', '.editorconfig', 'LICENSE', 'NOTICE',
     'README.md', 'README.en.md', 'AGENTS.md', 'CLAUDE.md', 'GEMINI.md',
-    'CONTRIBUTING.md', 'SECURITY.md', 'CODE_OF_CONDUCT.md', 'CHANGELOG.md', 'ROADMAP.md',
+    'CONTRIBUTING.md', 'SECURITY.md', 'CODE_OF_CONDUCT.md', 'CHANGELOG.md',
     'THIRD_PARTY_NOTICES.md', 'SOURCE_PROVENANCE.json', 'FRAMEWORK_RELEASE.json',
     'MANIFEST.sha256.json', 'spider.py', 'bootstrap.py', 'pyproject.toml', 'package.json', 'package-lock.json',
-    'requirements-collection.txt', 'requirements-dev.txt',
+    'requirements-collection.txt',
 }
 AGENT_ENTRY_FILES = {
     '.github/copilot-instructions.md', '.clinerules/00-spider-workbench.md',
     '.roo/rules/00-spider-workbench.md', '.trae/rules/project_rules.md',
 }
-SOURCE_DIRS = {'spider_core', 'scripts', 'skills', 'tests', 'docs', 'examples',
+SOURCE_DIRS = {'spider_core', 'scripts', 'skills', 'docs',
                'requirements-backends', '.github', 'upgrade', '.clinerules', '.roo', '.trae'}
 LOCAL_DIRS = {'.git', 'node_modules', '__pycache__', '.venv', '.venv-toolchain',
               '.pytest_cache', 'selftest_tmp', 'build', '.cache', 'debugger-sessions'}
@@ -47,6 +47,9 @@ def public_path(name):
     if p.is_absolute() or '..' in p.parts or not p.parts or ':' in name or '\\' in name:
         return False
     if any(part in LOCAL_DIRS for part in p.parts):
+        return False
+    if ('tests' in p.parts or p.name in {'test-prompts.json', 'selftest.py'}
+            or re.search(r'\.(?:test|spec)\.(?:js|mjs|cjs|ts|py)$', p.name)):
         return False
     if p.name == 'cookies.json' or p.name.startswith('.env') or p.suffix.lower() in {'.env', '.log', '.har', '.sqlite', '.sqlite3'}:
         return False

@@ -28,7 +28,7 @@ SpiderFramework/
 │   ├── setup_chrome.py              官方 Stable 下载、缓存与独立安装
 │   ├── agent_platform_compat.py     本机 Skill 入口和可选浏览器配置
 │   ├── verify_distribution.py       原始分发文件完整性检查
-│   ├── run_full_regression.py       框架版跨平台测试入口
+│   ├── run_full_regression.py       交付文件与离线合同验收入口
 │   ├── run_full_regression.ps1      Windows 包装入口
 │   ├── setup_optional_backend.py    可选采集后端隔离安装
 │   └── optional_backend_workers/   各后端独立进程
@@ -39,8 +39,7 @@ SpiderFramework/
 ├── requirements-backends/           可选后端锁文件
 ├── platforms/registry.json          初始为空
 ├── experiments/example_local/      唯一本地离线合同示例
-├── tests/                           框架与便携化测试
-├── docs/                            部署、说明及未来方案/计划目录
+├── docs/                            部署、使用、迁移与验收说明
 ├── tools/.gitkeep                   新项目工具预留目录，无个人通知工具
 ├── runs/.gitkeep                    新机器运行证据
 ├── tmp/.gitkeep                     新机器缓存/独立 Profile/隔离后端

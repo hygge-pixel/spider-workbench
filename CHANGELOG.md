@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.6 — 2026-10-19
+
+- Deliver only active framework files: remove developer test suites, Skill evaluation prompts, internal self-test, duplicate notes, future roadmap and redundant CDP wrapper.
+- Remove pytest and the development dependency file from customer installation.
+- Keep the existing verification command, now explicitly checking delivered file integrity, Python/JS syntax, JSON metadata, Skill discovery and the offline runner contract; it does not claim to execute deleted developer tests.
+- CI checks Windows/Linux delivery acceptance and separately builds and initializes the real MCP without a browser.
+
+
 ## 0.1.5 — 2026-10-19
 
 - Unify project Node selection across bootstrap, deployment and regression; add Windows runtime bootstrap with official Python installer signature and Node checksum verification.

@@ -19,13 +19,13 @@
 | **保留进度，支持复查** | 任务可保存检查点、原始材料和脱敏证据；支持恢复的采集器可据此续跑，交付前也能检查来源与覆盖范围。 |
 | **任务独立，复用有边界** | 新任务直接在 experiments 中实施；用户明确要求沉淀时才注册，已注册能力的 proof 与可运行状态分开管理。 |
 | **核心轻量，工具环境隔离** | Python 核心只用标准库；浏览器 Profile、Python 工具环境和 npm 依赖留在项目边界内，换电脑时重新生成本机配置。 |
-| **方便维护和协作** | 项目自带规则、分层验收、完整回归、文件清单和 CI，方便交接给另一台电脑的 Agent，也方便审核后续修改。 |
+| **方便维护和协作** | 项目自带规则、分层验收、完整交付检查、文件清单和 CI，方便交接给另一台电脑的 Agent，也方便审核后续修改。 |
 
 ## 安装：打开文件夹，发送提示词
 
 将下载并解压后的项目文件夹作为 **coding Agent 的工作区**打开，然后发送：
 
-> 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的部署；已经部署的部分先检查并复用。请自动检查并补齐环境和隔离工具依赖，从 Google 官方 Chrome for Testing 下载部署当天最新 Stable 浏览器，配置项目独立 Profile、Chrome/9222 和 js-reverse MCP。完成离线示例、浏览器连接、MCP 实际调用和完整回归，保留已有任务与配置，最后告诉我实际通过和待处理的项目。已授权部署所需的常规可逆安装、构建与本项目配置调整，请连续推进。
+> 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的部署；已经部署的部分先检查并复用。请自动检查并补齐环境和隔离工具依赖，从 Google 官方 Chrome for Testing 下载部署当天最新 Stable 浏览器，配置项目独立 Profile、Chrome/9222 和 js-reverse MCP。完成离线示例、浏览器连接、MCP 实际调用和完整交付检查，保留已有任务与配置，最后告诉我实际通过和待处理的项目。已授权部署所需的常规可逆安装、构建与本项目配置调整，请连续推进。
 
 Agent 会按[完整部署工单](docs/INSTALL_WITH_AGENT.md)执行后续步骤。统一部署入口先预检，再按阶段安装与验收；中断后复用已验证的依赖和浏览器，接着处理剩余步骤。需要宿主信任或重连时，Agent 会明确说明，重新打开后继续验收。实际状态和下一步统一写入 outputs/deployment_acceptance.md。需要能操作本机文件、终端并配置工具的 Agent；普通网页聊天窗口不会仅凭这段话自动部署电脑。完整浏览器流程推荐先在 Windows 上使用；其它系统的支持范围由 Agent 实际检查和报告。电脑上已有 Python/Node 版本不符时，Agent 会保留旧环境并选择或并行安装兼容版本；浏览器下载、连接和宿主加载分别验收，详见[版本与部署说明](docs/RUNTIME_COMPATIBILITY.md)。
 
@@ -66,7 +66,7 @@ flowchart LR
 - **采集与逆向方法**：13 个通用 Skills，涵盖 Web 采集、JS 逆向及相关分析流程。
 - **统一任务核心**：Python 标准库 runner、路由、字段和唯一键校验、运行比较、显式注册及证明状态管理。
 - **浏览器工具链**：随包 JSReverser MCP 源码、Playwright CDP 诊断及隔离工具安装；Agent 部署时从[官方渠道](https://googlechromelabs.github.io/chrome-for-testing/)获取 Chrome for Testing。
-- **维护与交付工具**：离线三条合成示例、完整回归、分发清单、公开发布检查和 GitHub Actions。
+- **维护与交付工具**：离线三条合成示例、完整交付检查、分发清单、公开发布检查和 GitHub Actions。
 
 ## 适用范围
 
@@ -82,6 +82,6 @@ flowchart LR
 
 ## 进一步了解
 
-[用户指南](docs/USER_GUIDE.md) · [Agent 部署工单](docs/INSTALL_WITH_AGENT.md) · [浏览器与 MCP](docs/BROWSER_MCP.md) · [开发采集器](docs/COLLECTOR_GUIDE.md) · [架构](docs/ARCHITECTURE.md) · [证据与数据](docs/EVIDENCE.md) · [测试与 CI](docs/TESTING.md) · [排错](docs/TROUBLESHOOTING.md) · [依赖状态](docs/DEPENDENCIES.md)
+[用户指南](docs/USER_GUIDE.md) · [Agent 部署工单](docs/INSTALL_WITH_AGENT.md) · [浏览器与 MCP](docs/BROWSER_MCP.md) · [开发采集器](docs/COLLECTOR_GUIDE.md) · [架构](docs/ARCHITECTURE.md) · [证据与数据](docs/EVIDENCE.md) · [测试与 CI](docs/VERIFICATION.md) · [排错](docs/TROUBLESHOOTING.md) · [依赖状态](docs/DEPENDENCIES.md)
 
 原创部分使用 [Apache-2.0](LICENSE)；第三方保留原许可证，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。[贡献指南](CONTRIBUTING.md) · [安全报告](SECURITY.md) · [版本记录](CHANGELOG.md)

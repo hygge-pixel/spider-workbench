@@ -21,7 +21,7 @@ Spider Workbench 是给 coding Agent 使用的数据采集与 Web / JavaScript �
 | 工具层 | 项目隔离依赖、JSReverser 构建和本机启动定义 |
 | 浏览器层 | 官方最新 Stable Chrome for Testing、独立 Profile、程序/端口/CDP 归属 |
 | MCP 与宿主 | 初始化、工具目录、只读调用、Playwright 合成页面、Agent 实际工具调用 |
-| 验收 | 完整回归、真实分项结果与必要待办 |
+| 验收 | 完整交付检查、真实分项结果与必要待办 |
 
 默认浏览器候选为 chrome，CDP 为 http://127.0.0.1:9222，Profile 为项目 tmp/chrome-mcp；MCP 使用 js-reverse。当前配置只含 chrome；旧多候选配置按 MIGRATION 先备份再审核迁移。
 
@@ -56,7 +56,7 @@ Spider Workbench 是给 coding Agent 使用的数据采集与 Web / JavaScript �
 
 ## 如何判断完成？
 
-部署报告会区分离线核心、依赖、浏览器、MCP、Playwright、Agent 实际加载和完整回归。未执行项应说明原因；配置写入或脚本初始化通过，不能替代宿主实际调用。
+部署报告会区分离线核心、依赖、浏览器、MCP、Playwright、Agent 实际加载和完整交付检查。未执行项应说明原因；配置写入或脚本初始化通过，不能替代宿主实际调用。
 
 业务交付还需看来源一致性、必填字段、唯一键、数量与结束条件。不能证明全量时，报告应明确为样本、部分或未知，不能只凭 HTTP 200 或退出码为零判定完成。
 

@@ -134,6 +134,21 @@ def local_settings():
     return json.loads(path.read_text(encoding='utf-8'))['browser_toolchain']
 
 
+def stdio_smoke(root=ROOT, node=None):
+    """Inspect the built MCP without requiring browser configuration or launching Chrome."""
+    from spider_core.project_runtime import select_node
+    root = Path(root).resolve()
+    selected = select_node(root, node)
+    settings = root / 'config/agent_tools.local.json'
+    data = json.loads(settings.read_text(encoding='utf-8')).get('browser_toolchain', {}) if settings.is_file() else {}
+    entry = Path(data.get('js_reverser_entry', root / 'vendor/js-reverse-mcp/build/src/index.js'))
+    if not entry.is_file():
+        raise ValueError('built_mcp_missing; install MCP component before acceptance')
+    runtime = root / 'runs/_mcp/js-reverse'
+    runtime.mkdir(parents=True, exist_ok=True)
+    return probe_stdio([str(selected), str(entry)], runtime, {'SPIDER_MCP_RUN_DIR': str(runtime)}, live=False)
+
+
 def launch_spec(candidate):
     from spider_core.browser import load_workspace_browser_configs
     pool = load_workspace_browser_configs(ROOT)
@@ -215,7 +230,7 @@ def doctor():
     import importlib.metadata
     result = {'python': sys.version.split()[0], 'python_packages': {},
               'browser': {}, 'mcp_configured': False, 'live_verified': False}
-    for name in ('playwright', 'requests', 'httpx', 'curl_cffi', 'beautifulsoup4', 'pytest'):
+    for name in ('playwright', 'requests', 'httpx', 'curl_cffi', 'beautifulsoup4'):
         try:
             result['python_packages'][name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
@@ -258,12 +273,14 @@ def main():
         elif args.action == 'cdp-smoke':
             result = cdp_smoke(args.candidate)
         elif args.action == 'mcp-smoke':
-            if not args.stdio_only:
+            if args.stdio_only:
+                result = stdio_smoke()
+            else:
                 from spider_core.browser import status_browser_candidate
                 status_browser_candidate(ROOT, args.candidate)
-            command, runtime, env = launch_spec(args.candidate)
-            runtime.mkdir(parents=True, exist_ok=True)
-            result = probe_stdio(command, runtime, env, live=not args.stdio_only)
+                command, runtime, env = launch_spec(args.candidate)
+                runtime.mkdir(parents=True, exist_ok=True)
+                result = probe_stdio(command, runtime, env, live=True)
         else:
             result = doctor()
         print(json.dumps(result, ensure_ascii=False, indent=2))
