@@ -1,27 +1,22 @@
-# 交付验收、CI 与发布检查
+# 测试、交付验收与 CI
 
-当前仓库按可部署的交付版维护，不附带开发测试目录、Skill 评测提示词、内部自测或 pytest。删除前的维护回归记录与备份由维护者本机保留；不会把历史测试通过当成新电脑已安装成功。
+源码仓库和 source ZIP 保留有效回归测试；精简 install ZIP 不含开发测试、pytest 依赖声明、Skill 内部自测及维护 CI。两包各有独立 MANIFEST.sha256.json。测试源码用于维护，运行输出与历史业务数据不分发。
 
-## 交付检查入口
+## 两种检查范围
 
-部署 Agent 执行 `python scripts/run_full_regression.py`，Windows 也可用同名 PowerShell 包装器。旧命令名保留兼容，实际检查范围明确记录在 JSON 中，不输出“零项测试通过”。
+- 源码：python scripts/run_full_regression.py 默认先做交付检查，再运行 tests/、实验目录测试、Skill 自测；发现 pytest 风格测试但环境未安装时明确失败，不默默漏跑。当前框架测试使用 unittest，不要求部署用户安装 pytest。
+- 部署：deploy.py 调用 run_full_regression.py --delivery-only；install ZIP 默认也只做交付检查。该检查覆盖清单/路径/许可证/本地文档链接、Python 与 JS 语法、JSON、Skill 发现和三条合成记录的统一 runner 合同。MCP 已构建时初始化并读取目录，否则记录 not_installed，完整部署还须继续安装与验收。
 
-它检查全部分发文件的清单哈希、允许路径、许可证和文档链接；编译全部交付 Python 源码、解析 JSON、检查 JavaScript 语法；创建 Skill 发现链接，并通过统一 runner 运行三条合成记录的离线示例、核验记录数量和合同。MCP 已构建时实际初始化并读取工具目录；没有安装则明确记录 not_installed，并继续由 Agent 完成部署。此入口不启动浏览器、不访问真实业务站点，不证明宿主会话已经调用工具。
-
-完整部署另由 deploy.py 连续核验依赖、浏览器归属与连接、MCP 只读调用、Playwright CDP、交付检查及宿主实际调用。不要把源文件检查、MCP 初始化、宿主加载和网站采集混为一项成功。
+源码缺失应由清单校验报错；不能通过删除 tests/ 自动降级为通过。检查 JSON 明确 developer_test_suite_distributed 和 developer_tests_run，交付检查通过不写成开发回归通过。
 
 ## CI
 
-Windows/Ubuntu 各自执行交付检查、发布扫描与源码 ZIP 构建。另一个任务从锁文件构建 MCP，并实际通过 stdio 完成初始化和工具目录查询；该步骤不要求浏览器。CI 不执行已移除的开发测试，不持有客户密钥，也不会自动发布 Release。
+Windows/Ubuntu 分别执行公开检查、完整源码回归、双包构建，并在中文/空格路径独立解压安装包执行交付检查。MCP 专项从锁文件安装并构建，做 stdio 初始化/工具目录读取和 Node 生命周期测试。无业务密钥，不自动发布 Release，不访问真实业务网站。
 
-## 发布
+本机或 CI 的 MCP 目录检查不证明目标 Agent 会话已调用工具；实际 CDP、进程归属、Playwright 和宿主调用由完整部署单独验收。全新无环境电脑验收见 CLEAN_MACHINE_ACCEPTANCE.md，仍待实际执行。
 
-维护者审查 Git 跟踪文件与差异后执行 release.py --refresh-manifest、check_public_release.py、run_full_regression.py，再用 release.py --output outputs/releases 构建。更新清单是维护操作，目标机不能靠刷新清单掩盖未知修改。
+## 发布验收
 
-源码 ZIP 只含已校验清单中的文件。发布后下载远端 ZIP，逐文件核对哈希、清单与远端 Git 树，并在新的中文/空格路径运行离线交付检查。检查器禁止开发测试文件和评测提示词重新混入发布；运行数据、Profile、安装依赖和个人配置仍留在忽略目录。
+维护者审阅新增文件与跟踪列表后刷新清单；运行公开检查、完整回归、双包构建。两个 ZIP 分别解压核对清单和内容；安装包不得有开发套件、依赖目录、运行数据、Profile 或个人配置。source ZIP 与 Git 树对应，install ZIP 是按规则筛出的独立分发，不能要求安装包等于整个 Git 树。
 
-## 开发验证的位置
-
-贡献者仍应先构造失败复现再修复，将维护测试和输出保存在独立的本机审计目录；提交实际改动、验证命令与脱敏结果。日常业务所需的样本对拍、数据校验和 Skill 方法仍保留，它们属于框架功能，不是历史开发测试文件。
-
-Git 禁用自动换行转换以保留分发哈希；原创源码按既有格式维护，vendor 保留上游格式和许可证。CI 通过不替代目标电脑的真实部署验收，也不证明任意网站全量成功。
+发布后下载远端两包核对 SHA-256、源包与 Git 树，并在新目录做交付验收。清单重建仅限维护者审核后的新版本，不用于目标机掩盖未知变更。版本记录与测试范围一致，不把旧报告当作新版真实部署证据。

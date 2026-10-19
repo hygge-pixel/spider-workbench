@@ -51,3 +51,17 @@ Chrome for Testing 是独立浏览器；唯一候选 chrome/9222，服务名 js-
 ## DeepSeek Harness
 
 0.1.0-rc.6 的实际部署已验证文件读取与宿主 MCP 调用；使用 [Harness 专用部署说明](DEEPSEEK_HARNESS.md)。提供 Cordis insert overlay 生成及有备份的合并/撤销工具，不将 mcpServers JSON 原样写入 Cordis Profile。不从其它 Agent 的成功推断当前会话加载。
+
+## 实测证据矩阵
+
+以下记录截至 2026-10-19，历史实测不代表 0.1.7 在全部宿主重新跑过；产品版本缺失不补填猜测。提供入口与实际调用分列，后续每次验收填写具体版本、系统、日期与脱敏报告。
+
+| 环境/宿主 | 版本与系统 | 规则/Skill 实际读取 | 完整安装 | 当前宿主 MCP 调用 | 证据范围 |
+|---|---|---|---|---|---|
+| DeepSeek Harness | 0.1.0-rc.6 / Windows，2026-10-19 | 历史实测通过 | 原测试部署通过；非干净机 | 历史会话通过，非本版复验 | 见 DEEPSEEK_HARNESS；升级后需续验 |
+| Codex | 本机 Windows，宿主版本未完整留存 | 有本机使用记录 | 工具层有实测 | 历史记录，不作为新会话验收 | 每次部署仍要求宿主真实调用 |
+| 其余表列 Agent | 未逐个实测 | 待验收 | 待验收 | 待验收 | 仅提供格式入口与合同检查 |
+| Antigravity | 用户测试出错，版本待补 | 待验收 | 未通过 | 待验收 | 按用户要求暂停排查 |
+| Windows CI | runner 实际环境 | 不启动商业宿主 | 离线框架/打包通过范围 | 未执行 | 无浏览器/新电脑承诺 |
+| Ubuntu CI | runner 实际环境 | 不启动商业宿主 | 离线框架/MCP 源码构建范围 | 未执行 | 不代表 Linux 完整浏览器安装 |
+| macOS / 无环境新 Windows | 待执行 | 待验收 | 待验收 | 待验收 | 见 CLEAN_MACHINE_ACCEPTANCE.md |

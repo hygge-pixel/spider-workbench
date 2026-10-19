@@ -18,3 +18,5 @@ Python and npm packages are installed separately. Their transitive licenses are 
 Historical input Git history is not redistributed. Hashes document content provenance and integrity, not copyright ownership or a third-party certification. Contributors must have the rights to contribute their changes; report any provenance correction through the repository's contribution or security channels.
 
 Spider Workbench 0.1.5 modifies bundled JSReverser `src/McpContext.ts` to support empty filtered page snapshots and `src/browser.ts` to disconnect attached remote browsers without closing them. Original copyright and Apache-2.0 notices are retained.
+
+See [third-party maintenance](docs/THIRD_PARTY_MAINTENANCE.md) for the snapshot identity boundary, local patches and update procedure.

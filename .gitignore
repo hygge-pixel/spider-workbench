@@ -47,6 +47,3 @@ skills/web-reverse-master/selftest_tmp/
 *.sqlite3
 .DS_Store
 Thumbs.db
-
-# Customer source distribution excludes local developer suites and fixtures.
-/tests/

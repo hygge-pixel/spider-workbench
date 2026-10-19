@@ -15,13 +15,13 @@ ROOT_FILES = {
     'CONTRIBUTING.md', 'SECURITY.md', 'CODE_OF_CONDUCT.md', 'CHANGELOG.md',
     'THIRD_PARTY_NOTICES.md', 'SOURCE_PROVENANCE.json', 'FRAMEWORK_RELEASE.json',
     'MANIFEST.sha256.json', 'spider.py', 'bootstrap.py', 'pyproject.toml', 'package.json', 'package-lock.json',
-    'requirements-collection.txt',
+    'requirements-collection.txt', 'requirements-dev.txt',
 }
 AGENT_ENTRY_FILES = {
     '.github/copilot-instructions.md', '.clinerules/00-spider-workbench.md',
     '.roo/rules/00-spider-workbench.md', '.trae/rules/project_rules.md',
 }
-SOURCE_DIRS = {'spider_core', 'scripts', 'skills', 'docs',
+SOURCE_DIRS = {'spider_core', 'scripts', 'skills', 'docs', 'tests',
                'requirements-backends', '.github', 'upgrade', '.clinerules', '.roo', '.trae'}
 LOCAL_DIRS = {'.git', 'node_modules', '__pycache__', '.venv', '.venv-toolchain',
               '.pytest_cache', 'selftest_tmp', 'build', '.cache', 'debugger-sessions'}
@@ -42,14 +42,19 @@ PRIVATE_PATH = re.compile(r'(?i)[A-Z]:[/\\]Users[/\\](?!Public(?:[/\\]|$)|USERNA
                           r'[A-Za-z0-9_.-]+[/\\]|[A-Z]:[/\\]py_code[/\\]')
 
 
+def developer_path(name):
+    p = PurePosixPath(name)
+    return ('tests' in p.parts or name in {'requirements-dev.txt', 'scripts/run_developer_tests.py'}
+            or (name.startswith('.github/') and name not in AGENT_ENTRY_FILES)
+            or p.name in {'test-prompts.json', 'selftest.py'}
+            or bool(re.search(r'\.(?:test|spec)\.(?:js|mjs|cjs|ts|py)$', p.name)))
+
+
 def public_path(name):
     p = PurePosixPath(name)
     if p.is_absolute() or '..' in p.parts or not p.parts or ':' in name or '\\' in name:
         return False
     if any(part in LOCAL_DIRS for part in p.parts):
-        return False
-    if ('tests' in p.parts or p.name in {'test-prompts.json', 'selftest.py'}
-            or re.search(r'\.(?:test|spec)\.(?:js|mjs|cjs|ts|py)$', p.name)):
         return False
     if p.name == 'cookies.json' or p.name.startswith('.env') or p.suffix.lower() in {'.env', '.log', '.har', '.sqlite', '.sqlite3'}:
         return False
@@ -102,12 +107,15 @@ def scan(root, *, require_structure=True):
         files = data['files']
         if data.get('schema_version') != 1 or not isinstance(files, dict) or not files:
             raise ValueError('invalid_manifest')
+        kind = data.get('distribution_kind', 'source')
+        if kind not in {'source', 'install'}:
+            raise ValueError('invalid distribution kind')
         tracked = set(tracked_files(root))
         expected = set(files) | {'MANIFEST.sha256.json'}
         for name in sorted(tracked - expected):
             issue(name, 'unmanifested_tracked_file')
         for name in sorted(expected | tracked):
-            if not public_path(name):
+            if not public_path(name) or (kind == 'install' and developer_path(name)):
                 issue(name, 'forbidden_path')
                 continue
             path = root / name
@@ -144,7 +152,8 @@ def scan(root, *, require_structure=True):
                     if target and not (path.parent/target).is_file():
                         issue(name, 'broken_local_link')
         if require_structure:
-            for name in sorted(REQUIRED - expected):
+            required = REQUIRED - ({'.github/workflows/ci.yml'} if kind == 'install' else set())
+            for name in sorted(required - expected):
                 issue(name, 'required_file_missing')
             registry = json.loads((root/'platforms/registry.json').read_text(encoding='utf-8'))
             if registry.get('platforms') != []:
@@ -173,7 +182,8 @@ def refresh_manifest(root):
             if is_linked(root, path):
                 raise ValueError('linked source requires review: ' + relative)
             files[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
-    data = {'schema_version':1, 'edition':'spider-workbench-public-source', 'files':dict(sorted(files.items()))}
+    data = {'schema_version':1, 'edition':'spider-workbench-public-source',
+            'distribution_kind': 'source', 'files':dict(sorted(files.items()))}
     (root/'MANIFEST.sha256.json').write_text(json.dumps(data, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     return data
 

@@ -63,3 +63,11 @@ python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --roll
 先备份/核对差异，再替换新版分发源码并保留 config/*.local.json、workspace_browser.json、任务、runs、outputs、隔离运行时与 Profile。维护者在新发行包生成新 manifest；目标机不重建清单掩盖修改。运行 setup_runtime.ps1 检查复用 → deploy.py preflight → apply → 宿主实际调用 → accept-host。已有工具配置会复用；变更 Node 或 MCP 源码会触发相应依赖重建。
 
 status 输出调整为 last_acceptance/live_health，自动化读取方须同步。DeepSeek Harness 既有未标记 js-reverse 配置不会被自动覆盖，先审核原定义与本项目定义的对应关系，再采用专用适配；保留其它服务与设置。
+
+## 升级到 0.1.7
+
+新升级器优先使用目标目录原有 MANIFEST.sha256.json 作为已安装版本基线；只在目标根本没有清单的旧框架使用 v1 兼容基线。损坏清单应先排查，不能回退到无关版本自动覆盖。清单是内容来源记录，不是第三方签名，仍需核实来源。
+
+先在新版源码目录运行 python scripts/upgrade_framework.py --target <旧项目目录> 查看只读计划；检查 changes、conflicts、preserved、baseline_source 和 obsolete_framework_files。只有无冲突再加 --apply，记录备份路径；回滚用 --target <旧项目目录> --rollback <备份路径> --apply。已有本地定制逐项审阅合并，--accept-local 仅用于已审核文件，并继续按本机补丁记录规则留痕。
+
+任务、注册表、运行记录、独立浏览器和本机配置保留；已废弃框架文件只列出，不自动删除。源码项目优先用 source 包升级，精简部署项目用 install 包升级，不混用清单或直接解压覆盖。升级后按统一 deploy 流程检查、宿主真实调用和验收；旧 proof 不自动刷新。

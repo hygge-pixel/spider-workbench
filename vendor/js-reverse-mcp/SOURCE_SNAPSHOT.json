@@ -121,5 +121,16 @@
     "src/utils/types.ts": "13f605fbd9270a0b28166b1db6ab60ccc48b041c5ff0754208535b037233ddcd",
     "tsconfig.json": "8de302be9f264545bd9f25fb8e522dabc1c62a67a45de2844b3bbbc22859926d"
   },
-  "distribution_patch": "src/utils/projectPaths.ts isolates runtime materials; framework 0.1.2 updates dependency locks and adapts Puppeteer 25 connected/count APIs and a separate aggregated-issue event. Original hashes remain the unmodified input baseline."
+  "distribution_patch": "src/utils/projectPaths.ts isolates runtime materials; framework 0.1.2 updates dependency locks and adapts Puppeteer 25 connected/count APIs and a separate aggregated-issue event. Original hashes remain the unmodified input baseline.",
+  "upstream_identity_review": {
+    "date": "2026-10-19",
+    "reference_tag": "v2.0.3",
+    "reference_object": "50af9d2e1f1d1a3aca8d3cc3d9b9da27bc918e19",
+    "reference_archive_sha256": "382884691930307130a7a2daf8f0589bcee39c71a617d8000bfac71df8a59d47",
+    "raw_input_hash_matches": 0,
+    "raw_input_hash_differences": 44,
+    "missing_input_files": 62,
+    "current_files_equal_after_crlf_normalization": 18,
+    "conclusion": "Installed input is not identical to the upstream v2.0.3 tag; its exact upstream commit remains unverified. Reference tag is a comparison target, not the snapshot origin."
+  }
 }

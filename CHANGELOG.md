@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.7 — 2026-10-19
+
+- Restore maintained framework/Skill/MCP regression sources in the repository and source ZIP; keep developer suites out of the independently manifested install ZIP. Default source regression runs developer tests; deployment uses explicit delivery-only checks.
+- Upgrade against the target's own installed manifest, preserve local conflicts, reject malformed baselines, and retain preview/backup/rollback.
+- Align Python metadata to 3.11.x, pin README to the stable install asset, document runtime maintenance limits, host evidence and clean-machine acceptance still pending.
+- Verify source/install bundles separately in CI; execute MCP lifecycle regressions after building; retain one-prompt user installation.
+- Add third-party source update guidance. No new site collectors, customer records, credentials or browser binaries.
+
+
 ## 0.1.6 — 2026-10-19
 
 - Deliver only active framework files: remove developer test suites, Skill evaluation prompts, internal self-test, duplicate notes, future roadmap and redundant CDP wrapper.

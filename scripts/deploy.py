@@ -268,7 +268,7 @@ def apply(root, node=None, codex=None):
             ('mcp_stdio', [python, 'scripts/browser_toolchain.py', 'mcp-smoke', '--candidate', 'chrome', '--stdio-only']),
             ('mcp_read_only', [python, 'scripts/browser_toolchain.py', 'mcp-smoke', '--candidate', 'chrome']),
             ('playwright_cdp', [python, 'scripts/browser_toolchain.py', 'cdp-smoke', '--candidate', 'chrome']),
-            ('regression', [python, 'scripts/run_full_regression.py', '--node', selected])]
+            ('regression', [python, 'scripts/run_full_regression.py', '--delivery-only', '--node', selected])]
         for name, argv in steps:
             deployment.stage(name, lambda argv=argv, name=name: command(root, argv, timeout=1800 if name == 'regression' else 150))
         deployment.finish()

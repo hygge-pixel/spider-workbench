@@ -34,6 +34,18 @@ jobs:
       - run: python scripts/check_public_release.py
       - run: python scripts/run_full_regression.py
       - run: python scripts/release.py --output outputs/releases
+      - name: Verify extracted install bundle
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess, sys, zipfile
+          archive = next(Path('outputs/releases').glob('*-install.zip'))
+          destination = Path('outputs/install bundle 验收')
+          with zipfile.ZipFile(archive) as bundle:
+              bundle.extractall(destination)
+          root = destination / 'spider-workbench'
+          assert not (root / 'tests').exists()
+          subprocess.run([sys.executable, str(root / 'scripts/run_full_regression.py')], check=True)
   mcp-build:
     name: mcp-source-build
     runs-on: ubuntu-latest
@@ -53,3 +65,4 @@ jobs:
       - run: npm run build
         working-directory: vendor/js-reverse-mcp
       - run: python scripts/browser_toolchain.py mcp-smoke --candidate chrome --stdio-only
+      - run: node --test tests/mcp_lifecycle.test.mjs

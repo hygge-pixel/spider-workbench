@@ -4,7 +4,7 @@
 
 你描述网站、数据范围和交付要求，Agent 在同一个工作区里完成环境部署、接口分析、采集实现、样本校验和结果整理。框架将项目规则、13 个通用 Skills、浏览器工具链、统一运行入口与运行证据组织在一起，让每个任务都有清楚的起点、过程和结果。
 
-[下载当前源码](https://github.com/hygge-pixel/spider-workbench/archive/refs/heads/main.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
+[下载稳定版 v0.1.7](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.7/spider-workbench-0.1.7-install.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
 
 ## 为什么使用 Spider Workbench？
 
@@ -19,7 +19,7 @@
 | **保留进度，支持复查** | 任务可保存检查点、原始材料和脱敏证据；支持恢复的采集器可据此续跑，交付前也能检查来源与覆盖范围。 |
 | **任务独立，复用有边界** | 新任务直接在 experiments 中实施；用户明确要求沉淀时才注册，已注册能力的 proof 与可运行状态分开管理。 |
 | **核心轻量，工具环境隔离** | Python 核心只用标准库；浏览器 Profile、Python 工具环境和 npm 依赖留在项目边界内，换电脑时重新生成本机配置。 |
-| **方便维护和协作** | 项目自带规则、分层验收、完整交付检查、文件清单和 CI，方便交接给另一台电脑的 Agent，也方便审核后续修改。 |
+| **方便维护和协作** | 源码仓库保留有效回归测试；安装包精简开发文件。项目自带规则、分层验收、文件清单和 CI，方便交接给另一台电脑的 Agent，也方便审核后续修改。 |
 
 ## 安装：打开文件夹，发送提示词
 
@@ -68,6 +68,19 @@ flowchart LR
 - **浏览器工具链**：随包 JSReverser MCP 源码、Playwright CDP 诊断及隔离工具安装；Agent 部署时从[官方渠道](https://googlechromelabs.github.io/chrome-for-testing/)获取 Chrome for Testing。
 - **维护与交付工具**：离线三条合成示例、完整交付检查、分发清单、公开发布检查和 GitHub Actions。
 
+## 一个无需网站账号的小例子
+
+让 Agent 运行随包的离线三条记录示例。它通过同一个 `spider.py run` 入口执行，实际检查三条合成记录的字段、唯一键和数量，并返回本次运行目录。
+
+| 输入与产物 | 作用 |
+|---|---|
+| experiments/example_local/task.example.json | 明确字段、唯一键和验收条件 |
+| normalized.jsonl | 三条标准化合成记录，保留在本次 runs 目录 |
+| validation.json | 记录实际数据校验结果 |
+| collector_result.json | 记录采集器结束状态与覆盖说明 |
+
+这个例子说明框架如何执行和验收任务；浏览器连接、宿主工具调用和真实网站仍分别验收。
+
 ## 适用范围
 
 适合使用 coding Agent 开展数据采集、接口分析和 Web / JavaScript 逆向的个人与团队，也适合作为新项目的起点。框架初始不附带具体网站采集器；网站适配、分页、字段语义与完整性需要逐任务验证。工具安装通过，也需要继续验证目标网站的真实业务结果。
@@ -79,6 +92,12 @@ flowchart LR
 项目已提供 Codex、Claude Code、Gemini CLI、Cursor、GitHub Copilot、Windsurf、Cline、Roo Code、Kiro、OpenCode、TRAE 的默认规则入口。核心规则统一在 AGENTS.md，Skill 索引可直接读取，部署时再建立本机发现链接；各宿主的 MCP 配置分别适配；DeepSeek Harness 另提供[专用适配与恢复说明](docs/DEEPSEEK_HARNESS.md)。用户仍只需打开工作区并发送上面的提示词。
 
 入口按各产品官方机制配置并有本地合同检查。首次打开需满足宿主的工作区信任、规则开关和文件权限；实际读取/工具连接状态由目标 Agent 现场验收，见 [兼容矩阵](docs/AGENT_COMPATIBILITY.md)。
+
+## 版本与验证范围
+
+默认下载链接固定到稳定版精简安装包；[源码仓库](https://github.com/hygge-pixel/spider-workbench)供开发贡献，main 为开发分支。[Release](https://github.com/hygge-pixel/spider-workbench/releases)同时提供完整源码包和安装包，二者各有独立文件清单与校验和。浏览器和运行时在目标电脑安装，安装包本身不含二进制环境。
+
+当前部署基线是 Python 3.11.x、Node 24 LTS，完整浏览器流程以 Windows 为主要验收平台。CI 覆盖 Windows/Ubuntu 的离线框架与打包检查；各 Agent 和操作系统的真实安装证据见[兼容矩阵](docs/AGENT_COMPATIBILITY.md)。**无编程环境新电脑的完整验收仍待进行**，不能用已有电脑上的成功代替。
 
 ## 进一步了解
 

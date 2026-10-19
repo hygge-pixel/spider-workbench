@@ -4,7 +4,7 @@
 
 Describe the target, scope and output you need. Your coding Agent uses project rules, 13 reusable Skills, browser tooling and a standard-library runner to implement the task, check samples and preserve evidence.
 
-[Download current source](https://github.com/hygge-pixel/spider-workbench/archive/refs/heads/main.zip) · [中文](README.md) · [Architecture](docs/ARCHITECTURE.md)
+[Download stable v0.1.7](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.7/spider-workbench-0.1.7-install.zip) · [中文](README.md) · [Architecture](docs/ARCHITECTURE.md)
 
 ## Why use it?
 
@@ -46,3 +46,7 @@ Project rule entrypoints cover Codex, Claude Code, Gemini CLI, Cursor, GitHub Co
 Deployment uses a preflight and resumable stage runner; verified dependencies and the configured browser are reused. Host trust, effective configuration and an actual tool call are accepted separately. See [deployment stages](docs/NEW_MACHINE_DEPLOYMENT.md). A host_pending result remains incomplete until the Agent observes the current host call.
 
 DeepSeek Harness uses a dedicated [Cordis profile adapter](docs/DEEPSEEK_HARNESS.md). Agents handle isolated runtime setup, browser recovery and separate historical acceptance/live health checks. The installation remains the single prompt above.
+
+## Releases and evidence
+
+The download points to the pinned v0.1.7 install ZIP. The repository and source ZIP retain maintained regression tests; the install ZIP excludes developer suites and has its own manifest. The main branch is development. Deployment supports Python 3.11.x; Node 24 LTS is the baseline. Windows/Ubuntu offline CI does not prove every host integration or a clean-machine browser deployment. A clean Windows machine acceptance is still pending. See [verification](docs/VERIFICATION.md) and [compatibility evidence](docs/AGENT_COMPATIBILITY.md).

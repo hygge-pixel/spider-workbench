@@ -1,4 +1,4 @@
-"""Verify the delivered workspace; developer test suites are not distributed."""
+"""Verify delivery and, in a source checkout, run maintained developer suites."""
 from pathlib import Path
 import argparse
 import json
@@ -61,7 +61,8 @@ def verify_workspace(root, node=None):
             'source': source, 'javascript_sources': javascript_count,
             'offline_records': 3, 'offline_validation_passed': True,
             'skill_discovery_created': demo['skill_discovery_links_created'], 'mcp_stdio': mcp,
-            'developer_test_suite_distributed': False, 'developer_tests_run': False,
+            'developer_test_suite_distributed': (root / 'tests/test_framework_contract.py').is_file(),
+            'developer_tests_run': False,
             'browser_connection_verified': False, 'host_tool_call_passed': None,
             'external_targets_tested': False}
 
@@ -72,9 +73,19 @@ def main():
             stream.reconfigure(encoding='utf-8', errors='replace')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--node', help='optional runtime override; defaults to the project configuration')
+    parser.add_argument('--delivery-only', action='store_true',
+                        help='deployment acceptance without contributor test suites')
     args = parser.parse_args()
     try:
         result = verify_workspace(ROOT, args.node)
+        manifest = json.loads((ROOT/'MANIFEST.sha256.json').read_text(encoding='utf-8'))
+        is_source = manifest.get('distribution_kind', 'source') == 'source'
+        if is_source and not args.delivery_only:
+            from spider_core.project_runtime import select_node
+            subprocess.run([sys.executable, str(ROOT/'scripts/run_developer_tests.py'),
+                            '--node', str(select_node(ROOT, args.node))], cwd=ROOT, check=True)
+            result['developer_tests_run'] = True
+            result['scope'] += '; maintained developer regression suites'
     except Exception as error:
         from scripts.deploy import diagnostic
         print(json.dumps({'passed': False, **diagnostic(error)}, ensure_ascii=False))

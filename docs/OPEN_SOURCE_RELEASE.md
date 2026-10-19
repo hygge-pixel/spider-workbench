@@ -68,21 +68,28 @@ git push -u origin main
 - 评估 Dependency graph 与更新 PR；锁文件升级经过构建和回归后合并，不为消告警盲目 npm audit fix --force。
 - 不创建虚假 Sponsor、Logo、Stars、已支持平台或已在线验证徽章。
 
-## 7. 发布当前 v0.1.4 Release
+## 7. 发布 0.1.7 及后续版本
 
-先确认 main 对应提交的 CI 通过和 CHANGELOG 一致，再本地运行完整交付检查、公开检查、刷新经审核的 manifest 并构建 ZIP。保存 checksums，独立解压验收。
+先审阅完整差异与新增文件，再刷新经审核清单，执行公开扫描、源码完整回归，构建双包并独立解压验收。main 对应提交的 Windows/Ubuntu/MCP CI 均通过后，创建与提交对应的版本 tag；禁止在旧 tag 上覆盖新内容。
 
 ```powershell
+python scripts/release.py --refresh-manifest
+python scripts/check_public_release.py
+python scripts/run_full_regression.py
 python scripts/release.py --output outputs/releases
-git tag -a v0.1.4 -m "Spider Workbench 0.1.4"
-git push origin v0.1.4
+git tag -a v0.1.7 -m "Spider Workbench 0.1.7"
+git push origin v0.1.7
 ```
 
-在 GitHub Releases 创建 v0.1.4，附生成的源码 ZIP 与 SHA256SUMS.txt。Release 文案建议：
+Release 同时附 spider-workbench-0.1.7-install.zip、spider-workbench-0.1.7-source.zip 和 SHA256SUMS.txt；README 默认稳定下载指向 install 包，用户操作仍只有打开文件夹并发送提示词。source 包保留有效回归测试，供开发者使用；install 包按代码中的 developer_path 规则排除开发文件，另生成有效清单。main 明确为开发分支。
 
-> Spider Workbench 0.1.4 deployment release: resumable installation, official Stable Chrome for Testing installer, runtime preflight, UTF-8 process checks, separate host acceptance, standard-library runner, evidence-based routing, 13 agent Skills, JSReverser MCP source integration and Playwright CDP diagnostics. Includes an offline three-record example, empty registry, contributor docs and CI definitions. Browser binaries, credentials, business datasets and historical collectors are excluded. Browser process ownership checks are currently verified on Windows; actual host loading and target collection require separate acceptance.
+发布后下载远端两包逐文件校验，并核对 source 包与远端 Git 树；不能要求精简包与整个 Git 树相同。记录真实执行的 CI、离线检查、MCP 构建/调用范围；新电脑完整安装及每个宿主实际调用单独验收，未执行写待验收，不复用历史结论。
 
-若尚未执行云端 CI/浏览器验收，照实写未执行，不把本地旧报告当新版本证据。
+## 公开前检查
+
+确认目标仍是框架仓库，排除旧业务、个人配置、运行记录和浏览器；检查所有可达 Git 历史中的高置信秘密格式和私人路径，仅报告位置不回显秘密。模式扫描不能保证覆盖未知凭据；结合人工审查和 GitHub 可用的 Secret scanning/Push protection。若发现真实秘密，先撤销凭据，再安排历史清理，不直接强推改写协作者历史。
+
+按账户实际能力配置 main 的必要 CI、禁止强推/删除和 PR 流程。Private 仓库若因套餐不支持分支保护，记录该限制并在公开前启用；不为启用功能擅自改 Public。私密漏洞报告的 API 返回不可用不能推断已启用；公开前核验真正可用的私密报告渠道，禁止让用户把漏洞细节发公开 Issue。
 
 ## 8. 后续维护
 

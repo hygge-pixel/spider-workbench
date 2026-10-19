@@ -41,7 +41,7 @@
 - 默认 MCP 为 js-reverse，连接 chrome/9222。生成器只输出 js-reverse；--write-project-mcp 只适用于已确认使用 mcpServers 格式的项目配置。同名冲突先审核，保留其它服务与个人配置；初始化、只读调用和宿主实际加载分别验收。
 - JSReverser 由 `scripts/start_js_reverser.mjs` 在核对浏览器归属后启动，材料隔离到 `runs/_mcp/`。工具诊断和合成页面检查不构成第二个业务采集入口。
 - Scrapling/Camoufox 只能用 `scripts/setup_optional_backend.py` 显式安装到 `tmp/runtimes/<backend>/`；由 `spider_core.optional_backends.execute_optional_backend` 调用。路由不会安装/升级后端。
-- 框架版完整交付检查入口：`python scripts/run_full_regression.py`；Windows 也可用 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run_full_regression.ps1`。这是本包的交付文件、语法、元数据、Skill 发现和离线合同检查，不运行开发测试，也不代表真实站点验收。
+- 框架版完整交付检查入口：`python scripts/run_full_regression.py`；Windows 也可用 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run_full_regression.ps1`。源码仓库默认执行交付检查和有效开发测试；精简安装包只执行交付检查。部署器使用 --delivery-only，不安装开发依赖。两者都不代表真实站点验收。
 - 交付前运行实际检查，说明范围和限制；不把本地离线通过写成目标电脑部署成功。
 
 ## 常用命令

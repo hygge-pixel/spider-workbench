@@ -49,8 +49,16 @@ def make_plan(release, target, *, accept_local=()):
     if release == target or release in target.parents or target in release.parents:
         raise ValueError('release and target must be separate non-nested directories')
     current = manifest(release)
-    baseline_path = release / 'upgrade/v1_manifest.sha256.json'
-    baseline = manifest(release, 'upgrade/v1_manifest.sha256.json')
+    baseline_path = safe(target, 'MANIFEST.sha256.json')
+    if baseline_path.exists():
+        # A malformed installed manifest is an error, never permission to use
+        # an unrelated historical baseline and overwrite local work.
+        baseline = manifest(target)
+        baseline_source = 'target_manifest'
+    else:
+        baseline_path = release / 'upgrade/v1_manifest.sha256.json'
+        baseline = manifest(release, 'upgrade/v1_manifest.sha256.json')
+        baseline_source = 'legacy_v1_manifest'
     accepted = set(accept_local)
     changes, conflicts, preserved = [], [], []
     expected = dict(current['files'])
@@ -88,6 +96,9 @@ def make_plan(release, target, *, accept_local=()):
             conflicts.append(name)
     return {'target': str(target), 'changes': changes, 'conflicts': sorted(conflicts),
             'preserved': sorted(preserved), 'accept_local': sorted(accepted),
+            'baseline_source': baseline_source,
+            'obsolete_framework_files': sorted(name for name in baseline['files']
+                if name not in expected and name not in PROTECTED_FILES and not name.startswith(PROTECTED_PREFIXES)),
             'scope': 'framework-owned changed/new files only; local tasks, registry, state and configs preserved'}
 
 

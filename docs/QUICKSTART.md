@@ -6,7 +6,7 @@
 
 ## 1. 选择体验层级
 
-只看运行合同：Python 3.11 即可运行离线示例。开发/跑完整交付检查：再准备 Node 24+ 与 pytest。需要浏览器逆向：安装隔离工具链、本机独立浏览器、生成 MCP 配置并逐层验收。
+只看运行合同：Python 3.11 即可运行离线示例。交付检查再准备 Node 24+；源码开发回归默认使用标准库 unittest，发现 pytest 风格测试时再在开发环境安装 requirements-dev.txt。需要浏览器逆向：安装隔离工具链、本机独立浏览器、生成 MCP 配置并逐层验收。
 
 推荐先通过离线示例，再安装完整工具。无需先登录任何网站或提供密码/Cookie。
 
@@ -43,11 +43,11 @@ canonical 内容在 skills/。setup 仅建立 .agents/skills、.claude/skills、
 
 ## 4. 开发环境
 
-推荐与业务工具环境分开建立测试环境：
+仅贡献者需要开发测试环境；安装用户由部署 Agent 完成环境配置。建议隔离开发环境：
 
 ```powershell
 py -3.11 -m venv .venv
-& ./.venv/Scripts/python.exe -m pip install -r requirements-collection.txt
+& ./.venv/Scripts/python.exe -m pip install -r requirements-dev.txt
 & ./.venv/Scripts/python.exe scripts/run_full_regression.py --node $nodeExecutable
 ```
 
@@ -55,7 +55,7 @@ POSIX：
 
 ```bash
 python3.11 -m venv .venv
-.venv/bin/python -m pip install -r requirements-collection.txt
+.venv/bin/python -m pip install -r requirements-dev.txt
 .venv/bin/python scripts/run_full_regression.py --node "$(command -v node)"
 ```
 
