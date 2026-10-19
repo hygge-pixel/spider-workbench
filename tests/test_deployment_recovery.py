@@ -106,7 +106,7 @@ class RecoveryTests(unittest.TestCase):
             with mock.patch.object(toolchain, 'ROOT', root), mock.patch.object(toolchain.subprocess, 'run', return_value=mock.Mock(stdout='v24.22.0')):
                 toolchain.configure(python, node, entry)
             result = json.loads(config.read_text('utf-8'))
-            self.assertEqual(result['browser_toolchain']['python_executable'], str(python))
+            self.assertEqual(result['browser_toolchain']['python_executable'], str(python.resolve()))
             self.assertEqual(result['unrelated'], 'preserved')
             self.assertFalse(result['runtime_bootstrap']['toolchain_pending'])
 

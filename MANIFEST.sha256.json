@@ -249,7 +249,7 @@
     "tests/test_chrome_only_agent_entries.py": "185c06a9741fef591690637af4fa0dbde1b259937a86c1300bf9db643840d052",
     "tests/test_cli.py": "3b78550c7421f98a05a797611ebfb723da6560b0aa1ee3e19c5024478dbc7bfd",
     "tests/test_deploy.py": "9b5fb278bd5e6a7d5693f9295b45122f36d591ed58e61101540b7651ea867d08",
-    "tests/test_deployment_recovery.py": "594cc34ef2a70c7c749c58ac270d2b2238557507bbfaea41ac591163c0a0c2a7",
+    "tests/test_deployment_recovery.py": "1d960f38176ea56af1cb601fb8c2ca89b5fad85929009ad6d271d6ec179d02a8",
     "tests/test_distribution_integrity.py": "a2e0bc054cb73065b47d2c57206222693a737b8dd7a6d07fe34f929f05b69d4a",
     "tests/test_evidence_safety.py": "1f48ed42e11ed99f6b66de5dccf94862566deb1f32be23899618eafc1b651148",
     "tests/test_example_local.py": "666cd42938b135f2c443b9e1ffa90a3393199030e128754062f81a9d6338d22d",
