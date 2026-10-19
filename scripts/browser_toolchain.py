@@ -168,9 +168,14 @@ def configure(python, node, entry, *, write_project=False, replace_managed=False
     managed = {'python_executable': str(python), 'node_executable': str(node), 'js_reverser_entry': str(entry)}
     prior = data.get('browser_toolchain', {})
     bootstrap = data.get('runtime_bootstrap', {})
+    def same_path(left, right):
+        return (isinstance(left, str) and bool(left) and isinstance(right, str) and bool(right)
+                and os.path.normcase(str(Path(left).resolve())) == os.path.normcase(str(Path(right).resolve())))
     initial_runtime = (bootstrap.get('toolchain_pending') is True and not prior.get('js_reverser_entry')
-                       and prior == {'python_executable': bootstrap.get('python'), 'node_executable': str(node)}
-                       and bootstrap.get('node') == str(node))
+                       and set(prior) == {'python_executable', 'node_executable'}
+                       and same_path(prior.get('python_executable'), bootstrap.get('python'))
+                       and same_path(prior.get('node_executable'), str(node))
+                       and same_path(bootstrap.get('node'), str(node)))
     if 'browser_toolchain' in data and prior != managed and not replace_managed and not initial_runtime:
         raise ValueError('existing toolchain settings differ; review before --replace-managed')
     data['browser_toolchain'] = managed

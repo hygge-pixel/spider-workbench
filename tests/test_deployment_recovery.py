@@ -97,10 +97,12 @@ class RecoveryTests(unittest.TestCase):
             base, python, node, entry = [root / value for value in ('base-python', 'tool-python', 'node', 'entry')]
             for path in (base, python, node, entry):
                 path.write_bytes(b'fixture')
+            (root / 'alias').mkdir()
+            recorded_node = str(root / 'alias' / '..' / 'node')
             config = root / 'config/agent_tools.local.json'
             config.parent.mkdir()
-            config.write_text(json.dumps({'unrelated': 'preserved', 'browser_toolchain': {'python_executable': str(base), 'node_executable': str(node)},
-                               'runtime_bootstrap': {'python': str(base), 'node': str(node), 'toolchain_pending': True}}))
+            config.write_text(json.dumps({'unrelated': 'preserved', 'browser_toolchain': {'python_executable': str(base), 'node_executable': recorded_node},
+                               'runtime_bootstrap': {'python': str(base), 'node': recorded_node, 'toolchain_pending': True}}))
             with mock.patch.object(toolchain, 'ROOT', root), mock.patch.object(toolchain.subprocess, 'run', return_value=mock.Mock(stdout='v24.22.0')):
                 toolchain.configure(python, node, entry)
             result = json.loads(config.read_text('utf-8'))
