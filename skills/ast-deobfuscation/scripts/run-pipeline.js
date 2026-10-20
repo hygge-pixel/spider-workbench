@@ -115,6 +115,7 @@ function main() {
     failedStep: report.failedStep,
     lastGoodFile: report.lastGoodFile
   })}\n`);
+  if (report.status !== "ok") process.exitCode = 1;
 }
 
 if (require.main === module) {

@@ -4,7 +4,7 @@
 
 | 声明 | 内容 | 安装位置 |
 |---|---|---|
-| requirements-collection.txt | Playwright1.57.0、requests2.32.5、httpx0.28.1、curl_cffi0.13.0、beautifulsoup4 4.15.0 | .venv-toolchain |
+| requirements-collection.txt | Playwright1.57.0、requests2.33.0、httpx0.28.1、curl_cffi0.15.0、beautifulsoup4 4.15.0 | .venv-toolchain |
 | 根 package-lock.json | Babel AST 依赖 | 根 node_modules，本机安装 |
 | skills/ast-deobfuscation/package-lock.json | 专项 AST 依赖 | 按该 Skill 需要局部安装 |
 | vendor/js-reverse-mcp/package-lock.json | JSReverser2.0.3 构建与运行依赖 | vendor 局部 node_modules / build |

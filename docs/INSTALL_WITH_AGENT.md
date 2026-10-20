@@ -24,3 +24,5 @@
 新会话先运行 deploy.py status，读取 last_acceptance 中最后阶段和 live_health 实时结果。浏览器关闭时运行 spider.py browser ensure 或重连宿主 MCP；历史 completed 不等于当前资源在线。若只是宿主重连，直接继续宿主验收；若阶段失败则修复原因后 apply，复用已验证依赖和缓存。超过有效期或源码/配置改变时重新执行技术验收，不搬用历史成功布尔值。
 
 完整性检查遇本机修复时保留原 manifest，审核逐文件 before/after、理由及测试结果；仅对精确匹配的已审核补丁建立本机记录。未知变化继续停止，不能批量刷新清单掩盖差异。
+
+部署交付回归复用这份精确补丁记录，仅接受对应的哈希差异，并继续检查内容、路径、结构、Python/JS 语法和 JSON。报告中的 original_distribution_passed=false 与 reviewed_local_changes 表示本机审核安装通过；原始源码发布扫描与打包仍要求原清单字节一致。

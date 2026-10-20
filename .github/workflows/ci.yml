@@ -65,4 +65,4 @@ jobs:
       - run: npm run build
         working-directory: vendor/js-reverse-mcp
       - run: python scripts/browser_toolchain.py mcp-smoke --candidate chrome --stdio-only
-      - run: node --test tests/mcp_lifecycle.test.mjs
+      - run: node --test tests/mcp_lifecycle.test.mjs tests/mcp_deobfuscation.test.mjs

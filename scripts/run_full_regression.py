@@ -13,10 +13,18 @@ if str(ROOT) not in sys.path:
 
 def verify_source(root):
     from scripts.check_public_release import scan
+    from scripts.verify_distribution import verify_installation
     root = Path(root)
     report = scan(root)
+    local_changes = {}
     if not report['passed']:
-        raise ValueError('source_release_checks_failed; run scripts/check_public_release.py for locations')
+        installation = verify_installation(root)
+        reviewed = installation.get('reviewed_local_changes', [])
+        if not (installation['passed'] and reviewed and report.get('issues') and all(
+                item['rule'] == 'hash_mismatch' and item['path'] in reviewed
+                for item in report['issues'])):
+            raise ValueError('source_release_checks_failed; run scripts/check_public_release.py for locations')
+        local_changes = {'original_distribution_passed': False, 'reviewed_local_changes': reviewed}
     manifest = json.loads((root / 'MANIFEST.sha256.json').read_text(encoding='utf-8'))
     python_count = json_count = 0
     for name in manifest['files']:
@@ -28,7 +36,7 @@ def verify_source(root):
             json.loads(path.read_text(encoding='utf-8-sig'))
             json_count += 1
     return {'passed': True, 'source_files': len(manifest['files']) + 1,
-            'python_sources': python_count, 'json_files': json_count}
+            'python_sources': python_count, 'json_files': json_count, **local_changes}
 
 
 def verify_workspace(root, node=None):

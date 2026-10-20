@@ -38,10 +38,7 @@ function replaceStatement(path, node) {
     path.remove();
     return;
   }
-  if (t.isBlockStatement(node)) {
-    path.replaceWithMultiple(node.body);
-    return;
-  }
+  // Keep the selected block's lexical scope (let/const and captured bindings).
   path.replaceWith(node);
 }
 

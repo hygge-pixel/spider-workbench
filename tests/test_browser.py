@@ -558,5 +558,62 @@ class BrowserRuntimeTests(BrowserConfigTests):
             self.assertTrue(browser_module._windows_process_matches(config))
 
 
+class WindowsOwnershipBoundaryTests(unittest.TestCase):
+    def setUp(self):
+        self.config = BrowserConfig(executable=Path('D:/Apps/Chrome/chrome.exe'),
+            cdp_url='http://127.0.0.1:9222', user_data_dir=Path('D:/项目 Profile/chrome'),
+            startup_timeout_seconds=5)
+
+    def matches(self, command, executable=None):
+        response = SimpleNamespace(returncode=0, stdout=json.dumps([{
+            'ExecutablePath': str(executable or self.config.executable), 'CommandLine': command}]))
+        with mock.patch.object(browser_module, 'os', SimpleNamespace(name='nt')), \
+             mock.patch.object(browser_module.subprocess, 'run', return_value=response):
+            return browser_module._windows_process_matches(self.config)
+
+    def test_matching_arguments_preserve_spaces_quotes_unicode_and_windows_paths(self):
+        profile = str(self.config.user_data_dir)
+        cases = [
+            subprocess.list2cmdline([str(self.config.executable), '--remote-debugging-port=9222',
+                                    '--user-data-dir=' + profile]),
+            f'chrome.exe --remote-debugging-port="9222" --user-data-dir="{profile}"',
+            subprocess.list2cmdline(['chrome.exe', '--remote-debugging-port=9222',
+                                    '--user-data-dir=' + profile.replace('/', '\\') + '\\']),
+        ]
+        for command in cases:
+            with self.subTest(command=command): self.assertTrue(self.matches(command))
+
+    def test_prefixes_embedded_flags_and_wrong_executable_do_not_prove_ownership(self):
+        profile = str(self.config.user_data_dir)
+        cases = [
+            # Ownership follows the launcher's explicit --switch=value form;
+            # a separate following argument does not establish that value.
+            ['--remote-debugging-port', '9222', '--user-data-dir', profile],
+            ['--remote-debugging-port=92220', '--user-data-dir=' + profile],
+            ['--remote-debugging-port=9222', '--user-data-dir=' + profile + '-other'],
+            ['--remote-debugging-port=9222', '--user-data-dir=' + profile + '/child'],
+            ['--remote-debugging-port=9222', '--note=--user-data-dir=' + profile],
+            ['--note=--remote-debugging-port=9222', '--user-data-dir=' + profile],
+            ['--note=--remote-debugging-port=9222 --user-data-dir=' + profile],
+        ]
+        for arguments in cases:
+            with self.subTest(arguments=arguments):
+                self.assertFalse(self.matches(subprocess.list2cmdline(['chrome.exe', *arguments])))
+        self.assertFalse(self.matches(subprocess.list2cmdline(['chrome.exe',
+            '--remote-debugging-port=9222', '--user-data-dir=' + profile]), 'D:/Other/chrome.exe'))
+
+    def test_duplicate_ownership_switches_are_ambiguous(self):
+        correct = ['--remote-debugging-port=9222', '--user-data-dir=' + str(self.config.user_data_dir)]
+        for duplicate in ('--remote-debugging-port=92220', '--user-data-dir=D:/other-profile'):
+            for arguments in ([*correct, duplicate], [duplicate, *correct]):
+                with self.subTest(arguments=arguments):
+                    self.assertFalse(self.matches(subprocess.list2cmdline(['chrome.exe', *arguments])))
+
+    def test_unbalanced_quotes_remain_unverified(self):
+        command = 'chrome.exe --remote-debugging-port=9222 --user-data-dir="' + str(self.config.user_data_dir)
+        with self.assertRaisesRegex(WorkspaceBrowserError, '^browser_ownership_unverified$'):
+            self.matches(command)
+
+
 if __name__ == "__main__":
     unittest.main()

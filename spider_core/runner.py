@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import signal
 import subprocess
 import sys
 import uuid
@@ -20,6 +21,7 @@ from .browser import (
     ensure_workspace_browser,
 )
 from .evidence_safety import scrub_run_evidence
+from .collector_package import package_hashes
 from .routing import CollectionEvidence, RouteDecision, RoutingError, decide_route
 
 
@@ -49,6 +51,52 @@ class RunOutcome:
 
 
 BrowserEnsurer = Callable[[Path], dict[str, Any]]
+
+
+def _run_process(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+    """Run the collector directly; clean up its process tree only on timeout."""
+    timeout = kwargs.pop("timeout")
+    kwargs.pop("capture_output", None)
+    kwargs.pop("check", None)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               start_new_session=os.name != "nt", **kwargs)
+    try:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            cleanup_failed = False
+            if os.name != "nt":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                except OSError:
+                    cleanup_failed = True
+            else:
+                try:
+                    cleanup = subprocess.run(
+                        ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                        timeout=5, check=False, creationflags=subprocess.CREATE_NO_WINDOW,
+                    )
+                    cleanup_failed = cleanup.returncode != 0
+                except (OSError, subprocess.SubprocessError):
+                    cleanup_failed = True
+            if process.poll() is None:
+                process.kill()
+            try:
+                stdout, stderr = process.communicate(timeout=5)
+            except subprocess.TimeoutExpired as error:
+                cleanup_failed = True
+                stdout, stderr = _timeout_text(error.stdout), _timeout_text(error.stderr)
+            if cleanup_failed:
+                stderr += "\ncollector process tree cleanup could not be confirmed\n"
+            raise subprocess.TimeoutExpired(command, timeout, stdout, stderr) from None
+        return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)
 
 
 def _utc_now() -> str:
@@ -102,7 +150,10 @@ def _redact(value: Any, secret_values: set[str]) -> Any:
 
 def _scrub_file(path: Path, secret_values: set[str]) -> None:
     if path.is_file() and secret_values:
-        content = path.read_text(encoding="utf-8")
+        try:
+            content = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            return  # The evidence scanner and output readers record this failure.
         scrubbed = _scrub_text(content, secret_values)
         if scrubbed != content:
             path.write_text(scrubbed, encoding="utf-8")
@@ -152,7 +203,7 @@ def _completion_contract(task: dict[str, Any]) -> tuple[str, int, int | None]:
     mode = raw.get("mode", "sample")
     if mode not in {"all", "at_least", "sample"}:
         raise RunError("completion.mode must be all, at_least, or sample")
-    min_records = raw.get("min_records", 1)
+    min_records = raw.get("min_records", 0 if raw.get("expected_total") == 0 else 1)
     if not isinstance(min_records, int) or isinstance(min_records, bool) or min_records < 0:
         raise RunError("completion.min_records must be a non-negative integer")
     expected_total = raw.get("expected_total")
@@ -164,6 +215,8 @@ def _completion_contract(task: dict[str, Any]) -> tuple[str, int, int | None]:
         raise RunError("completion.expected_total must be a non-negative integer")
     if mode != "all" and expected_total is not None:
         raise RunError("completion.expected_total is only valid in all mode")
+    if expected_total is not None and expected_total < min_records:
+        raise RunError("completion.expected_total must be at least min_records")
     return mode, min_records, expected_total
 
 
@@ -299,6 +352,8 @@ def _read_rows(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
         lines = path.read_text(encoding="utf-8").splitlines()
     except FileNotFoundError:
         return rows, ["normalized.jsonl is missing"]
+    except (OSError, UnicodeError):
+        return rows, ["normalized.jsonl is unreadable UTF-8 text"]
     for line_number, line in enumerate(lines, start=1):
         if not line.strip():
             continue
@@ -352,6 +407,9 @@ def _read_collector_result(path: Path, errors: list[str]) -> dict[str, Any]:
     except json.JSONDecodeError as error:
         errors.append(f"collector_result.json is invalid: {error.msg}")
         return {}
+    except (OSError, UnicodeError):
+        errors.append("collector_result.json is unreadable UTF-8 text")
+        return {}
     if not isinstance(loaded, dict):
         errors.append("collector_result.json must contain an object")
         return {}
@@ -379,6 +437,8 @@ def _classify_completion(
         return ("completed" if records >= min_records else "partial"), "sample"
     if mode == "at_least":
         return ("completed" if records >= min_records else "partial"), "partial"
+    if records < min_records:
+        return "partial", "partial"
     if expected_total is not None:
         if records == expected_total:
             return "completed", "complete"
@@ -405,12 +465,21 @@ def run_collector(
     if not entrypoint.is_file():
         raise RunError(f"collector is missing: {entrypoint}")
     collector_sha256 = hashlib.sha256(entrypoint.read_bytes()).hexdigest()
+    try:
+        collector_files = package_hashes(entrypoint)
+    except (OSError, ValueError, SyntaxError) as error:
+        raise RunError("invalid collector package: " + str(error)) from None
     task = _read_task(task_path)
     unknown_task_fields = set(task) - TASK_FIELDS
     if unknown_task_fields:
         raise RunError(f"task has unknown fields: {sorted(unknown_task_fields)}")
     secret_values = _secret_strings(task)
     task_required, task_unique = _validation_contract(task)
+    effective_required = (task_required if required_fields is None else
+                          tuple(dict.fromkeys((*required_fields, *task_required))))
+    if unique_key is not None and task_unique is not None and unique_key != task_unique:
+        raise RunError("validation.unique_key conflicts with the registered unique_key")
+    effective_unique = unique_key if unique_key is not None else task_unique
     mode, min_records, expected_total = _completion_contract(task)
     explicit_browser = _browser_contract(task)
     routing_contract = _routing_contract(task)
@@ -476,8 +545,6 @@ def run_collector(
     browser_required = explicit_browser or _session_evidence_requires_browser(
         routing_evidence
     )
-    effective_required = required_fields if required_fields is not None else task_required
-    effective_unique = unique_key if unique_key is not None else task_unique
     browser_result: dict[str, Any] | None = None
     if browser_required:
         try:
@@ -521,13 +588,14 @@ def run_collector(
         str(run_dir),
     ]
     timed_out = False
+    start_failed = False
     collector_exit_code: int | None
     try:
         collector_environment = {**os.environ, "PYTHONIOENCODING": "utf-8"}
         collector_environment.pop(CAPTCHA_PERMISSION_ENV, None)
         if allow_captcha:
             collector_environment[CAPTCHA_PERMISSION_ENV] = CAPTCHA_PERMISSION_VALUE
-        process = subprocess.run(
+        process = _run_process(
             command,
             cwd=root,
             capture_output=True,
@@ -546,11 +614,16 @@ def run_collector(
         stdout = _timeout_text(error.stdout)
         stderr = _timeout_text(error.stderr)
         collector_exit_code = None
+    except OSError:
+        start_failed = True
+        stdout, stderr = "", "collector process could not be started"
+        collector_exit_code = None
     try:
         collector_unchanged = (
             hashlib.sha256(entrypoint.read_bytes()).hexdigest() == collector_sha256
+            and package_hashes(entrypoint) == collector_files
         )
-    except OSError:
+    except (OSError, ValueError, SyntaxError):
         collector_unchanged = False
     (run_dir / "stdout.log").write_text(
         _scrub_text(stdout, secret_values), encoding="utf-8"
@@ -624,10 +697,14 @@ def run_collector(
     }
     if expected_total is not None:
         run_payload["expected_total"] = expected_total
+    if collector_files is not None:
+        run_payload["collector_files"] = collector_files
     if runtime_captcha:
         run_payload["stop_reason"] = "captcha_user_instruction_required"
     elif timed_out:
         run_payload["stop_reason"] = "collector_timeout"
+    elif start_failed:
+        run_payload["stop_reason"] = "collector_start_failed"
     if route_preference is not None:
         run_payload["route_preference"] = route_preference
     (run_dir / "run.json").write_text(

@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from .collector_package import package_hashes
 from .registry import load_registry
 
 
@@ -153,6 +154,11 @@ def _latest_verified_run(
     except OSError:
         warnings.append(f"{collector.parent.name}: collector is unreadable")
         return None
+    try:
+        current_files = package_hashes(collector)
+    except (OSError, ValueError, SyntaxError) as error:
+        warnings.append(f"{collector.parent.name}: collector package is invalid or unreadable: {error}")
+        return None
     run_dirs = sorted(
         (path for path in runs_dir.iterdir() if path.is_dir()),
         key=lambda path: path.name,
@@ -175,6 +181,8 @@ def _latest_verified_run(
             result,
             result_error,
         )
+        if evidence_error is None and run_payload.get("collector_files") != current_files:
+            evidence_error = "collector_files do not match current collector package; rerun the collector"
         if evidence_error is not None:
             if newest_invalid_warning is None:
                 newest_invalid_warning = (

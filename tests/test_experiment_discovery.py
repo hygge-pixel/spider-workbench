@@ -298,6 +298,67 @@ class ExperimentDiscoveryTests(unittest.TestCase):
         self.assertEqual(view.experiments, ())
         self.assertEqual(view.warnings, ())
 
+    def test_package_evidence_requires_all_current_file_hashes_without_mutation(self) -> None:
+        from spider_core.collector_package import package_hashes
+        for change in ('changed', 'missing', 'invalid_manifest', 'removed_manifest', 'no_package_evidence'):
+            with self.subTest(change=change):
+                collector = self.create_experiment(change, capability={
+                    'platform_id': 'demo', 'id': change, 'files': ['helper.py']})
+                helper = collector.parent / 'helper.py'
+                helper.write_text('VALUE=1\n', encoding='utf-8')
+                run = self.add_run(change, collector)
+                payload = json.loads((run / 'run.json').read_text('utf-8'))
+                payload['collector_files'] = package_hashes(collector)
+                self.write_json(run / 'run.json', payload)
+                self.assertEqual(next(item for item in discover_experiments(self.root).experiments
+                                      if item.name == change).status, 'verified_unregistered')
+                if change == 'changed':
+                    helper.write_text('VALUE=2\n', encoding='utf-8')
+                elif change == 'missing':
+                    helper.unlink()
+                elif change == 'invalid_manifest':
+                    self.write_json(collector.parent / 'capability.json', {'files': 'helper.py'})
+                elif change == 'removed_manifest':
+                    self.write_json(collector.parent / 'capability.json', {'platform_id': 'demo', 'id': change})
+                else:
+                    del payload['collector_files']; self.write_json(run / 'run.json', payload)
+                before = {path: path.read_bytes() for path in run.iterdir()}
+                view = discover_experiments(self.root)
+                item = next(item for item in view.experiments if item.name == change)
+                self.assertEqual(item.status, 'unverified')
+                self.assertIsNone(item.latest_verified_run)
+                self.assertTrue(any(warning.startswith(change + ':') and
+                                    ('package' in warning or 'collector_files' in warning)
+                                    for warning in view.warnings), view.warnings)
+                self.assertEqual(before, {path: path.read_bytes() for path in run.iterdir()})
+
+    def test_empty_explicit_package_requires_manifest_evidence_but_legacy_does_not(self) -> None:
+        from spider_core.collector_package import package_hashes
+        collector = self.create_experiment('explicit', capability={
+            'platform_id': 'demo', 'id': 'explicit', 'files': []})
+        run = self.add_run('explicit', collector)
+        self.assertEqual(discover_experiments(self.root).experiments[0].status, 'unverified')
+        payload = json.loads((run / 'run.json').read_text('utf-8'))
+        payload['collector_files'] = package_hashes(collector)
+        self.write_json(run / 'run.json', payload)
+        legacy = self.create_experiment('legacy')
+        self.add_run('legacy', legacy)
+        view = discover_experiments(self.root)
+        self.assertEqual([item.status for item in view.experiments],
+                         ['verified_unregistered', 'verified_unregistered'])
+        self.assertEqual(view.warnings, ())
+
+    def test_invalid_package_is_local_and_does_not_hide_legacy_success(self) -> None:
+        bad = self.create_experiment('bad', capability={'platform_id': 'demo', 'id': 'bad'})
+        self.add_run('bad', bad)
+        (bad.parent / 'capability.json').write_bytes(b'\xff')
+        good = self.create_experiment('good')
+        self.add_run('good', good)
+        view = discover_experiments(self.root)
+        self.assertEqual([item.status for item in view.experiments],
+                         ['unverified', 'verified_unregistered'])
+        self.assertTrue(any('bad:' in warning and 'package' in warning for warning in view.warnings))
+
 
 if __name__ == "__main__":
     unittest.main()

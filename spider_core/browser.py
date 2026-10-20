@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+import ntpath
 import os
 import socket
 import subprocess
@@ -323,8 +324,48 @@ def _try_probe(config: BrowserConfig, probe: Probe) -> dict[str, Any] | None:
         return None
 
 
-def _normalized_command_line(value: str) -> str:
-    return value.replace('"', "").replace("\\", "/").casefold()
+def _windows_command_line_args(value: str) -> list[str]:
+    """Split Windows quote/backslash syntax without treating flag values as flags."""
+    arguments, current = [], []
+    quoted = started = False
+    index = 0
+    if '\0' in value:
+        raise ValueError('invalid command line')
+    while index < len(value):
+        if value[index] in ' \t' and not quoted:
+            if started:
+                arguments.append(''.join(current))
+                current, started = [], False
+            index += 1
+            continue
+        started = True
+        if value[index] == '\\':
+            start = index
+            while index < len(value) and value[index] == '\\':
+                index += 1
+            count = index - start
+            if index == len(value) or value[index] != '"':
+                current.append('\\' * count)
+                continue
+            current.append('\\' * (count // 2))
+            if count % 2:
+                current.append('"')
+                index += 1
+                continue
+        if value[index] == '"':
+            if quoted and index + 1 < len(value) and value[index + 1] == '"':
+                current.append('"')
+                index += 2
+                continue
+            quoted = not quoted
+        else:
+            current.append(value[index])
+        index += 1
+    if quoted:
+        raise ValueError('unbalanced command line quotes')
+    if started:
+        arguments.append(''.join(current))
+    return arguments
 
 
 def _windows_process_matches(config: BrowserConfig) -> bool:
@@ -369,7 +410,7 @@ def _windows_process_matches(config: BrowserConfig) -> bool:
         raise WorkspaceBrowserError('browser_ownership_unverified') from None
 
     expected_executable = config.executable.as_posix().casefold()
-    expected_profile = config.user_data_dir.as_posix().casefold()
+    expected_profile = ntpath.normcase(ntpath.normpath(str(config.user_data_dir)))
     expected_port = urlsplit(config.cdp_url).port
     incomplete = False
     for process in processes:
@@ -382,11 +423,23 @@ def _windows_process_matches(config: BrowserConfig) -> bool:
             incomplete = True
             continue
         normalized_executable = executable.replace("\\", "/").casefold()
-        normalized_command = _normalized_command_line(command_line)
+        if normalized_executable != expected_executable:
+            continue
+        try:
+            arguments = _windows_command_line_args(command_line)
+        except ValueError:
+            incomplete = True
+            continue
+        switches = {'--remote-debugging-port': [], '--user-data-dir': []}
+        for argument in arguments[1:]:
+            name, _, value = argument.partition('=')
+            name = name.casefold()
+            if name in switches:
+                switches[name].append(value)
         if (
-            normalized_executable == expected_executable
-            and f"--remote-debugging-port={expected_port}" in normalized_command
-            and f"--user-data-dir={expected_profile}" in normalized_command
+            switches['--remote-debugging-port'] == [str(expected_port)]
+            and len(switches['--user-data-dir']) == 1
+            and ntpath.normcase(ntpath.normpath(switches['--user-data-dir'][0])) == expected_profile
         ):
             return True
     if incomplete:

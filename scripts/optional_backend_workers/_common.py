@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import codecs
 import ipaddress
 import socket
 from typing import Any, Mapping
@@ -142,15 +143,13 @@ def bounded_text(
     raw = content.encode("utf-8") if isinstance(content, str) else bytes(content)
     truncated = len(raw) > limit
     raw = raw[:limit]
-    selected_encoding = encoding or "utf-8"
-    while raw:
-        try:
-            return raw.decode(selected_encoding), truncated
-        except LookupError:
-            selected_encoding = "utf-8"
-        except UnicodeDecodeError:
-            raw = raw[:-1]
-    return "", truncated
+    try:
+        decoder = codecs.getincrementaldecoder(encoding or "utf-8")
+    except LookupError:
+        decoder = codecs.getincrementaldecoder("utf-8")
+    # A real size cut may leave one incomplete trailing character. Interior
+    # errors, or incomplete input without a size cut, must fail explicitly.
+    return decoder(errors="strict").decode(raw, final=not truncated), truncated
 
 
 def make_result(

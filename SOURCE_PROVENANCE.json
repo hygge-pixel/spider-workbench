@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "public_version": "0.1.9",
-  "prepared_on": "2026-10-19",
+  "public_version": "0.1.10",
+  "prepared_on": "2026-10-20",
   "base_edition": "framework-toolchain-v2",
   "base_archive_sha256": "288eb774d3ac139e06093c8869b407350f715fb5e558f051a1007ae906297091",
   "original_core_files": {
@@ -32,7 +32,8 @@
     "0.1.6: delivery-only source tree; remove developer suites, evaluations, duplicate notes and pytest dependency; retain explicit production acceptance",
     "0.1.7: restore maintained source tests; separate install/source bundles; target-version upgrades and explicit compatibility/acceptance scope",
     "0.1.8: distinguish unknown/denied browser ownership from mismatch; read-only health uses current MCP context, not a secondary browser runtime",
-    "0.1.9: documentation-only usability clarification; historical sandbox reproduction is not a default installation step; current user-reported host evidence and limitations"
+    "0.1.9: documentation-only usability clarification; historical sandbox reproduction is not a default installation step; current user-reported host evidence and limitations",
+    "0.1.10: audited decoder, package proof and runner reliability fixes; maintained dependency pins"
   ],
   "original_git_history_included": false,
   "legacy_collectors_or_data_included": false,

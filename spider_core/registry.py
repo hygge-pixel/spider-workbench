@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from .collector_package import package_hashes
 
 
 class RegistryError(ValueError):
@@ -93,6 +94,8 @@ def _portable_proof_status(
         return "missing", f"{selector}: proof is missing"
     try:
         payload = json.loads(proof.read_text(encoding="utf-8"))
+    except UnicodeError:
+        return "stale", f"{selector}: proof is unreadable UTF-8"
     except (OSError, json.JSONDecodeError):
         return "stale", f"{selector}: proof is invalid JSON"
     if not isinstance(payload, dict):
@@ -119,7 +122,7 @@ def _portable_proof_status(
     validation = payload.get("validation")
     observed = payload.get("observed")
     if (
-        set(payload) != allowed_top_level
+        set(payload) not in (allowed_top_level, allowed_top_level | {"collector_files"})
         or not isinstance(validation, dict)
         or set(validation) != allowed_validation
         or not isinstance(observed, dict)
@@ -174,6 +177,12 @@ def _portable_proof_status(
     actual_hash = hashlib.sha256(entrypoint.read_bytes()).hexdigest()
     if actual_hash != expected_hash:
         return "stale", f"{selector}: proof collector hash does not match entrypoint"
+    try:
+        current_files = package_hashes(entrypoint)
+    except (OSError, ValueError, SyntaxError):
+        return "stale", f"{selector}: invalid collector package"
+    if payload.get("collector_files") != current_files:
+        return "stale", f"{selector}: proof collector files do not match package"
     return "verified", None
 
 

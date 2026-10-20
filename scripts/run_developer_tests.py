@@ -85,7 +85,7 @@ def main():
         else:
             print('[node-tests] no Node test files in this framework edition', flush=True)
         if (ROOT / 'vendor/js-reverse-mcp/build/src/McpContext.js').is_file():
-            stage('mcp-lifecycle', [args.node, '--test', str(ROOT / 'tests/mcp_lifecycle.test.mjs')])
+            stage('mcp-regressions', [args.node, '--test', *map(str, files('tests', '*.test.mjs'))])
         else:
             print('[mcp-lifecycle] build not installed; covered by separate mcp-build CI job', flush=True)
         count = 0

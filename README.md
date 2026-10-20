@@ -4,7 +4,7 @@
 
 你描述网站、数据范围和交付要求，Agent 在同一个工作区里完成环境部署、接口分析、采集实现、样本校验和结果整理。框架将项目规则、13 个通用 Skills、浏览器工具链、统一运行入口与运行证据组织在一起，让每个任务都有清楚的起点、过程和结果。
 
-[下载稳定版 v0.1.9](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.9/spider-workbench-0.1.9-install.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
+[下载稳定版 v0.1.10](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
 
 ## 为什么使用 Spider Workbench？
 

@@ -2,6 +2,9 @@
 import hashlib
 import json
 import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -32,6 +35,101 @@ class SourcePatchTests(unittest.TestCase):
             self.assertFalse(verify_distribution.verify(root)['passed'], 'original provenance must remain unchanged')
             source.write_text('unreviewed followup', encoding='utf-8')
             self.assertFalse(fn(root)['passed'])
+
+
+class SourcePatchDeliveryTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        source = Path(__file__).resolve().parents[1]
+        manifest = json.loads((source / 'MANIFEST.sha256.json').read_text('utf-8'))
+        for name in (*manifest['files'], 'MANIFEST.sha256.json'):
+            target = self.root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source / name, target)
+        # This isolated fixture includes the newly written tests before the
+        # maintainer refreshes the real source manifest. Establish its own baseline.
+        for name in manifest['files']:
+            manifest['files'][name] = hashlib.sha256((self.root / name).read_bytes()).hexdigest()
+        (self.root / 'MANIFEST.sha256.json').write_bytes(
+            (json.dumps(manifest, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
+        self.original_manifest = (self.root / 'MANIFEST.sha256.json').read_bytes()
+
+    def approve(self, name, content):
+        from hashlib import sha256
+        path = self.root / name
+        path.write_text(content, encoding='utf-8')
+        manifest = json.loads(self.original_manifest)['files']
+        record = {'schema_version': 1, 'manifest_sha256': sha256(self.original_manifest).hexdigest(),
+                  'files': {name: {'before': manifest[name], 'after': sha256(path.read_bytes()).hexdigest(),
+                                   'reviewed': True, 'reason': 'synthetic reviewed maintenance'}}}
+        destination = self.root / 'config/source_patches.local.json'
+        destination.write_text(json.dumps(record), encoding='utf-8')
+        return destination
+
+    def test_reviewed_patch_passes_delivery_but_still_fails_original_release(self):
+        from scripts.run_full_regression import verify_source
+        from scripts.check_public_release import scan
+        from scripts.release import build_release
+        self.approve('README.md', (self.root / 'README.md').read_text('utf-8') + '\nLocal reviewed note.\n')
+        self.assertTrue(verify_distribution.verify_installation(self.root)['passed'])
+        self.assertFalse(scan(self.root)['passed'])
+        result = verify_source(self.root)
+        self.assertTrue(result['passed'])
+        self.assertFalse(result['original_distribution_passed'])
+        self.assertEqual(result['reviewed_local_changes'], ['README.md'])
+        with self.assertRaises(ValueError):
+            build_release(self.root, self.root / 'outputs/forbidden-release')
+        self.assertEqual((self.root / 'MANIFEST.sha256.json').read_bytes(), self.original_manifest)
+
+    def test_real_delivery_cli_accepts_reviewed_patch_without_refreshing_manifest(self):
+        self.approve('README.md', (self.root / 'README.md').read_text('utf-8') + '\nLocal reviewed note.\n')
+        result = subprocess.run([sys.executable, str(self.root / 'scripts/run_full_regression.py'),
+                                 '--delivery-only'], cwd=self.root, capture_output=True, text=True,
+                                encoding='utf-8', timeout=60,
+                                env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1', SPIDER_PYTHON=sys.executable))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report['source']['reviewed_local_changes'], ['README.md'])
+        self.assertFalse(report['source']['original_distribution_passed'])
+        self.assertEqual(report['offline_records'], 3)
+        self.assertEqual((self.root / 'MANIFEST.sha256.json').read_bytes(), self.original_manifest)
+
+    def test_delivery_rejects_missing_unreviewed_and_stale_approval(self):
+        from scripts.run_full_regression import verify_source
+        path = self.root / 'README.md'
+        original = path.read_text('utf-8')
+        for change in ('unreviewed', 'stale_manifest', 'followup', 'missing'):
+            with self.subTest(change=change):
+                record_path = self.approve('README.md', original + '\nLocal note.\n')
+                record = json.loads(record_path.read_text('utf-8'))
+                if change == 'unreviewed': record['files']['README.md']['reviewed'] = False
+                elif change == 'stale_manifest': record['manifest_sha256'] = '0' * 64
+                elif change == 'followup': path.write_text(original + '\nDifferent followup.\n', encoding='utf-8')
+                else: path.unlink()
+                record_path.write_text(json.dumps(record), encoding='utf-8')
+                with self.assertRaises(ValueError): verify_source(self.root)
+
+    def test_approval_does_not_bypass_content_structure_or_syntax_checks(self):
+        from scripts.run_full_regression import verify_source
+        original = (self.root / 'README.md').read_text('utf-8')
+        for suffix in ('\ngh' + 'p_' + 'A' * 36, '\n[bad](missing-local-fixture.md)\n',
+                       '\nC:' + '/Users/' + 'private-owner/fixture.py\n'):
+            with self.subTest(suffix=suffix[:12]):
+                self.approve('README.md', original + suffix)
+                self.assertTrue(verify_distribution.verify_installation(self.root)['passed'])
+                with self.assertRaises(ValueError): verify_source(self.root)
+        source = Path(__file__).resolve().parents[1]
+        shutil.copy2(source / 'README.md', self.root / 'README.md')
+        self.approve('platforms/registry.json', '{"schema_version":1,"platforms":[{}]}')
+        self.assertTrue(verify_distribution.verify_installation(self.root)['passed'])
+        with self.assertRaises(ValueError): verify_source(self.root)
+        # Restore exact original bytes before switching the approved file.
+        shutil.copy2(source / 'platforms/registry.json', self.root / 'platforms/registry.json')
+        self.approve('spider_core/routing.py', 'def broken(:\n')
+        self.assertTrue(verify_distribution.verify_installation(self.root)['passed'])
+        with self.assertRaises(SyntaxError): verify_source(self.root)
 
 
 class ResumeTests(unittest.TestCase):
@@ -71,6 +169,7 @@ class ResumeTests(unittest.TestCase):
 
 
 class RuntimeChoiceTests(unittest.TestCase):
+    @mock.patch.dict(os.environ, {'SPIDER_PYTHON': ''})
     def test_project_config_and_explicit_runtime_have_consistent_priority(self):
         from spider_core.project_runtime import select_python
         with tempfile.TemporaryDirectory() as directory:

@@ -348,6 +348,24 @@ class CliTests(unittest.TestCase):
         listed = json.loads(self.run_cli("list", "--json").stdout)
         self.assertEqual(listed["capabilities"][0]["selector"], "demo/items")
 
+    def test_registered_and_direct_runs_enforce_stricter_task_fields(self) -> None:
+        experiment, task_path = self.create_experiment()
+        initial = self.run_cli("run", str(experiment / "collector.py"), "--task", str(task_path))
+        self.assertEqual(initial.returncode, 0, initial.stderr)
+        registered = self.run_cli("register", str(experiment), "--proof-run", json.loads(initial.stdout)["run_dir"])
+        self.assertEqual(registered.returncode, 0, registered.stderr)
+        task = json.loads(task_path.read_text("utf-8"))
+        task["validation"]["required_fields"].append("author")
+        self.write_json(task_path, task)
+        for target in (str(experiment / "collector.py"), "demo/items"):
+            with self.subTest(target=target):
+                result = self.run_cli("run", target, "--task", str(task_path))
+                self.assertEqual(result.returncode, 1, result.stderr)
+                payload = json.loads(result.stdout)
+                self.assertEqual(payload["status"], "failed")
+                validation = json.loads((Path(payload["run_dir"]) / "validation.json").read_text("utf-8"))
+                self.assertIn("author", validation["required_fields"])
+
     def test_refresh_proof_emits_verified_machine_readable_result(self) -> None:
         experiment, task_path = self.create_experiment()
         direct_run = json.loads(

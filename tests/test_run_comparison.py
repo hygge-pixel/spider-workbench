@@ -2,6 +2,11 @@ from __future__ import annotations
 
 import json
 import hashlib
+import os
+import re
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -91,6 +96,25 @@ class RunComparisonTests(unittest.TestCase):
         self.assertNotIn("collected_at", report["changed_fields_on_shared_ids"])
         self.assertNotIn("shared_ids", report)
         self.assertNotIn("old only", json.dumps(report))
+
+    def test_documented_compare_command_writes_inside_current_run(self) -> None:
+        source = Path(__file__).resolve().parents[1]
+        text = (source / 'docs/EVIDENCE.md').read_text('utf-8')
+        command = re.search(r'^python spider\.py compare .+$', text, re.M).group().split()
+        baseline = self.make_run('BASELINE_RUN', [{'id': '1', 'title': 'before'}])
+        current = self.make_run('CURRENT_RUN', [{'id': '1', 'title': 'after'}])
+        original = {path: path.read_bytes() for directory in (baseline, current) for path in directory.iterdir()}
+        shutil.copy2(source / 'spider.py', self.root / 'spider.py')
+        shutil.copytree(source / 'spider_core', self.root / 'spider_core',
+                        ignore=shutil.ignore_patterns('__pycache__'))
+        result = subprocess.run([sys.executable, *command[1:]], cwd=self.root,
+            capture_output=True, text=True, encoding='utf-8', timeout=15,
+            env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1'))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        output = current / 'comparison.json'
+        self.assertTrue(output.is_file())
+        self.assertEqual(json.loads(output.read_text('utf-8'))['shared_unique_ids'], 1)
+        self.assertEqual(original, {path: path.read_bytes() for path in original})
 
     def test_additional_ignored_fields_are_applied(self) -> None:
         baseline = self.make_run(

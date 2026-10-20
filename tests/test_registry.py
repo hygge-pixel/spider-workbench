@@ -143,6 +143,42 @@ class RegistryTests(unittest.TestCase):
         )
         self.assertFalse(any("proof" in warning for warning in view.warnings))
 
+    def test_unreadable_proof_is_local_and_healthy_capability_still_runs(self) -> None:
+        from spider_core.runner import run_collector
+        broken = self.collector()
+        bad_proof = broken.parent / 'proof.json'
+        bad_proof.write_bytes(b'\xff\xfe{broken proof}')
+        healthy = self.root / 'platforms/demo/healthy/collector.py'
+        healthy.parent.mkdir(parents=True)
+        healthy.write_text('''import argparse,json
+from pathlib import Path
+p=argparse.ArgumentParser();p.add_argument('--task');p.add_argument('--output-dir');a=p.parse_args()
+out=Path(a.output_dir)
+(out/'normalized.jsonl').write_text(json.dumps({'id':'1','title':'healthy'})+'\\n',encoding='utf-8')
+(out/'collector_result.json').write_text(json.dumps({'route':'http','backend':'python','source_exhausted':True}),encoding='utf-8')
+''', encoding='utf-8')
+        good_proof = self.write_proof(healthy, overrides={'selector': 'demo/healthy',
+            'verified_at': datetime.now(timezone.utc).isoformat()})
+        bad = self.valid_capability(proof='platforms/demo/items/proof.json')
+        good = self.valid_capability(id='healthy', entrypoint='platforms/demo/healthy/collector.py',
+                                     proof='platforms/demo/healthy/proof.json')
+        bad.pop('proof_run'); good.pop('proof_run')
+        self.write_registry([self.platform([bad, good])])
+        evidence = {path: path.read_bytes() for path in
+                    (bad_proof, good_proof, self.root / 'platforms/registry.json')}
+        view = load_registry(self.root)
+        self.assertEqual([item.proof_status for item in view.capabilities], ['stale', 'verified'])
+        self.assertTrue(all(item.available for item in view.capabilities))
+        self.assertTrue(any('demo/items' in warning and 'unreadable' in warning and 'UTF-8' in warning
+                            for warning in view.warnings), view.warnings)
+        capability = find_capability(self.root, 'demo/healthy')
+        task = self.root / 'task.json'
+        self.write_json(task, {'completion': {'mode': 'all', 'expected_total': 1},
+                               'validation': {'unique_key': 'id', 'required_fields': ['id', 'title']}})
+        self.assertEqual(run_collector(self.root, capability.entrypoint, task,
+                                      selector=capability.selector).status, 'completed')
+        self.assertEqual(evidence, {path: path.read_bytes() for path in evidence})
+
     def test_changed_collector_makes_portable_proof_stale(self) -> None:
         collector = self.collector()
         self.write_proof(collector)

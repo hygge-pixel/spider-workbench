@@ -18,10 +18,10 @@
 compare 用于两份已验证运行的聚合差异：
 
 ```console
-python spider.py compare runs/BASELINE_RUN runs/CURRENT_RUN --output outputs/comparison.json
+python spider.py compare runs/BASELINE_RUN runs/CURRENT_RUN --output runs/CURRENT_RUN/comparison.json
 ```
 
-替换为真实目录；变化可能来自来源、日期或采集逻辑，需先解释语义。失败或未验证运行不能当可信基线。
+替换为真实目录；输出必须是 CURRENT_RUN 目录下尚不存在的直接子文件，不能覆盖运行证据。变化可能来自来源、日期或采集逻辑，需先解释语义。失败或未验证运行不能当可信基线。
 
 ## 数据保存
 

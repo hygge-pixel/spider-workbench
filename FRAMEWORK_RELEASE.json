@@ -1,7 +1,7 @@
 {
   "edition": "public-source",
-  "version": "0.1.9",
-  "prepared_on": "2026-10-19",
+  "version": "0.1.10",
+  "prepared_on": "2026-10-20",
   "upgrade_from": "framework-only-2026-10-16",
   "default_browser_preference": "chrome",
   "browser_endpoints": {
@@ -23,5 +23,5 @@
   "browser_install_channel": "Stable",
   "browser_downloads_metadata": "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json",
   "browser_deployment_work_order": "docs/INSTALL_WITH_AGENT.md",
-  "preparation_status": "source-release"
+  "preparation_status": "release"
 }

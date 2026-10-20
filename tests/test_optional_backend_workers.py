@@ -71,6 +71,24 @@ class RoutePage:
 
 
 class CommonWorkerTests(unittest.TestCase):
+    def test_decode_errors_are_not_silently_trimmed_into_success(self) -> None:
+        for raw, limit in ((b'before\xffafter', 1024), (b'before\xffafter', 10),
+                           (b'before\xe4\xbd', 1024)):
+            with self.subTest(raw=raw, limit=limit), self.assertRaises(UnicodeDecodeError):
+                _common.bounded_text(raw, limit)
+
+    def test_only_actual_size_truncation_can_drop_an_incomplete_tail(self) -> None:
+        cases = [
+            ('你好'.encode('utf-8'), 4, 'utf-8', ('你', True)),
+            ('你好'.encode('utf-8'), 6, 'utf-8', ('你好', False)),
+            ('你好'.encode('utf-16-le'), 3, 'utf-16-le', ('你', True)),
+            (b'plain', 9, 'unknown-fixture-codec', ('plain', False)),
+            (b'', 8, 'utf-8', ('', False)),
+        ]
+        for raw, limit, encoding, expected in cases:
+            with self.subTest(encoding=encoding, limit=limit):
+                self.assertEqual(_common.bounded_text(raw, limit, encoding), expected)
+
     def test_validate_request_requires_exact_typed_wire_contract(self) -> None:
         missing = payload("scrapling_static")
         del missing["headers"]
@@ -190,6 +208,23 @@ class ScraplingWorkerTests(unittest.TestCase):
                     )
                 if backend == "scrapling_stealth":
                     self.assertFalse(kwargs["solve_cloudflare"])
+
+    def test_bad_response_bytes_fail_the_real_worker_path_without_success_json(self) -> None:
+        request = payload('scrapling_static'); request['max_content_bytes'] = 1024
+        actual_run = scrapling_worker.run_request
+        stdout = io.StringIO(); stderr = io.StringIO()
+        with (
+            mock.patch.object(FakeScraplingPage, 'body', b'<p>before</p>\xff<p>after</p>'),
+            mock.patch.object(scrapling_worker, 'run_request', side_effect=lambda item: actual_run(
+                item, fetchers=self.fetchers, resolver=public_resolver)),
+            mock.patch.object(scrapling_worker.sys, 'stdin', io.StringIO(json.dumps(request))),
+            mock.patch.object(scrapling_worker.sys, 'stdout', stdout),
+            mock.patch.object(scrapling_worker.sys, 'stderr', stderr),
+        ):
+            self.assertEqual(scrapling_worker.main(), 2)
+        self.assertEqual(stdout.getvalue(), '')
+        self.assertEqual(json.loads(stderr.getvalue()), {'error': 'backend_failed'})
+        self.assertNotIn('before', stderr.getvalue())
 
     def test_dynamic_page_setup_installs_public_route_guard(self) -> None:
         scrapling_worker.run_request(

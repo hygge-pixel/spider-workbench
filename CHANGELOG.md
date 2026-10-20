@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.10 — 2026-10-20
+
+- Accept exact manifest-bound reviewed local source patches during deployment regression while retaining content, path, structure and syntax checks; original release scanning and packaging stay strict.
+- Match Windows browser ownership using complete parsed port/profile arguments; reject prefixes, embedded lookalikes and duplicate ownership switches without changing permission handling.
+- Fail optional workers on invalid response bytes instead of silently dropping the suffix; only a real size cut may omit an incomplete final character. Return nonzero for failed/timed-out AST pipelines while retaining reports and the last successful output; align the compare example with its protected output contract.
+- Check statically resolvable package-module and relative imports, including existing package initializers, against explicit capability.files; require a fresh run after fixing the manifest and continue copying only declared files.
+- Recheck whole-package hashes during experiment discovery; warn on changed/missing helpers or invalid manifests while preserving legacy single-file evidence and historical runs.
+- Degrade only an unreadable UTF-8 proof to stale, keeping healthy registry capabilities discoverable and usable.
+- Preserve registered validation requirements and enforce additional Task fields; reject conflicting unique keys before starting resources. Task structure and proof metadata are unchanged.
+- Remove non-equivalent main-pipeline string-table, nested escape and identifier rewrites, including the shared table that contaminated sequential/concurrent requests; preserve double negation and selected lexical blocks in the AST Skill. Add executable parity and CLI regressions without new dependencies.
+- Remove host execution of untrusted AAEncode/JSFuck/JJEncode decoder input; parse Packer parameters and VM string arrays as literal data. Unsupported dynamic decoding preserves input and returns warnings.
+- Key deobfuscation cache by complete source and output-affecting options. Add maintained MCP security/correctness regressions to local checks and CI.
+- Add explicit capability.files source allowlists and whole-package proof hashes; reject undeclared local helper imports at registration and preserve legacy single-file proofs.
+- Enforce minimum counts in all completion modes and finalize evidence for unreadable output/start failures. Keep direct collector execution; on timeout use Windows taskkill /T or a POSIX process group, recording cleanup failures. Existing redaction rules are unchanged.
+- Maintain requests 2.33.0, curl_cffi 0.15.0 and developer pytest 9.0.3 pins for the reviewed advisories. No new site collectors, browser installation or host configuration changes.
+
 ## 0.1.9 — 2026-10-19
 
 - Documentation and release metadata only; collection core, browser/MCP logic, dependencies and deployment stages are unchanged from 0.1.8. Existing working deployments need no rebuild or redeployment for this release.

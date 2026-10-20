@@ -1,3 +1,5 @@
+// Modified by Spider Workbench, 2026-10-19: static decoder data and complete-input cache identity.
+// Modified by Spider Workbench, 2026-10-20: remove non-equivalent table, escape, coercion and renaming rewrites.
 /**
  * 反混淆主管线
  *
@@ -6,7 +8,7 @@
  *   2. JSVMPDeobfuscator   — JSVMP 虚拟机保护还原
  *   3. AdvancedDeobfuscator — 高级混淆 (invisible-unicode, 控制流平坦化, 不透明谓词, 死代码…)
  *   4. ASTOptimizer         — 通用 AST 优化 (常量折叠/传播, 变量内联, 序列展开…)
- *   5. 基础管线             — 字符串数组提取/替换, 字符串解码, 表达式简化, 变量重命名
+ *   5. 基础管线             — 常量折叠与表达式简化，保留字符串表、转义文本和变量名
  *   6. LLM 辅助分析        — 可选，利用 AI 做语义分析
  *
  * 设计原则：
@@ -64,7 +66,6 @@ export class Deobfuscator {
   private universalUnpacker: UniversalUnpacker;
 
   // 缓存
-  private stringArrays: Map<string, string[]> = new Map();
   private resultCache = new Map<string, DeobfuscateResult>();
   private maxCacheSize = 100;
 
@@ -110,7 +111,7 @@ export class Deobfuscator {
 
       // ── Step 1: Packer / AAEncode / URLEncode 自动解包 ──
       if (this.shouldRun(options.unpack, autoMode, obfuscationType, ['packer', 'aaencode', 'urlencoded', 'eval-obfuscation'])) {
-        code = await this.runUnpack(code, transformations);
+        code = await this.runUnpack(code, transformations, pipelineWarnings);
       }
 
       // ── Step 2: JSVMP 虚拟机保护还原 ──
@@ -127,11 +128,9 @@ export class Deobfuscator {
       }
 
       // ── Step 4: 基础管线 ──
-      // 字符串数组提取 + 替换
-      code = await this.extractStringArrays(code, transformations);
+      // Name-only string tables are unsafe under mutation, shadowing and concurrent calls.
+      pipelineWarnings.push('String-table inlining and nested escape decoding are disabled; expressions are preserved.');
       code = await this.basicTransform(code, transformations);
-      code = await this.decodeStrings(code, transformations);
-      code = await this.decryptArrays(code, transformations);
 
       // 控制流平坦化还原（基础版，仅 aggressive 时）
       if (options.aggressive) {
@@ -146,9 +145,9 @@ export class Deobfuscator {
         code = await this.runASTOptimizer(code, transformations);
       }
 
-      // ── Step 6: 变量重命名 ──
+      // Preserve identifiers until binding, property and dynamic-name equivalence is established.
       if (options.renameVariables) {
-        code = await this.renameVariables(code, transformations);
+        pipelineWarnings.push('Variable renaming skipped; original bindings and property names are preserved.');
       }
 
       // ── Step 7: LLM 辅助分析 ──
@@ -216,7 +215,7 @@ export class Deobfuscator {
   /**
    * Packer / AAEncode / URLEncode 解包
    */
-  private async runUnpack(code: string, transformations: Transformation[]): Promise<string> {
+  private async runUnpack(code: string, transformations: Transformation[], warnings: string[]): Promise<string> {
     try {
       logger.info('Running UniversalUnpacker...');
       const result = await this.universalUnpacker.deobfuscate(code);
@@ -228,6 +227,7 @@ export class Deobfuscator {
         });
         return result.code;
       }
+      warnings.push(`${result.type}: dynamic decoding disabled or no static literal decoder matched; input preserved`);
     } catch (error) {
       logger.warn('UniversalUnpacker failed', error);
       transformations.push({ type: 'unpack', description: 'UniversalUnpacker failed', success: false });
@@ -595,132 +595,6 @@ export class Deobfuscator {
   }
 
   /**
-   * 字符串解码 (hex / unicode)
-   */
-  private async decodeStrings(code: string, transformations: Transformation[]): Promise<string> {
-    try {
-      const ast = parser.parse(code, { sourceType: 'module', plugins: ['jsx', 'typescript'] });
-      let decoded = 0;
-
-      traverse(ast, {
-        StringLiteral(path) {
-          const value = path.node.value;
-          let newValue = value;
-
-          // 十六进制
-          if (value.includes('\\x')) {
-            newValue = newValue.replace(/\\x([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-          }
-          // Unicode
-          if (value.includes('\\u')) {
-            newValue = newValue.replace(/\\u([0-9A-Fa-f]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-          }
-
-          if (newValue !== value) {
-            path.node.value = newValue;
-            decoded++;
-          }
-        },
-      });
-
-      if (decoded > 0) {
-        const output = generate(ast, { comments: true, compact: false });
-        transformations.push({ type: 'string-decode', description: `Decoded ${decoded} strings (hex/unicode)`, success: true });
-        return output.code;
-      }
-      return code;
-    } catch (error) {
-      logger.warn('String decoding failed', error);
-      transformations.push({ type: 'string-decode', description: 'Failed', success: false });
-      return code;
-    }
-  }
-
-  /**
-   * 提取字符串数组 (JavaScript Obfuscator 特有)
-   */
-  private async extractStringArrays(code: string, transformations: Transformation[]): Promise<string> {
-    try {
-      const ast = parser.parse(code, { sourceType: 'module', plugins: ['jsx', 'typescript'] });
-      let extracted = 0;
-
-      traverse(ast, {
-        VariableDeclarator: (path) => {
-          if (
-            t.isIdentifier(path.node.id) &&
-            path.node.id.name.startsWith('_0x') &&
-            t.isArrayExpression(path.node.init)
-          ) {
-            const arrayName = path.node.id.name;
-            const strings: string[] = [];
-            path.node.init.elements.forEach((el) => {
-              if (t.isStringLiteral(el)) strings.push(el.value);
-            });
-            if (strings.length > 0) {
-              this.stringArrays.set(arrayName, strings);
-              extracted++;
-              logger.debug(`Extracted string array: ${arrayName} (${strings.length} strings)`);
-            }
-          }
-        },
-      });
-
-      if (extracted > 0) {
-        transformations.push({ type: 'extract-string-arrays', description: `Extracted ${extracted} string arrays`, success: true });
-      }
-      return code;
-    } catch (error) {
-      logger.warn('String array extraction failed', error);
-      transformations.push({ type: 'extract-string-arrays', description: 'Failed', success: false });
-      return code;
-    }
-  }
-
-  /**
-   * 数组解密 (替换字符串数组引用)
-   */
-  private async decryptArrays(code: string, transformations: Transformation[]): Promise<string> {
-    if (this.stringArrays.size === 0) return code;
-
-    try {
-      const ast = parser.parse(code, { sourceType: 'module', plugins: ['jsx', 'typescript'] });
-      let replaced = 0;
-      const arrays = this.stringArrays;
-
-      traverse(ast, {
-        MemberExpression(path) {
-          if (
-            t.isIdentifier(path.node.object) &&
-            t.isNumericLiteral(path.node.property) &&
-            path.node.object.name.startsWith('_0x')
-          ) {
-            const arr = arrays.get(path.node.object.name);
-            const idx = path.node.property.value;
-            if (arr && idx >= 0 && idx < arr.length) {
-              const value = arr[idx];
-              if (value !== undefined) {
-                path.replaceWith(t.stringLiteral(value));
-                replaced++;
-              }
-            }
-          }
-        },
-      });
-
-      if (replaced > 0) {
-        const output = generate(ast, { comments: true, compact: false });
-        transformations.push({ type: 'decrypt-arrays', description: `Replaced ${replaced} array references`, success: true });
-        return output.code;
-      }
-      return code;
-    } catch (error) {
-      logger.warn('Array decryption failed', error);
-      transformations.push({ type: 'decrypt-arrays', description: 'Failed', success: false });
-      return code;
-    }
-  }
-
-  /**
    * 控制流平坦化还原 (基础版)
    */
   private async unflattenControlFlow(code: string, transformations: Transformation[]): Promise<string> {
@@ -808,17 +682,9 @@ export class Deobfuscator {
 
       traverse(ast, {
         UnaryExpression(path) {
-          // !!value → Boolean(value) 保持语义但更清晰（这里直接保留原值）
-          if (
-            path.node.operator === '!' &&
-            t.isUnaryExpression(path.node.argument) &&
-            path.node.argument.operator === '!'
-          ) {
-            path.replaceWith(path.node.argument.argument);
-            simplified++;
-          }
+          // Preserve double negation: !!value is a boolean, not the operand's value.
           // void 0 → undefined
-          else if (path.node.operator === 'void' && t.isNumericLiteral(path.node.argument, { value: 0 })) {
+          if (path.node.operator === 'void' && t.isNumericLiteral(path.node.argument, { value: 0 })) {
             path.replaceWith(t.identifier('undefined'));
             simplified++;
           }
@@ -847,50 +713,6 @@ export class Deobfuscator {
     } catch (error) {
       logger.warn('Expression simplification failed', error);
       transformations.push({ type: 'simplify-expressions', description: 'Failed', success: false });
-      return code;
-    }
-  }
-
-  /**
-   * 变量重命名
-   */
-  private async renameVariables(code: string, transformations: Transformation[]): Promise<string> {
-    try {
-      const ast = parser.parse(code, { sourceType: 'module', plugins: ['jsx', 'typescript'] });
-      let renamed = 0;
-      const renameMap = new Map<string, string>();
-
-      // 第一遍：收集需要重命名的变量
-      traverse(ast, {
-        VariableDeclarator(path) {
-          if (t.isIdentifier(path.node.id) && path.node.id.name.startsWith('_0x')) {
-            const oldName = path.node.id.name;
-            const newName = `var_${renamed}`;
-            renameMap.set(oldName, newName);
-            renamed++;
-          }
-        },
-      });
-
-      // 第二遍：使用 scope 安全重命名
-      if (renameMap.size > 0) {
-        traverse(ast, {
-          Identifier(path) {
-            const newName = renameMap.get(path.node.name);
-            if (newName) {
-              path.node.name = newName;
-            }
-          },
-        });
-
-        const output = generate(ast, { comments: true, compact: false });
-        transformations.push({ type: 'rename-variables', description: `Renamed ${renamed} variables`, success: true });
-        return output.code;
-      }
-      return code;
-    } catch (error) {
-      logger.warn('Variable renaming failed', error);
-      transformations.push({ type: 'rename-variables', description: 'Failed', success: false });
       return code;
     }
   }
@@ -936,15 +758,19 @@ export class Deobfuscator {
 
   private generateCacheKey(options: DeobfuscateFullOptions): string {
     const key = JSON.stringify({
-      code: options.code.substring(0, 1000),
+      code: options.code,
       aggressive: options.aggressive,
       advanced: options.advanced,
       jsvmp: options.jsvmp,
       astOptimize: options.astOptimize,
       unpack: options.unpack,
       auto: options.auto,
+      renameVariables: options.renameVariables,
+      aggressiveVM: options.aggressiveVM,
+      timeout: options.timeout,
+      llm: options.llm,
     });
-    return crypto.createHash('md5').update(key).digest('hex');
+    return crypto.createHash('sha256').update(key).digest('hex');
   }
 
   private cacheResult(key: string, result: DeobfuscateResult): void {
@@ -958,6 +784,5 @@ export class Deobfuscator {
   /** 清除缓存 */
   clearCache(): void {
     this.resultCache.clear();
-    this.stringArrays.clear();
   }
 }

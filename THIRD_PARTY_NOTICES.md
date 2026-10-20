@@ -1,5 +1,9 @@
 # Third-party notices and provenance
 
+Unreleased Spider Workbench audit fixes modify bundled Deobfuscator.ts, PackerDeobfuscator.ts and JSVMPDeobfuscator.ts and add staticValue.ts: full-input cache keys and static decoder-data parsing replace host execution of untrusted decoder input. Original notices remain in place; these are local adaptations, not a claim about upstream behavior.
+
+The 2026-10-20 local Deobfuscator adaptation removes shared name-based string-table inlining, nested escape decoding and unsafe identifier renaming, and preserves double-negation coercion. These conservative changes do not expand dynamic decoding or change the original snapshot hashes.
+
 The root [Apache-2.0 license](LICENSE) covers original contributions. It does not replace the licenses below. Preserve these files when redistributing or extracting the corresponding material. Browser binaries, installed dependencies, customer records, credentials and third-party host applications are not included.
 
 | Component / consulted source | Scope and modification | License / retained text |

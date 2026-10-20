@@ -1,3 +1,4 @@
+// Modified by Spider Workbench, 2026-10-19: static decoder data and complete-input cache identity.
 /**
  * Packer反混淆器
  * 专门用于处理Dean Edwards' Packer混淆的JavaScript代码
@@ -14,6 +15,7 @@
  */
 
 import { logger } from '../../utils/logger.js';
+import {staticValue} from './staticValue.js';
 
 /**
  * Packer反混淆选项
@@ -135,12 +137,14 @@ export class PackerDeobfuscator {
     d: Function;
   } | null {
     try {
-      // 使用Function构造器安全地解析参数
-      // eslint-disable-next-line no-new-func
-      const parseFunc = new Function(`return [${argsString}];`);
-      const params = parseFunc();
+      const parsed = staticValue(`[${argsString}]`);
+      if (!Array.isArray(parsed)) return null;
+      const params = parsed;
 
-      if (params.length < 4) {
+      if (params.length < 4 || typeof params[0] !== 'string'
+          || !Number.isInteger(params[1]) || params[1] < 2 || params[1] > 62
+          || !Number.isInteger(params[2]) || params[2] < 0 || params[2] > 100000
+          || !(typeof params[3] === 'string' || (Array.isArray(params[3]) && params[3].every(x => typeof x === 'string')))) {
         return null;
       }
 
@@ -148,9 +152,9 @@ export class PackerDeobfuscator {
         p: params[0] || '',
         a: params[1] || 0,
         c: params[2] || 0,
-        k: (params[3] || '').split('|'),
-        e: params[4] || function (c: any) { return c; },
-        d: params[5] || function () { return ''; },
+        k: typeof params[3] === 'string' ? params[3].split('|') : params[3],
+        e: function (c: unknown) { return c; },
+        d: function () { return ''; },
       };
     } catch {
       return null;
@@ -239,13 +243,9 @@ export class AAEncodeDeobfuscator {
     logger.info('😊 开始AAEncode反混淆...');
 
     try {
-      // AAEncode本质上是可执行的JavaScript
-      // 使用Function构造器执行并获取结果
-      // eslint-disable-next-line no-new-func
-      const decoded = new Function(`return (${code})`)();
-
-      logger.info('✅ AAEncode反混淆完成');
-      return decoded;
+      // Preserve unsupported executable encodings; never run them in the MCP host.
+      logger.warn('AAEncode dynamic decoding disabled; input preserved for isolated analysis');
+      return code;
     } catch (error) {
       logger.error('AAEncode反混淆失败', error);
       return code;

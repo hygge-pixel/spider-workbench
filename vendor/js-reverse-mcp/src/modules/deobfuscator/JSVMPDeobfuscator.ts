@@ -1,9 +1,11 @@
+// Modified by Spider Workbench, 2026-10-19: static decoder data and complete-input cache identity.
 /**
  * JSVMP反混淆器
  * 识别和破解JavaScript虚拟机保护（JSVMP）混淆
  */
 
 import * as parser from '@babel/parser';
+import {staticValue} from './staticValue.js';
 import traverseImport from '@babel/traverse';
 const traverse = (traverseImport as unknown as {default?: typeof traverseImport}).default ?? traverseImport;
 import generateImport from '@babel/generator';
@@ -511,9 +513,8 @@ export class JSVMPDeobfuscator {
         logger.info(`🔍 发现字符串数组: ${arrayName}`);
 
         try {
-          // 尝试解析字符串数组（使用Function构造器更安全）
-          const arrayFunc = new Function(`return ${arrayContent || '[]'};`);
-          const stringArray = arrayFunc();
+          // Parse literal array data; input expressions are never executed.
+          const stringArray = staticValue(arrayContent || '[]');
 
           if (Array.isArray(stringArray)) {
             logger.info(`✅ 成功解析字符串数组，包含 ${stringArray.length} 个字符串`);
@@ -622,45 +623,8 @@ export class JSVMPDeobfuscator {
     confidence: number;
     warnings: string[];
   }> {
-    try {
-      logger.info('🔍 检测到JSFuck混淆，尝试还原...');
-
-      // JSFuck代码通常非常长，直接执行可能会超时
-      // 我们尝试使用Function构造器执行它
-      try {
-        // 限制代码长度避免执行超时
-        if (code.length > 100000) {
-          warnings.push('JSFuck代码过长，本地执行可能超时，尝试AI分析...');
-          return await this.llmDecodeEncoding(code, 'JSFuck', warnings);
-        }
-
-        // 尝试执行JSFuck代码获取原始代码
-        const func = new Function(`return ${code};`);
-        const result = func();
-
-        if (typeof result === 'string') {
-          logger.info('✅ JSFuck还原成功');
-          return {
-            code: result,
-            confidence: 0.9,
-            warnings: ['JSFuck已成功还原'],
-          };
-        } else {
-          warnings.push('JSFuck执行结果不是字符串，尝试AI分析...');
-          return await this.llmDecodeEncoding(code, 'JSFuck', warnings);
-        }
-      } catch (execError) {
-        warnings.push(`JSFuck本地执行失败: ${execError}`);
-        return await this.llmDecodeEncoding(code, 'JSFuck', warnings);
-      }
-    } catch (error) {
-      warnings.push(`JSFuck还原失败: ${error}`);
-      return {
-        code,
-        confidence: 0.1,
-        warnings,
-      };
-    }
+    warnings.push('Dynamic JSFuck execution disabled; input preserved for isolated analysis');
+    return {code, confidence: 0, warnings};
   }
 
   /**
@@ -673,49 +637,8 @@ export class JSVMPDeobfuscator {
     confidence: number;
     warnings: string[];
   }> {
-    try {
-      logger.info('🔍 检测到JJEncode混淆，尝试还原...');
-
-      // JJEncode的还原方法：直接执行代码
-      try {
-        // 提取JJEncode的核心代码（通常在最后一行）
-        const lines = code.split('\n').filter((line) => line.trim());
-        const lastLine = lines.length > 0 ? lines[lines.length - 1] : '';
-
-        // JJEncode通常以 $$$$ 结尾
-        if (lastLine && lastLine.includes('$$$$')) {
-          // 尝试执行获取原始代码
-          const func = new Function(`${code}; return $$$$()`);
-          const result = func();
-
-          if (typeof result === 'string') {
-            logger.info('✅ JJEncode还原成功');
-            return {
-              code: result,
-              confidence: 0.9,
-              warnings: ['JJEncode已成功还原'],
-            };
-          }
-        }
-
-        // 如果上面的方法失败，尝试直接执行整个代码
-        const func2 = new Function(code);
-        func2();
-
-        warnings.push('JJEncode本地执行完成但无法提取原始代码，尝试AI分析...');
-        return await this.llmDecodeEncoding(code, 'JJEncode', warnings);
-      } catch (execError) {
-        warnings.push(`JJEncode本地执行失败: ${execError}`);
-        return await this.llmDecodeEncoding(code, 'JJEncode', warnings);
-      }
-    } catch (error) {
-      warnings.push(`JJEncode还原失败: ${error}`);
-      return {
-        code,
-        confidence: 0.1,
-        warnings,
-      };
-    }
+    warnings.push('Dynamic JJEncode execution disabled; input preserved for isolated analysis');
+    return {code, confidence: 0, warnings};
   }
 
   /**

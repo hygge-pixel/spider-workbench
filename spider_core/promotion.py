@@ -15,6 +15,7 @@ from typing import Any
 
 from .registry import RegistryError, find_capability, load_registry, write_registry
 from .runner import SECRET_FRAGMENTS
+from .collector_package import package_hashes
 
 
 IDENTIFIER = re.compile(r"^[a-z0-9_]+$")
@@ -107,7 +108,7 @@ def _metadata(path: Path) -> dict[str, Any]:
         raise PromotionError(
             "verification_ttl_days must be an integer from 1 to 3650"
         )
-    return {
+    normalized = {
         "platform_id": platform_id,
         "platform_name": platform_name,
         "id": capability_id,
@@ -118,6 +119,9 @@ def _metadata(path: Path) -> dict[str, Any]:
         "required_fields": [field.strip() for field in required_fields],
         "verification_ttl_days": verification_ttl_days,
     }
+    if "files" in payload:
+        normalized["files"] = payload["files"]
+    return normalized
 
 
 def _find_secret_key(value: Any, prefix: str = "") -> str | None:
@@ -167,6 +171,12 @@ def _validate_proof(
         or collector_sha256 != current_sha256
     ):
         raise PromotionError("proof run collector_sha256 does not match the collector")
+    try:
+        manifest = package_hashes(collector, require_declared_imports=True)
+    except (OSError, ValueError, SyntaxError) as error:
+        raise PromotionError(str(error)) from None
+    if run.get("collector_files") != manifest:
+        raise PromotionError("proof run collector_files do not match the declared source package; rerun collector")
     if validation.get("unique_key") != metadata["unique_key"]:
         raise PromotionError("proof validation unique_key does not match capability metadata")
     if validation.get("required_fields") != metadata["required_fields"]:
@@ -221,6 +231,8 @@ def _proof_snapshot(
     secret_key = _find_secret_key(snapshot)
     if secret_key:
         raise PromotionError(f"proof snapshot contains a secret-like key: {secret_key}")
+    if run.get("collector_files") is not None:
+        snapshot["collector_files"] = run["collector_files"]
     return snapshot
 
 
@@ -306,6 +318,16 @@ def promote_experiment(
     installed = False
     try:
         shutil.copy2(collector, staging / "collector.py")
+        for name in run.get("collector_files", {}):
+            if name == "collector.py":
+                continue
+            destination = staging / name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(experiment_dir / name, destination)
+        # Do not install changed bytes if a helper was edited while copying.
+        for name, digest in run.get("collector_files", {}).items():
+            if hashlib.sha256((staging / name).read_bytes()).hexdigest() != digest:
+                raise PromotionError("collector package changed during registration")
         (staging / "capability.json").write_text(
             json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",

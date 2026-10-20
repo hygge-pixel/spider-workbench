@@ -146,6 +146,44 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(saved_task["query"]["nested"]["Cookie"], "<redacted>")
         self.assertEqual((outcome.run_dir / "stdout.log").read_text(encoding="utf-8").strip(), "collector stdout")
 
+    def test_registry_fields_do_not_hide_stricter_task_validation(self) -> None:
+        task = self.task_for([{"id": "1", "title": "one"}], collector_result={
+            "source_exhausted": True, "route": "local", "backend": "python",
+        })
+        task["validation"]["required_fields"].append("author")
+        outcome = run_collector(self.root, self.collector, self.write_task(task),
+                                required_fields=("id", "title"), unique_key="id")
+        self.assertEqual(outcome.status, "failed")
+        validation = json.loads((outcome.run_dir / "validation.json").read_text("utf-8"))
+        self.assertIn("author", validation["required_fields"])
+        self.assertIn("required field is blank: author", "\n".join(validation["errors"]))
+
+    def test_stricter_task_can_pass_without_relaxing_registry_fields(self) -> None:
+        for row, expected in (({"id": "1", "author": "a"}, "failed"),
+                              ({"id": "1", "title": "one", "author": "a"}, "completed")):
+            with self.subTest(row=row):
+                task = self.task_for([row], collector_result={
+                    "source_exhausted": True, "route": "local", "backend": "python",
+                })
+                task["validation"]["required_fields"] = ["author", "id"]
+                outcome = run_collector(self.root, self.collector, self.write_task(task),
+                                        required_fields=("id", "title"), unique_key="id")
+                self.assertEqual(outcome.status, expected)
+                validation = json.loads((outcome.run_dir / "validation.json").read_text("utf-8"))
+                self.assertEqual(validation["required_fields"], ["id", "title", "author"])
+
+    def test_conflicting_registry_task_unique_keys_fail_before_start(self) -> None:
+        task = self.task_for([{"id": "1", "title": "one", "other_id": "a"}],
+                             collector_result={"source_exhausted": True, "route": "local", "backend": "python"})
+        task["validation"]["unique_key"] = "other_id"
+        task["browser"] = {"ensure": True}
+        with patch("spider_core.runner._run_process") as process, self.assertRaisesRegex(RunError, "unique_key.*conflict"):
+            run_collector(self.root, self.collector, self.write_task(task),
+                          required_fields=("id", "title"), unique_key="id",
+                          browser_ensurer=lambda _: self.fail("conflicting contract started browser"))
+        process.assert_not_called()
+        self.assertEqual(list((self.root / "runs").iterdir()), [])
+
     def test_task_contract_rejects_unknown_top_level_fields(self) -> None:
         task = self.task_for(
             [{"id": "1", "title": "one"}],
@@ -756,7 +794,7 @@ class RunnerTests(unittest.TestCase):
         }
 
         with (
-            patch("spider_core.runner.subprocess.run") as process,
+            patch("spider_core.runner._run_process") as process,
             self.assertRaisesRegex(
                 RunError,
                 "captcha_user_instruction_required.*--allow-captcha",
@@ -861,7 +899,7 @@ class RunnerTests(unittest.TestCase):
                 {"SPIDER_CAPTCHA_PERMISSION": "allow_once_v1"},
                 clear=False,
             ),
-            patch("spider_core.runner.subprocess.run", side_effect=fake_run),
+            patch("spider_core.runner._run_process", side_effect=fake_run),
         ):
             run_collector(self.root, self.collector, self.write_task(task))
             run_collector(
@@ -1020,7 +1058,7 @@ class RunnerTests(unittest.TestCase):
                 stderr="partial-err",
             )
 
-        with patch("spider_core.runner.subprocess.run", side_effect=time_out):
+        with patch("spider_core.runner._run_process", side_effect=time_out):
             outcome = run_collector(self.root, self.collector, self.write_task(task))
 
         run_payload = json.loads(

@@ -48,6 +48,8 @@ Task 的受支持顶层字段：query、completion、validation、browser、rout
 
 collector_result.json 至少如实给出本次 route、backend、source_exhausted 等执行事实。协议不足而浏览器补采时记录 browser_fallback_reason、browser_only_parts 与脱敏协议尝试。样例中 source_exhausted=true 仅因静态列表被完整读取，真实站点要有结束证据。
 
+通过注册 selector 运行时，required_fields 以注册字段为底线，再追加 Task 的额外字段并去重；两边要求都必须满足。Task 未声明 unique_key 时沿用注册值，两边非空且不同则在浏览器和采集器启动前拒绝，避免静默换键。Task 结构不变，validation.json 记录本次实际合同；proof 注册/刷新仍要求其合同与能力元数据一致，更严格的任务运行不会自动改变原 proof。
+
 分页测试覆盖空末页、重复记录、失败页、总数变化、断点续跑。详情测试覆盖缺字段、数据类型、时间解析和来源一致性。对真实接口先留少量脱敏样本；不要把私密原始响应提交仓库。
 
 ## 5. 候选切换与会话
@@ -65,6 +67,18 @@ python spider.py register experiments/my_task --proof-run runs/ACTUAL_SUCCESSFUL
 ```
 
 ACTUAL_SUCCESSFUL_RUN 必须替换为真实运行目录。先查看 register --help 与实验元数据要求，不用本地示例伪造线上 proof。collector 修改、文件哈希变化会令旧 proof 失效；TTL 过期降级 stale，不自动禁用 collector，也不代表新鲜验证。available 与 proof_status 分开看。
+
+### 多文件采集器
+
+在运行前通过 capability.json 的可选 `files` 显式声明辅助源码和非敏感静态配置，例如 `"files": ["helper.py", "mapping.json", "requirements.txt"]`。collector.py 隐式包含，不重复列入。路径相对任务目录，不能越界或经过链接，不能包含 cookies.json、凭据、运行目录或日志。未声明 files 时保持单文件合同，注册会拒绝可检测到的未声明本地 Python 导入；间接加载和动态路径仍须开发者明确列出并验证，不自动搬整个目录。
+
+runner 执行前后核对整包哈希；注册只复制清单文件，proof 保存同一清单，辅助文件修改或丢失会令证明降级。添加清单或修改辅助文件后先重新运行，再用新的成功 run 注册或刷新证明。原有单文件 proof 仍可读取；任务依赖仍需显式安装，哈希快照不代替目标环境验收。
+
+本地 Python 导入检查覆盖字面量 `import package.module`、`from package import module`、相对导入及路径中已存在的包 `__init__.py`。绝对导入从采集器根目录查找，相对导入按当前源码位置和点数查找；命中的辅助模块和包初始化文件都须加入 `files`，再重新运行。检查不执行导入，不分析动态导入、运行时修改的搜索路径或包外依赖，也不自动复制未声明文件。
+
+实验发现也会复核当前源码包哈希：辅助文件变化、缺失、清单无效或与旧 run 的 `collector_files` 不匹配时，该 run 不再证明当前实验已验证，并给出警告。旧单文件 run 没有 `collector_files` 时仍按入口哈希兼容；不会改写历史 run 或自动刷新 proof。单份 proof 存在无效 UTF-8 时，仅该项降级为 stale 并报告不可读，其余能力继续发现，available 仍独立判断。
+
+completion.min_records 在所有模式下生效；expected_total 小于显式最低数量会在执行前被拒绝。允许预期总数确为零的任务，未显式指定最低数量时其最低数量默认为零。
 
 ## 7. 提交前
 
