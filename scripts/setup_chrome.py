@@ -123,7 +123,7 @@ def select_asset(metadata, target):
 
 def latest_asset():
     if sys.platform != 'win32' or platform.machine().lower() not in ('amd64', 'x86_64', 'x86', 'i386', 'i686'):
-        raise ValueError('automated_browser_identity_baseline_requires_windows_x64_or_x86; see docs/CHROME_FOR_TESTING.md')
+        raise ValueError('automated_browser_identity_baseline_requires_windows_x64_or_x86; see docs/BROWSER_MCP.md')
     target = 'win64' if platform.machine().lower() in ('amd64', 'x86_64') else 'win32'
     with fetch(METADATA) as response:
         metadata = json.load(response)

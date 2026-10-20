@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.11 — 2026-10-20
+
+- Read project rules and task-relevant Skills for daily work; load orientation and deployment guides only for the corresponding task.
+- Consolidate handoff, browser/toolchain and framework documentation into existing guides; retire the historical 0.1.8 specialist work order while retaining the Git history.
+- Keep contribution, community, release, third-party maintenance and clean-machine acceptance documents in source distributions only. Preserve strict install integrity and local-link checks; collection, deployment and Skill behavior remain unchanged.
+
 ## 0.1.10 — 2026-10-20
 
 - Accept exact manifest-bound reviewed local source patches during deployment regression while retaining content, path, structure and syntax checks; original release scanning and packaging stay strict.

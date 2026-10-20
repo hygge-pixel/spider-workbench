@@ -1,6 +1,6 @@
 # 测试、交付验收与 CI
 
-源码仓库和 source ZIP 保留有效回归测试；精简 install ZIP 不含开发测试、pytest 依赖声明、Skill 内部自测及维护 CI。两包各有独立 MANIFEST.sha256.json。测试源码用于维护，运行输出与历史业务数据不分发。
+源码仓库和 source ZIP 保留有效回归测试与维护文档；精简 install ZIP 不含开发测试、pytest 依赖声明、Skill 内部自测、维护 CI，以及贡献指南、社区规范、发布手册、第三方维护和新机验收工单。两包各有独立 MANIFEST.sha256.json。测试源码用于维护，运行输出与历史业务数据不分发。
 
 ## 两种检查范围
 
@@ -13,7 +13,7 @@
 
 Windows/Ubuntu 分别执行公开检查、完整源码回归、双包构建，并在中文/空格路径独立解压安装包执行交付检查。MCP 专项从锁文件安装并构建，做 stdio 初始化/工具目录读取和 Node 生命周期测试。无业务密钥，不自动发布 Release，不访问真实业务网站。
 
-本机或 CI 的 MCP 目录检查不证明目标 Agent 会话已调用工具；实际 CDP、进程归属、Playwright 和宿主调用由完整部署单独验收。全新无环境电脑验收见 CLEAN_MACHINE_ACCEPTANCE.md，仍待实际执行。
+本机或 CI 的 MCP 目录检查不证明目标 Agent 会话已调用工具；实际 CDP、进程归属、Playwright 和宿主调用由完整部署单独验收。全新无环境电脑验收仍待实际执行，维护工单见[源码中的新机验收说明](https://github.com/hygge-pixel/spider-workbench/blob/v0.1.11/docs/CLEAN_MACHINE_ACCEPTANCE.md)。
 
 ## 发布验收
 

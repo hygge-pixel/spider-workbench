@@ -11,6 +11,8 @@
 | toolchain/playwright-cli/package-lock.json | @playwright/cli0.1.18 | toolchain 局部 node_modules |
 | requirements-backends | Scrapling/Camoufox 可选隔离后端 | tmp/runtimes/对应后端 |
 
+JSReverser 的 SOURCE_SNAPSHOT.json 记录输入源码快照哈希；分发适配单独记录在来源声明与 CHANGELOG 中，不宣称该快照等同于未核验的上游 tag。Python、Node 和浏览器本体在目标机安装，不放入源码 ZIP。Python 版本为 3.11.x，Node 24 LTS 为部署基线，具体来源与选择规则见 RUNTIME_COMPATIBILITY.md。
+
 Playwright CLI0.1.18 自己的 lock 依赖 Playwright1.63.0-alpha-2026-08-05，与 Python Playwright1.57.0 是两个独立环境。这里保留已用工具快照，不宣称这些版本全是最新稳定版；主要 CDP 检查使用 Python Playwright。若升级 CLI，应单独更新 lock、检查命令兼容性并回归，不能从 Python CDP 通过推定 CLI 浏览器功能通过。
 
 npm 使用完整 lock，公共版把三个非 vendor lock 的镜像 resolved URL 改成官方 registry 地址，版本与 integrity 均保持一致。Python只固定直接依赖，传递依赖由目标环境解析，pip check 检查兼容性；不是全系统二进制可重现锁。

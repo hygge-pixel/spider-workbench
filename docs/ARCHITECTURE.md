@@ -38,7 +38,23 @@ config/workspace_browser.json 是唯一浏览器配置源。agent_platform_compa
 
 ## 5. 目录约定
 
-源码：spider_core、scripts、skills、tests、examples、docs、vendor、toolchain、requirements-backends。任务：experiments。注册：platforms。运行：runs。缓存/Profile/隔离后端：tmp。交付：outputs。本机秘密：config/local_credentials 下受忽略的 .env 或进程环境；根 .env 禁用。
+源码：spider_core、scripts、skills、tests、docs、vendor、toolchain、requirements-backends。任务及唯一离线示例：experiments。注册：platforms。运行：runs。缓存/Profile/隔离后端：tmp。交付：outputs。本机秘密：config/local_credentials 下受忽略的 .env 或进程环境；根 .env 禁用。
+
+| 入口或目录 | 用途 |
+|---|---|
+| AGENTS.md、CLAUDE.md、GEMINI.md 及宿主规则入口 | 一份项目规则与薄适配入口 |
+| bootstrap.py | 离线体验与显式依赖安装子步骤，业务仍交给 spider.py |
+| scripts/deploy.py、setup_runtime.ps1、setup_chrome.py | 运行时、浏览器与分层部署编排 |
+| scripts/start_js_reverser.mjs 与 .py | Node MCP 启动及短时 Python 浏览器身份预检 |
+| scripts/agent_platform_compat.py | 本机 Skill 发现链接和浏览器配置 |
+| scripts/verify_distribution.py、run_full_regression.py | 来源完整性与交付/开发回归 |
+| config/*.example.json | 无真实路径的配置模板；本机文件不随包分发 |
+| platforms/registry.json | 初始空注册表；不预置历史能力 |
+| tools/ | 通用工具预留目录，不附个人通知工具 |
+
+Skill 任务索引只维护在 [AGENTS.md](../AGENTS.md#skill-索引与默认读取)。Skill 是方法与辅助脚本，MCP 是宿主可调用工具，collector 是任务数据逻辑，runner 是执行与基础校验，proof 是已注册版本的最小验证快照。这几类的验收分别判断，不因工具安装或 Skill 存在就声称网站已验证。
+
+每个 Skill 的 name/description 用于发现，正文按任务读取；references/ 按需提供方法、算法与上游来源，scripts/ 放辅助程序，agents/ 中的元数据仅供相应宿主使用。发现目录是本机链接，不复制多套正文。保留的通用 provider/算法示例不等于已验证的站点 collector；第三方来源与许可保留在各 Skill 的说明和许可证中。
 
 默认不搬旧能力、不搬 proof、不复制登录态。新开源版从可审阅的干净内容快照开始，不继承原工作区 Git 历史。
 

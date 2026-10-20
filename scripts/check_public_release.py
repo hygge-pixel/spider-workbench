@@ -33,6 +33,10 @@ REQUIRED = {'README.md', 'README.en.md', 'bootstrap.py', 'docs/USER_GUIDE.md', '
             '.github/workflows/ci.yml', 'docs/QUICKSTART.md', 'docs/OPEN_SOURCE_RELEASE.md',
             'vendor/js-reverse-mcp/LICENSE', 'skills/playwright-cli/LICENSE'}
 REQUIRED |= AGENT_ENTRY_FILES | {'docs/AGENT_COMPATIBILITY.md'}
+MAINTAINER_DOCS = {
+    'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md', 'docs/OPEN_SOURCE_RELEASE.md',
+    'docs/THIRD_PARTY_MAINTENANCE.md', 'docs/CLEAN_MACHINE_ACCEPTANCE.md',
+}
 
 # High-confidence formats only; no claim of exhaustive credential detection.
 SECRET = re.compile(r'gh[pousr]_[A-Za-z0-9]{30,255}|github_pat_[A-Za-z0-9_]{40,255}|'
@@ -44,7 +48,8 @@ PRIVATE_PATH = re.compile(r'(?i)[A-Z]:[/\\]Users[/\\](?!Public(?:[/\\]|$)|USERNA
 
 def developer_path(name):
     p = PurePosixPath(name)
-    return ('tests' in p.parts or name in {'requirements-dev.txt', 'scripts/run_developer_tests.py'}
+    return ('tests' in p.parts or name in MAINTAINER_DOCS
+            or name in {'requirements-dev.txt', 'scripts/run_developer_tests.py'}
             or (name.startswith('.github/') and name not in AGENT_ENTRY_FILES)
             or p.name in {'test-prompts.json', 'selftest.py'}
             or bool(re.search(r'\.(?:test|spec)\.(?:js|mjs|cjs|ts|py)$', p.name)))
@@ -154,7 +159,7 @@ def scan(root, *, require_structure=True):
                     if target and not (path.parent/target).is_file():
                         issue(name, 'broken_local_link')
         if require_structure:
-            required = REQUIRED - ({'.github/workflows/ci.yml'} if kind == 'install' else set())
+            required = {name for name in REQUIRED if kind == 'source' or not developer_path(name)}
             for name in sorted(required - expected):
                 issue(name, 'required_file_missing')
             registry = json.loads((root/'platforms/registry.json').read_text(encoding='utf-8'))

@@ -29,10 +29,10 @@ python scripts/upgrade_framework.py --target '<现有项目绝对路径>' --roll
 
 - 默认 Chrome for Testing / chrome / 9222。压力证据尊重已配置默认浏览器，生成器默认只输出 js-reverse。本版只允许 chrome 候选，不保留备用槽位。
 - 当前包保留 13 个通用 Skills，已移除验证码、小程序、Android、原生逆向与 REA 专项。验证码暂停规则保留。
-- 旧工单归并到 INSTALL_WITH_AGENT、CHROME_FOR_TESTING、BROWSER_MCP 和本说明；Skill/tool 名称与会话保存规则以新入口为准。
+- 部署工单统一在 INSTALL_WITH_AGENT，浏览器配置与验收在 BROWSER_MCP，迁移以本说明为准；Skill/tool 名称与会话保存规则以当前入口为准。
 - MCP 依赖锁有修补。备份已有配置，重新按锁安装并构建，再做初始化、实际 CDP 和宿主加载验收；只替换锁文件不代表升级完成。
 
-重新检查 Python 3.11、Node 24+ 与隔离环境版本。保留旧版本，不全局覆盖 PATH；既有虚拟环境版本不符时保留后建立新环境。浏览器程序与 Profile 分开，退出后再备份 Profile，切换按 CHROME_FOR_TESTING 工单执行。
+重新检查 Python 3.11、Node 24+ 与隔离环境版本。保留旧版本，不全局覆盖 PATH；既有虚拟环境版本不符时保留后建立新环境。浏览器程序与 Profile 分开，退出后再备份 Profile，切换按 [浏览器配置与迁移](BROWSER_MCP.md) 执行。
 
 最后运行完整交付检查与离线例子。此步骤验证框架；当前在线平台仍须用本次真实请求和业务数据验收，旧 proof 不自动升级。
 
@@ -71,3 +71,9 @@ status 输出调整为 last_acceptance/live_health，自动化读取方须同步
 先在新版源码目录运行 python scripts/upgrade_framework.py --target <旧项目目录> 查看只读计划；检查 changes、conflicts、preserved、baseline_source 和 obsolete_framework_files。只有无冲突再加 --apply，记录备份路径；回滚用 --target <旧项目目录> --rollback <备份路径> --apply。已有本地定制逐项审阅合并，--accept-local 仅用于已审核文件，并继续按本机补丁记录规则留痕。
 
 任务、注册表、运行记录、独立浏览器和本机配置保留；已废弃框架文件只列出，不自动删除。源码项目优先用 source 包升级，精简部署项目用 install 包升级，不混用清单或直接解压覆盖。升级后按统一 deploy 流程检查、宿主真实调用和验收；旧 proof 不自动刷新。
+
+## 历史环境问题与文档整理
+
+0.1.7→0.1.8 的受限环境复测属于特定电脑案例，不是新安装的必做步骤。权限被拒绝或进程归属不可验证时保留对应失败状态，不修改 ACL、不接管其它浏览器，也不重装依赖掩盖宿主问题；有真实宿主调用后再续验。完整历史工单保留在 v0.1.10 及更早 tag 的 Git 历史中，当前包只保留通用迁移方法。
+
+0.1.11 的文档整理合并了交接、Chrome、工具链和框架说明；安装包不再附带贡献/发布/第三方维护/新机验收工单，源码包仍保留这些维护资料。升级器会列出已废弃文件，旧目录中多余文档由 Agent 审核后归档，不自动删除用户定制。代码、Skill 索引和 Task/运行证据合同不变。

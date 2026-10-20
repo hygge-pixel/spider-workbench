@@ -99,6 +99,56 @@ class PublicReleaseTests(unittest.TestCase):
         self.put('MANIFEST.sha256.json', json.dumps(manifest))
         self.assertFalse(scan(self.root, require_structure=False)['passed'])
 
+    def test_maintainer_docs_stay_in_source_but_not_in_install(self):
+        maintainer_docs = ('CONTRIBUTING.md', 'CODE_OF_CONDUCT.md',
+                           'docs/OPEN_SOURCE_RELEASE.md', 'docs/THIRD_PARTY_MAINTENANCE.md',
+                           'docs/CLEAN_MACHINE_ACCEPTANCE.md')
+        for name in maintainer_docs:
+            self.put(name, '# Maintainer reference\n')
+        self.put('docs/USER_GUIDE.md', '# Runtime guide\n')
+        refresh_manifest(self.root)
+        source = build_release(self.root, self.output, require_structure=False)
+        install = build_release(self.root, self.output, require_structure=False, kind='install')
+        with zipfile.ZipFile(source['archive']) as bundle:
+            for name in maintainer_docs:
+                self.assertIn('spider-workbench/'+name, bundle.namelist())
+        with zipfile.ZipFile(install['archive']) as bundle:
+            for name in maintainer_docs:
+                self.assertNotIn('spider-workbench/'+name, bundle.namelist())
+            self.assertIn('spider-workbench/docs/USER_GUIDE.md', bundle.namelist())
+            bundle.extractall(self.output/'extracted')
+        self.assertTrue(scan(self.output/'extracted/spider-workbench', require_structure=False)['passed'])
+
+    def test_install_manifest_rejects_maintainer_documents(self):
+        for name in ('CONTRIBUTING.md', 'CODE_OF_CONDUCT.md', 'docs/OPEN_SOURCE_RELEASE.md',
+                     'docs/THIRD_PARTY_MAINTENANCE.md', 'docs/CLEAN_MACHINE_ACCEPTANCE.md'):
+            with self.subTest(name=name):
+                self.put(name, '# Maintainer reference\n')
+                self.manifest(['README.md', name])
+                data=json.loads((self.root/'MANIFEST.sha256.json').read_text('utf-8'))
+                data['distribution_kind']='install'
+                self.put('MANIFEST.sha256.json', json.dumps(data))
+                result=scan(self.root, require_structure=False)
+                self.assertIn({'path':name,'rule':'forbidden_path'}, result['issues'])
+
+    def test_install_structure_keeps_runtime_requirements_without_release_handbook(self):
+        from scripts.check_public_release import REQUIRED
+        excluded={'CONTRIBUTING.md','CODE_OF_CONDUCT.md','docs/OPEN_SOURCE_RELEASE.md',
+                  'docs/THIRD_PARTY_MAINTENANCE.md','docs/CLEAN_MACHINE_ACCEPTANCE.md',
+                  '.github/workflows/ci.yml'}
+        for name in REQUIRED-excluded:
+            self.put(name, 'fixture\n')
+        self.put('platforms/registry.json', json.dumps({'platforms':[]}))
+        for index in range(13):
+            self.put(f'skills/fixture-{index}/SKILL.md', '# Fixture\n')
+        data=refresh_manifest(self.root)
+        data['distribution_kind']='install'
+        self.put('MANIFEST.sha256.json',json.dumps(data))
+        self.assertTrue(scan(self.root)['passed'])
+        del data['files']['docs/USER_GUIDE.md']
+        self.put('MANIFEST.sha256.json',json.dumps(data))
+        self.assertIn({'path':'docs/USER_GUIDE.md','rule':'required_file_missing'}, scan(self.root)['issues'])
+
     def test_forbidden_runtime_config_and_credentials_are_rejected(self):
         for name in ('runs/history.json', 'config/workspace_browser.json',
                      'config/local_credentials/key.env', '.mcp.json', 'node_modules/a.js',

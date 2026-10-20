@@ -12,9 +12,9 @@
 
 Describe the task. Give your Agent one workspace to analyze, implement, validate and deliver.
 
-[![Release v0.1.10](https://img.shields.io/badge/release-v0.1.10-147D73?style=flat-square)](https://github.com/hygge-pixel/spider-workbench/releases/tag/v0.1.10) [![Python 3.11](https://img.shields.io/badge/Python-3.11-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![Node.js 24](https://img.shields.io/badge/Node.js-24-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![License Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-53667A?style=flat-square)](LICENSE)
+[![Release v0.1.11](https://img.shields.io/badge/release-v0.1.11-147D73?style=flat-square)](https://github.com/hygge-pixel/spider-workbench/releases/tag/v0.1.11) [![Python 3.11](https://img.shields.io/badge/Python-3.11-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![Node.js 24](https://img.shields.io/badge/Node.js-24-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![License Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-53667A?style=flat-square)](LICENSE)
 
-**[Download install ZIP](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip)** · **[Get started](#get-started)** · [User guide](docs/USER_GUIDE.md) · [中文](README.md)
+**[Download install ZIP](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.11/spider-workbench-0.1.11-install.zip)** · **[Get started](#get-started)** · [User guide](docs/USER_GUIDE.md) · [中文](README.md)
 
 </div>
 
@@ -51,7 +51,7 @@ Collection work often gets stuck between environment setup, request analysis, da
 
 **1. Download** → **2. Open the folder in your coding Agent** → **3. Send the deployment prompt**
 
-Download and extract the [v0.1.10 install ZIP](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip), then open the project folder as your Agent's workspace.
+Download and extract the [v0.1.11 install ZIP](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.11/spider-workbench-0.1.11-install.zip), then open the project folder as your Agent's workspace.
 
 <details open>
 <summary><strong>Copy to your Agent: deploy and verify this workspace</strong></summary>
@@ -117,7 +117,7 @@ The initial workspace has no website collectors. Website adaptation, pagination,
 | --- | --- |
 | [User guide](docs/USER_GUIDE.md) · [Agent deployment](docs/INSTALL_WITH_AGENT.md) | [Collector guide](docs/COLLECTOR_GUIDE.md) · [Architecture](docs/ARCHITECTURE.md) |
 | [Browser and MCP](docs/BROWSER_MCP.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) | [Data and evidence](docs/EVIDENCE.md) · [Tests and CI](docs/VERIFICATION.md) |
-| [Skills](docs/框架与Skills说明.md) · [Runtime compatibility](docs/RUNTIME_COMPATIBILITY.md) | [Dependencies](docs/DEPENDENCIES.md) · [Contributing](CONTRIBUTING.md) |
+| [Skills](AGENTS.md#skill-索引与默认读取) · [Runtime compatibility](docs/RUNTIME_COMPATIBILITY.md) | [Dependencies](docs/DEPENDENCIES.md) · [Contributing](https://github.com/hygge-pixel/spider-workbench/blob/v0.1.11/CONTRIBUTING.md) |
 
 ---
 

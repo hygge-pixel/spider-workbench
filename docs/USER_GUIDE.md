@@ -29,7 +29,7 @@ Spider Workbench 是给 coding Agent 使用的数据采集与 Web / JavaScript �
 
 ## 已经部署过，怎么调整？
 
-在原项目打开 Agent，发送同一部署提示词即可。Agent 应先复用通过的阶段，按[浏览器调整工单](CHROME_FOR_TESTING.md)切换默认配置，并保留旧程序、Profile、任务、数据和其它 MCP 设置。
+在原项目打开 Agent，发送同一部署提示词即可。Agent 应先复用通过的阶段，按[浏览器配置与迁移](BROWSER_MCP.md)调整配置，并保留旧程序、Profile、任务、数据和其它 MCP 设置。
 
 如果还需要升级框架文件，按[保留式迁移](MIGRATION.md)比较差异，不直接把新 ZIP 解压覆盖旧项目。换电脑重新生成本机路径、环境和配置，不复制登录态、虚拟环境或 node_modules。
 
@@ -70,7 +70,7 @@ Spider Workbench 是给 coding Agent 使用的数据采集与 Web / JavaScript �
 
 本项目不附带所有网站的现成功能。对外承诺安装后点击采集时，还需要完成具体网站适配、客户操作界面、依赖打包和业务验收。
 
-出错时将错误类别、版本和当前状态交给 Agent，保留现场。技术参考见[排错](TROUBLESHOOTING.md)、[浏览器/MCP](BROWSER_MCP.md)与[框架说明](框架与Skills说明.md)。
+出错时将错误类别、版本和当前状态交给 Agent，保留现场。技术参考见[排错](TROUBLESHOOTING.md)、[浏览器/MCP](BROWSER_MCP.md)与[架构说明](ARCHITECTURE.md)。
 
 ## 已装的 Python 或 Node 版本不对怎么办？
 

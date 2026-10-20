@@ -12,9 +12,9 @@
 
 描述任务，让 Agent 在同一工作区完成分析、实现、验证与交付。
 
-[![Release v0.1.10](https://img.shields.io/badge/release-v0.1.10-147D73?style=flat-square)](https://github.com/hygge-pixel/spider-workbench/releases/tag/v0.1.10) [![Python 3.11](https://img.shields.io/badge/Python-3.11-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![Node.js 24](https://img.shields.io/badge/Node.js-24-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![License Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-53667A?style=flat-square)](LICENSE)
+[![Release v0.1.11](https://img.shields.io/badge/release-v0.1.11-147D73?style=flat-square)](https://github.com/hygge-pixel/spider-workbench/releases/tag/v0.1.11) [![Python 3.11](https://img.shields.io/badge/Python-3.11-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![Node.js 24](https://img.shields.io/badge/Node.js-24-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![License Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-53667A?style=flat-square)](LICENSE)
 
-**[下载安装包](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip)** · **[快速开始](#快速开始)** · [用户指南](docs/USER_GUIDE.md) · [English](README.en.md)
+**[下载安装包](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.11/spider-workbench-0.1.11-install.zip)** · **[快速开始](#快速开始)** · [用户指南](docs/USER_GUIDE.md) · [English](README.en.md)
 
 </div>
 
@@ -51,7 +51,7 @@
 
 **1. 下载项目** → **2. 用 Coding Agent 打开文件夹** → **3. 复制下面的部署提示词**
 
-下载 [v0.1.10 安装包](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip) 并解压，将项目文件夹作为 Agent 的工作区打开。
+下载 [v0.1.11 安装包](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.11/spider-workbench-0.1.11-install.zip) 并解压，将项目文件夹作为 Agent 的工作区打开。
 
 <details open>
 <summary><strong>复制给 Agent：部署并验收这个工作区</strong></summary>
@@ -117,7 +117,7 @@ python spider.py run experiments/example_local/collector.py --task experiments/e
 | --- | --- |
 | [用户指南](docs/USER_GUIDE.md) · [Agent 部署工单](docs/INSTALL_WITH_AGENT.md) | [开发采集器](docs/COLLECTOR_GUIDE.md) · [框架架构](docs/ARCHITECTURE.md) |
 | [浏览器与 MCP](docs/BROWSER_MCP.md) · [问题排查](docs/TROUBLESHOOTING.md) | [证据与数据](docs/EVIDENCE.md) · [测试与 CI](docs/VERIFICATION.md) |
-| [Skills 说明](docs/框架与Skills说明.md) · [运行时兼容](docs/RUNTIME_COMPATIBILITY.md) | [依赖状态](docs/DEPENDENCIES.md) · [贡献指南](CONTRIBUTING.md) |
+| [Skills 说明](AGENTS.md#skill-索引与默认读取) · [运行时兼容](docs/RUNTIME_COMPATIBILITY.md) | [依赖状态](docs/DEPENDENCIES.md) · [贡献指南](https://github.com/hygge-pixel/spider-workbench/blob/v0.1.11/CONTRIBUTING.md) |
 
 ---
 

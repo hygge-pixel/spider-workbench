@@ -1,6 +1,6 @@
 # 交给 Agent 的部署工单
 
-用户只需打开工作区并发送 README 的提示词，后续步骤由 Agent 执行。完整编排、退出码和宿主续验见 [新电脑部署流程](NEW_MACHINE_DEPLOYMENT.md)，旧项目先读 [增量调整工单](MIGRATION.md)。
+本页只在部署或升级时读取；已部署后的日常任务直接按 AGENTS 和相关 Skill 执行。用户只需打开工作区并发送 README 的提示词，后续步骤由 Agent 执行。完整编排、退出码和宿主续验见 [新电脑部署流程](NEW_MACHINE_DEPLOYMENT.md)，旧项目先读 [增量调整工单](MIGRATION.md)。
 
 ## 执行约定
 
@@ -26,3 +26,5 @@
 完整性检查遇本机修复时保留原 manifest，审核逐文件 before/after、理由及测试结果；仅对精确匹配的已审核补丁建立本机记录。未知变化继续停止，不能批量刷新清单掩盖差异。
 
 部署交付回归复用这份精确补丁记录，仅接受对应的哈希差异，并继续检查内容、路径、结构、Python/JS 语法和 JSON。报告中的 original_distribution_passed=false 与 reviewed_local_changes 表示本机审核安装通过；原始源码发布扫描与打包仍要求原清单字节一致。
+
+交给另一会话继续时，先读取 outputs/deployment_acceptance.md/JSON 中的实际状态与下一步；host_pending 直接续验宿主，不重复安装。单项排错命令在 [QUICKSTART](QUICKSTART.md) 和 [BROWSER_MCP](BROWSER_MCP.md)，部署结果不替代真实网站验收。

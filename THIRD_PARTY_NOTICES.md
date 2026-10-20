@@ -23,6 +23,6 @@ Historical input Git history is not redistributed. Hashes document content prove
 
 Spider Workbench 0.1.5 modifies bundled JSReverser `src/McpContext.ts` to support empty filtered page snapshots and `src/browser.ts` to disconnect attached remote browsers without closing them. Original copyright and Apache-2.0 notices are retained.
 
-See [third-party maintenance](docs/THIRD_PARTY_MAINTENANCE.md) for the snapshot identity boundary, local patches and update procedure.
+See [third-party maintenance in the source repository](https://github.com/hygge-pixel/spider-workbench/blob/v0.1.11/docs/THIRD_PARTY_MAINTENANCE.md) for the snapshot identity boundary, local patches and update procedure.
 
 Spider Workbench 0.1.8 modifies JSReverser src/tools/page.ts, src/tools/ToolDefinition.ts and src/McpContext.ts so health checks use the active MCP connection and selected page without invoking the secondary browser runtime. Original notices and input hashes are retained.

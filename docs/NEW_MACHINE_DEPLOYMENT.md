@@ -29,6 +29,22 @@ Codex 宿主另传 `--codex <兼容CLI绝对路径>`。不要假定 PATH 中的 
 5. 验证默认独立浏览器归属和 CDP、MCP stdio、MCP list_pages、Playwright 合成页面，再运行交付检查（--delivery-only，不为部署安装开发测试依赖）。
 6. 写 outputs/deployment_acceptance.json 和 Markdown。技术检查通过后返回 `host_pending`，由当前宿主实际加载并调用工具后完成最后验收。
 
+### 按需排查依赖安装
+
+统一 apply 已编排安装，下列命令仅用于诊断或单项补齐，不要求日常重复执行：
+
+```powershell
+# $nodeExecutable 为目标机已核验的 Node 24+ 真实路径。
+py -3.11 scripts/install_browser_toolchain.py --component all --node $nodeExecutable
+py -3.11 scripts/install_browser_toolchain.py --component all --node $nodeExecutable --apply
+$toolPython = (Resolve-Path -LiteralPath '.venv-toolchain/Scripts/python.exe').Path
+& $toolPython -m pip check
+```
+
+未传 --apply 时只输出计划。可选组件为 python/mcp/cli/ast；all 覆盖四项。Python 工具环境为 .venv-toolchain，保留任务原有 .venv；MCP/CLI 在各自目录按锁安装，Babel 使用根 package-lock。安装器跳过 Puppeteer/Playwright 自带浏览器下载，MCP 先 npm ci --ignore-scripts，再显式 prepare/build；prepare 仅适配该 MCP 的本机依赖目录，不安装 Node 本体，不修改全局代理或证书。
+
+版本与安装位置见 [DEPENDENCIES](DEPENDENCIES.md)。浏览器安装、现有配置迁移、MCP/CDP 分层探针见 [BROWSER_MCP](BROWSER_MCP.md)。CLI 和 Python Playwright 分开验收，不复制源电脑的 node_modules，不把包安装成功当成连接或业务成功。
+
 浏览器自动安装/进程身份验收当前以 Windows x64/x86 为基线。其它系统保持离线入口可用，Agent 按官方资源与平台身份机制单独适配并说明限制，不跳过检查声称完整通过。
 
 浏览器下载最多整文件重试三次，显示已下载大小。当前不实现 HTTP Range 断点续传，`.partial` 重试时重新下载；已完成且收据哈希一致的 ZIP 可以复用。缓存没有来源收据、程序被修改或目录不完整时保留并要求审核，不静默覆盖。安装锁记录 PID；崩溃后只有确认对应进程已结束，才能移除这一个失效锁，不删除浏览器/Profile。

@@ -19,6 +19,8 @@ experiments/my_task/
 
 可从 experiments/example_local 的示例复制到这个新目录再改。不要直接改已有任务或在未确认需求时注册平台能力。
 
+该离线示例只有 3 条合成记录，不访问网站。任务输入输出和注册方法由本页统一说明；分析阶段按 [AGENTS 的 Skill 索引](../AGENTS.md#skill-索引与默认读取) 选择方法，辅助资料仅在需要时读取。
+
 ## 3. collector 的输入输出
 
 collector 必须接受 --task 和 --output-dir。读取 Task JSON，将规范化结果逐行写入 output-dir/normalized.jsonl，并输出 collector_result.json。具体命令始终由框架执行：
