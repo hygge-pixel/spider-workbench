@@ -36,6 +36,23 @@ class PublicReleaseTests(unittest.TestCase):
         self.manifest(['README.md'])
         self.assertTrue(scan(self.root, require_structure=False)['passed'])
 
+    def test_only_reviewed_readme_banners_are_packaged(self):
+        from scripts.check_public_release import public_path
+        for theme in ('light', 'dark'):
+            name = f'docs/images/readme-hero-{theme}.svg'
+            self.assertTrue(public_path(name))
+            self.put(name, '<svg xmlns="http://www.w3.org/2000/svg"/>\n')
+        self.assertFalse(public_path('docs/images/unreviewed.svg'))
+        self.assertFalse(public_path('runs/readme-hero-dark.svg'))
+        manifest = refresh_manifest(self.root)
+        self.assertEqual(len(manifest['files']), 3)
+        self.assertTrue(scan(self.root, require_structure=False)['passed'])
+        for kind in ('source', 'install'):
+            release = build_release(self.root, self.output, require_structure=False, kind=kind)
+            with zipfile.ZipFile(release['archive']) as archive:
+                for theme in ('light', 'dark'):
+                    self.assertIn(f'spider-workbench/docs/images/readme-hero-{theme}.svg', archive.namelist())
+
     def test_developer_sources_are_audited_in_repository(self):
         self.put('tests/test_contract.py', 'import unittest\n')
         self.put('requirements-dev.txt', 'pytest==8.4.2\n')

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-labelledby="title desc">
+  <title id="title">Spider Workbench</title>
+  <desc id="desc">A clear path from intent to evidence. A conceptual workflow connecting a request to protocol analysis, a collector and validation.</desc>
+  <defs><pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#D6E1E8"/></pattern></defs>
+  <rect x="1" y="1" width="1278" height="398" rx="22" fill="#F2F6F8" stroke="#D6E1E8"/>
+  <rect x="710" y="28" width="530" height="342" fill="url(#grid)"/>
+  <path d="M66 57h18v18H66z M84 66h18 M75 75v18" stroke="#117D70" stroke-width="3" fill="none"/>
+  <circle cx="106" cy="66" r="4" fill="#117D70"/><circle cx="75" cy="97" r="4" fill="#117D70"/>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <text x="126" y="76" fill="#172C41" font-size="17" font-weight="650" letter-spacing="2.5">SPIDER WORKBENCH</text>
+    <text x="64" y="169" fill="#172C41" font-size="59" font-weight="700" letter-spacing="-2">A clear path from</text>
+    <text x="64" y="239" fill="#117D70" font-size="59" font-weight="700" letter-spacing="-2">intent to evidence.</text>
+    <text x="67" y="286" fill="#586E82" font-size="19">One workspace. Your coding Agent. Inspectable results.</text>
+    <text x="67" y="351" fill="#586E82" font-size="11" letter-spacing="2">DATA COLLECTION / WEB + JAVASCRIPT REVERSE ENGINEERING</text>
+    <g stroke="#D6E1E8" stroke-width="2" fill="none">
+      <path d="M994 113v25H851v41 M994 138h139v41 M851 221v42h143v25 M1133 221v42H994"/>
+    </g>
+    <g fill="#117D70"><circle cx="994" cy="138" r="4"/><circle cx="994" cy="263" r="4"/></g>
+    <rect x="922" y="71" width="144" height="42" rx="8" fill="#FFFFFF" stroke="#D6E1E8"/>
+    <rect x="779" y="179" width="144" height="42" rx="8" fill="#FFFFFF" stroke="#D6E1E8"/>
+    <rect x="1061" y="179" width="144" height="42" rx="8" fill="#FFFFFF" stroke="#D6E1E8"/>
+    <rect x="906" y="288" width="176" height="44" rx="8" fill="#E0F1EC" stroke="#117D70"/>
+    <g font-size="12" letter-spacing="1.6" text-anchor="middle" fill="#586E82">
+      <text x="994" y="97">REQUEST</text><text x="851" y="205">PROTOCOL</text><text x="1133" y="205">COLLECTOR</text>
+    </g>
+    <text x="994" y="315" font-size="12" font-weight="650" letter-spacing="1.8" text-anchor="middle" fill="#117D70">VALIDATE + DELIVER</text>
+  </g>
+</svg>

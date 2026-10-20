@@ -58,6 +58,8 @@ def public_path(name):
         return False
     if p.name == 'cookies.json' or p.name.startswith('.env') or p.suffix.lower() in {'.env', '.log', '.har', '.sqlite', '.sqlite3'}:
         return False
+    if name in {'docs/images/readme-hero-light.svg', 'docs/images/readme-hero-dark.svg'}:
+        return True
     if len(p.parts) == 1:
         return name in ROOT_FILES
     if p.parts[0] in {'.clinerules', '.roo', '.trae'}:

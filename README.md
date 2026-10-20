@@ -1,108 +1,126 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/readme-hero-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/images/readme-hero-light.svg">
+  <img alt="Spider Workbench — A clear path from intent to evidence. 需求、协议、采集与校验相互衔接。" src="docs/images/readme-hero-light.svg" width="100%">
+</picture>
+
+<div align="center">
+
 # Spider Workbench
 
-**把数据采集与 Web / JavaScript 逆向，变成 Agent 可以持续推进、验证和交付的项目流程。**
+**面向 Coding Agent 的数据采集与 Web / JavaScript 逆向工作台**
 
-你描述网站、数据范围和交付要求，Agent 在同一个工作区里完成环境部署、接口分析、采集实现、样本校验和结果整理。框架将项目规则、13 个通用 Skills、浏览器工具链、统一运行入口与运行证据组织在一起，让每个任务都有清楚的起点、过程和结果。
+描述任务，让 Agent 在同一工作区完成分析、实现、验证与交付。
 
-[下载稳定版 v0.1.10](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip) · [English](README.en.md) · [框架架构](docs/ARCHITECTURE.md) · [Skills 说明](docs/框架与Skills说明.md)
+[![Release v0.1.10](https://img.shields.io/badge/release-v0.1.10-147D73?style=flat-square)](https://github.com/hygge-pixel/spider-workbench/releases/tag/v0.1.10) [![Python 3.11](https://img.shields.io/badge/Python-3.11-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![Node.js 24](https://img.shields.io/badge/Node.js-24-53667A?style=flat-square)](docs/RUNTIME_COMPATIBILITY.md) [![License Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-53667A?style=flat-square)](LICENSE)
 
-## 为什么使用 Spider Workbench？
+**[下载安装包](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip)** · **[快速开始](#快速开始)** · [用户指南](docs/USER_GUIDE.md) · [English](README.en.md)
 
-采集和逆向工作经常需要反复搭环境、找接口、处理分页、恢复进度，再确认数据是否完整。Spider Workbench 把这些工作的共用部分留在框架里，让 Agent 把精力放到当前任务的实现和验证上。
+</div>
 
-| 框架优势 | 对实际工作的帮助 |
-|---|---|
-| **用自然语言开始，交给 Agent 部署** | 打开项目、发送提示词，由 Agent 检查环境、安装隔离依赖、下载浏览器并接入 MCP，用户无需逐条执行安装命令。 |
-| **13 个通用 Skills，按问题调用** | 覆盖采集选路、请求分析、JS 逆向、参数复现、AST、补环境和证据排查，让 Agent 有可查阅的方法与工具。 |
-| **浏览器分析与协议采集衔接** | 需要时借助浏览器观察请求、调试 JS，再验证本地 Python / Node 请求；已验证的协议任务可直接执行，减少重复页面操作。 |
-| **统一运行和数据校验** | Task 明确字段、唯一键、数量与结束条件；runner 执行采集并校验结果，让“脚本跑完”和“数据合格”分别可判断。 |
-| **保留进度，支持复查** | 任务可保存检查点、原始材料和脱敏证据；支持恢复的采集器可据此续跑，交付前也能检查来源与覆盖范围。 |
-| **任务独立，复用有边界** | 新任务直接在 experiments 中实施；用户明确要求沉淀时才注册，已注册能力的 proof 与可运行状态分开管理。 |
-| **核心轻量，工具环境隔离** | Python 核心只用标准库；浏览器 Profile、Python 工具环境和 npm 依赖留在项目边界内，换电脑时重新生成本机配置。 |
-| **方便维护和协作** | 源码仓库保留有效回归测试；安装包精简开发文件。项目自带规则、分层验收、文件清单和 CI，方便交接给另一台电脑的 Agent，也方便审核后续修改。 |
+---
 
-## 安装：打开文件夹，发送提示词
+## 把方法、工具和结果放在同一个工作区
 
-将下载并解压后的项目文件夹作为 **coding Agent 的工作区**打开，然后发送：
+采集任务常常卡在反复搭环境、分析接口、验证数据和交接结果之间。Spider Workbench 将项目规则、13 个通用 Skills、浏览器工具链和统一运行入口组织在一起，让 Agent 有路径可循，让结果有依据可查。
+
+<table>
+<tr>
+<td width="50%" valign="top">
+<h3>01 · 用自然语言开始</h3>
+<p>打开项目、发送部署提示词。Agent 检查环境、安装隔离工具并接入 MCP，已经完成的部分继续复用。</p>
+</td>
+<td width="50%" valign="top">
+<h3>02 · 让采集与逆向衔接</h3>
+<p>按证据选择接口观察、JS 分析与 Python / Node 协议验证；必要时补充浏览器，已有可用协议不重复侦察。</p>
+</td>
+</tr>
+<tr>
+<td valign="top">
+<h3>03 · 检查结果，保留依据</h3>
+<p>任务声明字段、唯一键、数量和完成条件。运行后保留标准化数据、校验结果及覆盖说明，方便复查与交付。</p>
+</td>
+<td valign="top">
+<h3>04 · 任务独立，工具隔离</h3>
+<p>具体任务留在 experiments；共享核心只用 Python 标准库。依赖与浏览器 Profile 就近隔离，能力复用由你决定。</p>
+</td>
+</tr>
+</table>
+
+## 快速开始
+
+**1. 下载项目** → **2. 用 Coding Agent 打开文件夹** → **3. 复制下面的部署提示词**
+
+下载 [v0.1.10 安装包](https://github.com/hygge-pixel/spider-workbench/releases/download/v0.1.10/spider-workbench-0.1.10-install.zip) 并解压，将项目文件夹作为 Agent 的工作区打开。
+
+<details open>
+<summary><strong>复制给 Agent：部署并验收这个工作区</strong></summary>
 
 > 请阅读 README.md、AGENTS.md 和 docs/INSTALL_WITH_AGENT.md，按文档完成这个项目的部署；已经部署的部分先检查并复用。请自动检查并补齐环境和隔离工具依赖，从 Google 官方 Chrome for Testing 下载部署当天最新 Stable 浏览器，配置项目独立 Profile、Chrome/9222 和 js-reverse MCP。完成离线示例、浏览器连接、MCP 实际调用和完整交付检查，保留已有任务与配置，最后告诉我实际通过和待处理的项目。已授权部署所需的常规可逆安装、构建与本项目配置调整，请连续推进。
 
-Agent 会按[完整部署工单](docs/INSTALL_WITH_AGENT.md)执行后续步骤。统一部署入口先预检，再按阶段安装与验收；中断后复用已验证的依赖和浏览器，接着处理剩余步骤。需要宿主信任或重连时，Agent 会明确说明，重新打开后继续验收。实际状态和下一步统一写入 outputs/deployment_acceptance.md。需要能操作本机文件、终端并配置工具的 Agent；普通网页聊天窗口不会仅凭这段话自动部署电脑。完整浏览器流程推荐先在 Windows 上使用；其它系统的支持范围由 Agent 实际检查和报告。电脑上已有 Python/Node 版本不符时，Agent 会保留旧环境并选择或并行安装兼容版本；浏览器下载、连接和宿主加载分别验收，详见[版本与部署说明](docs/RUNTIME_COMPATIBILITY.md)。
+</details>
 
-## 框架怎样处理一次任务？
+Agent 按[现有部署工单](docs/INSTALL_WITH_AGENT.md)继续执行。已有环境、任务、配置和 Profile 保留；验收结果写入 `outputs/deployment_acceptance.md`。需要能访问本机文件、终端并配置工具的 Coding Agent，Agent 账户由你准备。
+
+已部署的项目可直接[开始任务](#开始你的第一个任务)；升级已有工作区请先读[迁移与升级说明](docs/MIGRATION.md)，不要直接覆盖任务和配置。
+
+## 从任务到交付
 
 ```mermaid
 flowchart LR
-    A[说明目标和数据范围] --> B[Agent 按规则与 Skills 选路]
-    B --> C[接口观察与本地请求验证]
-    C --> D[独立任务实现与小样本]
-    D --> E[统一执行与数据校验]
-    E --> F[交付文件与覆盖说明]
+    A[描述需求] --> B[分析接口与证据]
+    B --> C[实现独立任务]
+    C --> D[运行与校验]
+    D --> E[交付与覆盖说明]
 ```
 
-浏览器观察、JS 调试、纯算法复现和环境补齐都按当次证据使用。任务已有可用协议和样本时，可跳过重复分析。采集仍通过统一 runner 执行；遇到普通失败先保存进度，再评估已实现且同范围的候选。确认出现验证码时按项目规则保存进度并暂停。
+具体任务由 collector 实现，通过 `spider.py run` 统一执行；字段、唯一键、数量和完成条件由 runner 校验。方法和工具按当次证据选用，确认出现验证码时保存进度并暂停。注册能力是显式选择，不是采集后的默认步骤。
 
-## 部署后怎么用？
+### 开始你的第一个任务
 
-继续在同一项目里向 Agent 描述需求，例如：
+部署后，在同一工作区描述需求，例如：
 
 > 从我提供的网站采集最近 7 天的公开文章，字段包括标题、原文、发布时间、作者和来源链接。先给我 5 条样本，确认后采集指定范围，输出 Excel 和 JSON，说明遗漏和失败，并保留进度。没有对应能力就创建独立任务，不自动注册。
 
-说清入口、范围、时间、字段和输出形式，Agent 就能按项目流程推进。任务最终需要的 Excel、JSON 或其它报告，由具体任务实现并验证；框架保留数据与证据的位置，方便找到结果、排查问题和交接。
+想先了解结果如何被校验？让 Agent 运行随包的**离线三条记录示例**，无需网站账号：
 
-| 目录 | 你能在这里找到什么 |
-|---|---|
-| outputs/ | 本次任务的最终文件、报告与部署验收结果 |
-| runs/ | 原始数据、标准化记录、校验结果、检查点和脱敏运行证据 |
-| experiments/ | 独立任务实现及其非敏感配置 |
-| skills/ | Agent 使用的通用方法、脚本与参考资料 |
-| spider_core/ | 执行、路由、校验、浏览器资源和能力管理的共用核心 |
+```sh
+python spider.py run experiments/example_local/collector.py --task experiments/example_local/task.example.json
+```
 
-日常任务复用已验收环境，不反复安装或自动升级浏览器。网站需要登录时，在项目独立浏览器中完成；换电脑重新部署工具和本机配置，历史登录态不随源码迁移。更多使用与交付说明见[用户指南](docs/USER_GUIDE.md)。
+这条命令使用已配置的 Python 3.11，检查三条合成记录的字段、唯一键和数量。运行目录中的 `normalized.jsonl` 是数据，`validation.json` 是校验结果，`collector_result.json` 是采集器的结束与覆盖说明。
 
-## 随仓库提供的能力
+## 能力与工作区
 
-- **项目规则与多平台入口**：AGENTS.md、CLAUDE.md、GEMINI.md，以及本机 Skill 发现链接。
-- **采集与逆向方法**：13 个通用 Skills，涵盖 Web 采集、JS 逆向及相关分析流程。
-- **统一任务核心**：Python 标准库 runner、路由、字段和唯一键校验、运行比较、显式注册及证明状态管理。
-- **浏览器工具链**：随包 JSReverser MCP 源码、Playwright CDP 诊断及隔离工具安装；Agent 部署时从[官方渠道](https://googlechromelabs.github.io/chrome-for-testing/)获取 Chrome for Testing。
-- **维护与交付工具**：离线三条合成示例、完整交付检查、分发清单、公开发布检查和 GitHub Actions。
+| 组成 | 用途 |
+| --- | --- |
+| **13 个通用 Skills** | 采集选路、请求分析、JS 逆向、参数复现、AST、补环境与证据排查 |
+| **浏览器与 MCP** | JSReverser MCP 源码集成、Playwright CDP 诊断、独立浏览器配置 |
+| **统一任务核心** | 执行与超时、数据合同校验、运行比较、显式注册与 proof 管理 |
+| **维护与交付** | 离线示例、维护回归、CI、分发清单，以及分别构建的源码包和安装包 |
 
-## 一个无需网站账号的小例子
+`experiments/` 放独立任务，`runs/` 放运行数据与证据，`outputs/` 放最终交付；共享方法在 `skills/`，执行核心在 `spider_core/`。详细职责见[架构说明](docs/ARCHITECTURE.md)。
 
-让 Agent 运行随包的离线三条记录示例。它通过同一个 `spider.py run` 入口执行，实际检查三条合成记录的字段、唯一键和数量，并返回本次运行目录。
+## 兼容与验证
 
-| 输入与产物 | 作用 |
-|---|---|
-| experiments/example_local/task.example.json | 明确字段、唯一键和验收条件 |
-| normalized.jsonl | 三条标准化合成记录，保留在本次 runs 目录 |
-| validation.json | 记录实际数据校验结果 |
-| collector_result.json | 记录采集器结束状态与覆盖说明 |
+项目提供 **Codex、Claude Code、Gemini CLI、Cursor、GitHub Copilot、Windsurf、Cline、Roo Code、Kiro、OpenCode、TRAE** 的规则入口。核心约定统一在 `AGENTS.md`；DeepSeek Harness 有[单独适配说明](docs/DEEPSEEK_HARNESS.md)。入口存在不等于每个宿主均已实测，现场连接和权限仍须分别验收。
 
-这个例子说明框架如何执行和验收任务；浏览器连接、宿主工具调用和真实网站仍分别验收。
+- **运行基线**：Python 3.11.x、Node 24 LTS；完整浏览器流程以 Windows 为主要验收平台。
+- **已有检查**：Windows / Ubuntu 离线框架与打包 CI，以及 MCP 源码构建。查看 [Actions](https://github.com/hygge-pixel/spider-workbench/actions) 与[验证说明](docs/VERIFICATION.md)。
+- **验证边界**：离线通过不代表真实网站、每个 Agent 宿主或无编程环境新电脑已通过；完整新机验收仍待进行。详见[兼容矩阵](docs/AGENT_COMPATIBILITY.md)。
 
-## 适用范围
+框架初始不附带具体网站采集器。网站适配、分页、字段语义和全量覆盖按任务验证；Excel、JSON 等最终格式由具体任务实现。源码不携带历史客户数据、凭据、浏览器 Profile 或个人 Agent 设置，运行时与浏览器在目标机部署。
 
-适合使用 coding Agent 开展数据采集、接口分析和 Web / JavaScript 逆向的个人与团队，也适合作为新项目的起点。框架初始不附带具体网站采集器；网站适配、分页、字段语义与完整性需要逐任务验证。工具安装通过，也需要继续验证目标网站的真实业务结果。
+## 文档导航
 
-源码不携带历史客户数据、账号、Cookie、浏览器 Profile 或个人 Agent 设置。Python、Node、浏览器本体在目标机部署，Agent 账户由用户准备。可选外部应用按需要接入；通用框架不承诺任意网站都能直接采集，也不等同于已经打包好的客户桌面软件。
+| 开始与使用 | 实现与维护 |
+| --- | --- |
+| [用户指南](docs/USER_GUIDE.md) · [Agent 部署工单](docs/INSTALL_WITH_AGENT.md) | [开发采集器](docs/COLLECTOR_GUIDE.md) · [框架架构](docs/ARCHITECTURE.md) |
+| [浏览器与 MCP](docs/BROWSER_MCP.md) · [问题排查](docs/TROUBLESHOOTING.md) | [证据与数据](docs/EVIDENCE.md) · [测试与 CI](docs/VERIFICATION.md) |
+| [Skills 说明](docs/框架与Skills说明.md) · [运行时兼容](docs/RUNTIME_COMPATIBILITY.md) | [依赖状态](docs/DEPENDENCIES.md) · [贡献指南](CONTRIBUTING.md) |
 
-## Agent 兼容
+---
 
-项目已提供 Codex、Claude Code、Gemini CLI、Cursor、GitHub Copilot、Windsurf、Cline、Roo Code、Kiro、OpenCode、TRAE 的默认规则入口。核心规则统一在 AGENTS.md，Skill 索引可直接读取，部署时再建立本机发现链接；各宿主的 MCP 配置分别适配；DeepSeek Harness 另提供[专用适配与恢复说明](docs/DEEPSEEK_HARNESS.md)。用户仍只需打开工作区并发送上面的提示词。
+**下载说明**：[Release](https://github.com/hygge-pixel/spider-workbench/releases) 提供安装包、完整源码包和校验和。安装包排除开发测试，不含 Python、Node 或浏览器二进制；源码包保留维护回归。`main` 为开发分支，顶部下载固定到稳定版。
 
-入口按各产品官方机制配置并有本地合同检查。首次打开需满足宿主的工作区信任、规则开关和文件权限；实际读取/工具连接状态由目标 Agent 现场验收，见 [兼容矩阵](docs/AGENT_COMPATIBILITY.md)。
-
-DSH 0.2.1-rc.2 的一次 Windows 用户反馈中，完整权限模式下部署、宿主调用和业务流程通过，受限模式下项目目录写入未通过。具体兼容性见矩阵，不承诺所有宿主权限模式均已验证。普通排错由 Agent 在授权内继续处理，不要求用户反复运行专项权限测试。
-
-## 版本与验证范围
-
-默认下载链接固定到稳定版精简安装包；[源码仓库](https://github.com/hygge-pixel/spider-workbench)供开发贡献，main 为开发分支。[Release](https://github.com/hygge-pixel/spider-workbench/releases)同时提供完整源码包和安装包，二者各有独立文件清单与校验和。浏览器和运行时在目标电脑安装，安装包本身不含二进制环境。
-
-当前部署基线是 Python 3.11.x、Node 24 LTS，完整浏览器流程以 Windows 为主要验收平台。CI 覆盖 Windows/Ubuntu 的离线框架与打包检查；各 Agent 和操作系统的真实安装证据见[兼容矩阵](docs/AGENT_COMPATIBILITY.md)。**无编程环境新电脑的完整验收仍待进行**，不能用已有电脑上的成功代替。
-
-## 进一步了解
-
-[用户指南](docs/USER_GUIDE.md) · [Agent 部署工单](docs/INSTALL_WITH_AGENT.md) · [浏览器与 MCP](docs/BROWSER_MCP.md) · [开发采集器](docs/COLLECTOR_GUIDE.md) · [架构](docs/ARCHITECTURE.md) · [证据与数据](docs/EVIDENCE.md) · [测试与 CI](docs/VERIFICATION.md) · [排错](docs/TROUBLESHOOTING.md) · [依赖状态](docs/DEPENDENCIES.md)
-
-原创部分使用 [Apache-2.0](LICENSE)；第三方保留原许可证，见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。[贡献指南](CONTRIBUTING.md) · [安全报告](SECURITY.md) · [版本记录](CHANGELOG.md)
+原创部分使用 [Apache-2.0](LICENSE)，第三方材料保留原许可证，见 [Third-party notices](THIRD_PARTY_NOTICES.md)。[安全报告](SECURITY.md) · [版本记录](CHANGELOG.md)
